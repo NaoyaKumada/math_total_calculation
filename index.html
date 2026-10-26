@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 & 弱点分析アプリ ver44 (7大学習支援機能統合版)</title>
+  <title>数学総合演習 & 弱点分析アプリ ver44 (端末間データ共有統合版)</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -41,7 +41,7 @@
           </div>
           <div>
             <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver44</span></h1>
-            <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断搭載</p>
+            <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・クラウド同期搭載</p>
           </div>
         </div>
 
@@ -110,7 +110,7 @@
             </select>
           </div>
 
-          <!-- 授業・プリント連動タグ (要素7) -->
+          <!-- 授業・プリント連動タグ -->
           <div>
             <label class="block text-xs font-semibold text-cyan-300 mb-1.5">
               <i class="fa-solid fa-book-bookmark mr-1"></i>授業・教科書連動タグ
@@ -120,7 +120,7 @@
             </select>
           </div>
 
-          <!-- 実施モード (要素4) -->
+          <!-- 実施モード -->
           <div>
             <label class="block text-xs font-semibold text-amber-300 mb-1.5">
               <i class="fa-solid fa-brain mr-1"></i>演習モード
@@ -183,7 +183,7 @@
           </div>
 
           <div class="flex items-center space-x-3">
-            <!-- UI/UX: 手書き計算メモキャンバスのトグルボタン (要素2) -->
+            <!-- 手書き計算メモキャンバスのトグルボタン -->
             <button onclick="toggleScratchpad()" class="px-3 py-1.5 bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-600/50 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5">
               <i class="fa-solid fa-pen-ruler"></i>
               <span>計算メモ</span>
@@ -194,7 +194,7 @@
           </div>
         </div>
 
-        <!-- 手書き計算メモエリア (UI/UX工夫 - 要素2) -->
+        <!-- 手書き計算メモエリア -->
         <div id="scratchpad-wrapper" class="hidden bg-slate-950 border border-indigo-500/40 rounded-xl p-3 space-y-2">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
             <span class="text-indigo-300 font-semibold flex items-center space-x-1">
@@ -228,7 +228,7 @@
           </div>
         </div>
 
-        <!-- 思考プロセス入力ステップ (丸写し防止 - 要素4) -->
+        <!-- 思考プロセス入力ステップ -->
         <div id="thinking-process-box" class="hidden bg-amber-950/40 border border-amber-500/40 rounded-xl p-4 space-y-3">
           <div class="text-xs font-bold text-amber-300 flex items-center space-x-2">
             <i class="fa-solid fa-lightbulb"></i>
@@ -248,7 +248,7 @@
         <div id="explanation-box" class="hidden bg-slate-900/90 border border-indigo-500/30 rounded-xl p-5 space-y-4">
           <div id="answer-result-banner" class="font-bold text-base flex items-center space-x-2"></div>
 
-          <!-- つ diagnosis section for wrong answers (つまずき診断 - 要素5) -->
+          <!-- つまずき診断セクション -->
           <div id="misconception-diagnosis-box" class="hidden bg-rose-950/30 border border-rose-500/40 rounded-xl p-3.5 space-y-2">
             <div class="text-xs font-bold text-rose-300 flex items-center space-x-1.5">
               <i class="fa-solid fa-stethoscope"></i>
@@ -279,7 +279,7 @@
           </div>
           <div id="explanation-text" class="text-sm text-slate-200 leading-relaxed"></div>
 
-          <!-- 動的類題生成アクション (要素6) -->
+          <!-- 動的類題生成アクション -->
           <div class="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
             <button onclick="generateSimilarQuestionAI()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-xl shadow transition-all flex items-center space-x-2">
               <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
@@ -359,7 +359,7 @@
           </div>
         </div>
 
-        <!-- つまずき原因別トップ分析 (要素5) -->
+        <!-- つまずき原因別トップ分析 -->
         <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex items-center space-x-4">
           <div class="p-3.5 bg-amber-500/20 text-amber-400 rounded-xl">
             <i class="fa-solid fa-stethoscope text-2xl"></i>
@@ -386,7 +386,7 @@
         <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
           <h3 class="text-base font-bold text-white flex items-center space-x-2">
             <i class="fa-solid fa-stethoscope text-amber-400"></i>
-            <span>つmostつまずき要因（誤答理由）内訳分析</span>
+            <span>つまずき要因（誤答理由）内訳分析</span>
           </h3>
           <div id="misconception-stats-container" class="space-y-3">
             <!-- Dynamically populated -->
@@ -443,7 +443,7 @@
             </div>
             <div>
               <h3 class="text-base font-bold text-white">スプレッドシート連携 GAS Web App URL 設定</h3>
-              <p class="text-xs text-slate-400">小テストの成績データを自動記録するGoogle Apps ScriptのウェブアプリURL</p>
+              <p class="text-xs text-slate-400">小テストの成績記録および問題マスターのクラウド同期に使用するGoogle Apps ScriptのウェブアプリURL</p>
             </div>
           </div>
         </div>
@@ -455,7 +455,45 @@
         </div>
       </div>
 
-      <!-- PDF / Image AI Importer with Class Tagging (要素7) -->
+      <!-- 【新規追加】問題データの全端末共有・入出力パネル -->
+      <div class="bg-slate-800 border border-indigo-500/40 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+        <div class="flex items-center space-x-2 border-b border-slate-700 pb-3">
+          <div class="p-2 bg-indigo-500/20 text-indigo-300 rounded-lg">
+            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">問題データの全端末共有・入出力</h3>
+            <p class="text-xs text-slate-400">クラウド(GAS)との同期、またはJSONファイルによるエクスポート/インポート</p>
+          </div>
+        </div>
+        
+        <div class="flex flex-wrap gap-3">
+          <!-- GASクラウド同期 -->
+          <button onclick="uploadQuestionsToCloud()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow flex items-center space-x-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>現在の問題をクラウド(GAS)へ一括保存</span>
+          </button>
+          
+          <button onclick="syncQuestionsFromCloud()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+            <span>クラウドから再読み込み</span>
+          </button>
+
+          <!-- JSONファイル共有 -->
+          <button onclick="exportQuestionsJSON()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-file-export"></i>
+            <span>JSONファイル出力(バックアップ)</span>
+          </button>
+          
+          <label class="px-4 py-2.5 bg-amber-700 hover:bg-amber-600 text-white text-xs sm:text-sm font-semibold rounded-xl cursor-pointer transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-file-import"></i>
+            <span>JSONファイル取り込み</span>
+            <input type="file" accept=".json" onchange="importQuestionsJSON(event)" class="hidden">
+          </label>
+        </div>
+      </div>
+
+      <!-- PDF / Image AI Importer with Class Tagging -->
       <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-5">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <div class="flex items-center space-x-2">
@@ -589,7 +627,7 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbzvylciGE1Kkchb9_Nju4brkPhPBDQLcOgUJVR9pYXaBo5DTpaPXtgufD7Xqv_PqJnW/exec";
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxK5seFpBk-sfmy7fHG4HhnwE1DKjjQVXaI3snCSm7_UprD3z31ZzeryVz7dhQcj2bWlA/exec";
 
     const SUBJECT_UNIT_MAP = {
       "数学Ⅰ": ["数と式", "2次関数", "図形と計量", "データの分析"],
@@ -767,7 +805,7 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       loadStoredData();
       updateUnitSelectOptions();
       updateTagSelectOptions();
@@ -775,6 +813,9 @@
       renderAdminQuestionList();
       updateAnalyticsUI();
       toggleStudentInfoVisibility();
+
+      // 【新規】起動時にGASから問題データを自動取得
+      await syncQuestionsFromCloud();
 
       const dropZone = document.getElementById('pdf-drop-zone');
       if (dropZone) {
@@ -789,6 +830,92 @@
         });
       }
     });
+
+    /* =========================================================
+       クラウド(GAS) / JSON データ共有関連処理 (新規追加・拡張)
+       ========================================================= */
+
+    // クラウドから問題一覧を取得・更新
+    async function syncQuestionsFromCloud() {
+      const gasUrl = document.getElementById('gas-url-input').value.trim();
+      if (!gasUrl) return;
+
+      try {
+        showToast("クラウドから最新問題を同期中...");
+        const res = await fetch(gasUrl);
+        if (res.ok) {
+          const cloudQuestions = await res.json();
+          if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
+            questions = cloudQuestions;
+            saveQuestions(); // localStorageも同期して画面表示更新
+            showToast(`クラウドから ${questions.length} 問の同期が完了しました`);
+          }
+        }
+      } catch (e) {
+        console.warn("クラウド同期エラー（オフライン保存データを使用します）:", e);
+      }
+    }
+
+    // クラウド(GAS)へ現在の問題データを一括送信・保存
+    async function uploadQuestionsToCloud() {
+      const gasUrl = document.getElementById('gas-url-input').value.trim();
+      if (!gasUrl) {
+        showToast("GAS Web App URLを設定してください", true);
+        return;
+      }
+
+      try {
+        showToast("クラウドへ問題を送信中...");
+        await fetch(gasUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: "save_questions",
+            questions: questions
+          })
+        });
+        showToast("クラウドへの問題保存リクエストを送信しました！");
+      } catch (e) {
+        showToast("クラウド保存に失敗しました", true);
+      }
+    }
+
+    // JSONファイル出力
+    function exportQuestionsJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `math_questions_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    // JSONファイル読み込み
+    function importQuestionsJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            questions = imported;
+            saveQuestions();
+            showToast(`${questions.length} 問の問題を取り込みました！`);
+          } else {
+            showToast("無効なJSONフォーマットです", true);
+          }
+        } catch (err) {
+          showToast("ファイル解析エラーが発生しました", true);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ========================================================= */
 
     function handleFileSelect(event) {
       if (event.target.files && event.target.files[0]) {
@@ -1015,7 +1142,7 @@
       }
     }
 
-    // 動的類題生成機能 (要素6)
+    // 動的類題生成機能
     async function generateSimilarQuestionAI() {
       const apiKey = cleanApiKeyString(document.getElementById('gemini-api-key-input').value);
       if (!apiKey) {
@@ -1261,7 +1388,7 @@
         figBox.classList.add('hidden');
       }
 
-      // 思考プロセス選択の制御 (要素4)
+      // 思考プロセス選択の制御
       const thinkingBox = document.getElementById('thinking-process-box');
       const thinkingContainer = document.getElementById('thinking-options-container');
       if (currentMode === 'THINKING_CHECK' && q.thinkingOptions) {
@@ -1368,7 +1495,7 @@
       } else {
         resBanner.className = "font-bold text-base flex items-center space-x-2 text-rose-400";
         resBanner.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解です (正解: ${q.answer + 1})</span>`;
-        // 不正解時のつまずき診断を表示 (要素5)
+        // 不正解時のつまずき診断を表示
         document.getElementById('misconception-diagnosis-box').classList.remove('hidden');
       }
 
@@ -1377,7 +1504,7 @@
       expBox.classList.remove('hidden');
     }
 
-    // つまずき原因記録 (要素5)
+    // つまずき原因記録
     function recordMisconception(type) {
       misconceptionStats[type] = (misconceptionStats[type] || 0) + 1;
       localStorage.setItem('math_app_misconceptions', JSON.stringify(misconceptionStats));
@@ -1510,7 +1637,7 @@
 
       document.getElementById('weakest-unit-name').textContent = weakestUnit;
 
-      // つまずき原因別集計表示 (要素5)
+      // つまずき原因別集計表示
       const misconceptionMap = {
         CALC: "🧮 計算ミス",
         FORMULA: "📖 公式の誤用・失念",
