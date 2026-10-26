@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 & 弱点分析アプリ ver45 (端末間データ共有統合版)</title>
+  <title>数学総合演習 & 弱点分析アプリ ver49 (小問自動分割対応版)</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +40,7 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver45</span></h1>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver49</span></h1>
             <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・クラウド同期搭載</p>
           </div>
         </div>
@@ -183,7 +183,6 @@
           </div>
 
           <div class="flex items-center space-x-3">
-            <!-- 手書き計算メモキャンバスのトグルボタン -->
             <button onclick="toggleScratchpad()" class="px-3 py-1.5 bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-600/50 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5">
               <i class="fa-solid fa-pen-ruler"></i>
               <span>計算メモ</span>
@@ -234,15 +233,11 @@
             <i class="fa-solid fa-lightbulb"></i>
             <span>【思考ステップ】回答する前に、解法のアプローチ（方針）を選択してください</span>
           </div>
-          <div id="thinking-options-container" class="grid grid-cols-1 gap-2">
-            <!-- Dynamically populated -->
-          </div>
+          <div id="thinking-options-container" class="grid grid-cols-1 gap-2"></div>
         </div>
 
         <!-- Options Container -->
-        <div id="options-container" class="grid grid-cols-1 gap-3">
-          <!-- Dynamically populated -->
-        </div>
+        <div id="options-container" class="grid grid-cols-1 gap-3"></div>
 
         <!-- Explanation & Diagnostics Box -->
         <div id="explanation-box" class="hidden bg-slate-900/90 border border-indigo-500/30 rounded-xl p-5 space-y-4">
@@ -359,7 +354,6 @@
           </div>
         </div>
 
-        <!-- つまずき原因別トップ分析 -->
         <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex items-center space-x-4">
           <div class="p-3.5 bg-amber-500/20 text-amber-400 rounded-xl">
             <i class="fa-solid fa-stethoscope text-2xl"></i>
@@ -378,9 +372,7 @@
             <i class="fa-solid fa-chart-radar text-indigo-400"></i>
             <span>科目・単元別 理解度分析</span>
           </h3>
-          <div id="unit-performance-list" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
-            <!-- Dynamically populated -->
-          </div>
+          <div id="unit-performance-list" class="space-y-3 max-h-[380px] overflow-y-auto pr-1"></div>
         </div>
 
         <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
@@ -388,9 +380,7 @@
             <i class="fa-solid fa-stethoscope text-amber-400"></i>
             <span>つまずき要因（誤答理由）内訳分析</span>
           </h3>
-          <div id="misconception-stats-container" class="space-y-3">
-            <!-- Dynamically populated -->
-          </div>
+          <div id="misconception-stats-container" class="space-y-3"></div>
         </div>
       </div>
     </section>
@@ -420,9 +410,10 @@
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">使用AIモデル (Model ID)</label>
             <select id="gemini-model-select" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-              <option value="gemini-3.8-flash">gemini-3.8-flash (推奨・最新標準)</option>
-              <option value="gemini-3.8-flash-lite">gemini-3.8-flash-lite (軽量・超高速)</option>
-              <option value="gemini-3.0-flash">gemini-3.0-flash (安定版)</option>
+              <option value="gemini-3.8-flash">gemini-3.8-flash (推奨・最新)</option>
+              <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (軽量・高速版)</option>
+              <option value="gemini-2.5-flash">gemini-2.5-flash (標準版)</option>
+              <option value="gemini-2.0-flash">gemini-2.0-flash (安定版)</option>
             </select>
           </div>
         </div>
@@ -455,7 +446,7 @@
         </div>
       </div>
 
-      <!-- 【新規追加】問題データの全端末共有・入出力パネル -->
+      <!-- 問題データの全端末共有・入出力パネル -->
       <div class="bg-slate-800 border border-indigo-500/40 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
         <div class="flex items-center space-x-2 border-b border-slate-700 pb-3">
           <div class="p-2 bg-indigo-500/20 text-indigo-300 rounded-lg">
@@ -468,7 +459,6 @@
         </div>
         
         <div class="flex flex-wrap gap-3">
-          <!-- GASクラウド同期 -->
           <button onclick="uploadQuestionsToCloud()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow flex items-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <span>現在の問題をクラウド(GAS)へ一括保存</span>
@@ -479,7 +469,6 @@
             <span>クラウドから再読み込み</span>
           </button>
 
-          <!-- JSONファイル共有 -->
           <button onclick="exportQuestionsJSON()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
             <i class="fa-solid fa-file-export"></i>
             <span>JSONファイル出力(バックアップ)</span>
@@ -585,9 +574,7 @@
           </div>
         </div>
 
-        <div id="admin-question-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-          <!-- Dynamically populated -->
-        </div>
+        <div id="admin-question-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
       </div>
     </section>
 
@@ -611,6 +598,103 @@
       <div class="flex items-center justify-end space-x-3 pt-2">
         <button onclick="closeErrorModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
           閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Question Modal -->
+  <div id="edit-question-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-indigo-500/60 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 text-slate-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+          <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
+          <span>問題タグ・内容の編集</span>
+        </h3>
+        <button onclick="closeEditQuestionModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="edit-q-id">
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">科目（大区分）</label>
+          <select id="edit-q-subject" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <option value="数学Ⅰ">数学Ⅰ</option>
+            <option value="数学Ⅱ">数学Ⅱ</option>
+            <option value="数学Ⅲ">数学Ⅲ</option>
+            <option value="数学A">数学A</option>
+            <option value="数学B">数学B</option>
+            <option value="数学C">数学C</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">詳細単元</label>
+          <input type="text" id="edit-q-unit" placeholder="例: 2次関数" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">授業・プリント連動タグ</label>
+          <input type="text" id="edit-q-tag" placeholder="例: 教科書 P.45" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">難易度</label>
+          <select id="edit-q-diff" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <option value="1">★1 初級</option>
+            <option value="2">★2 中級</option>
+            <option value="3">★3 上級</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="text-xs space-y-1">
+        <label class="block text-slate-300 font-semibold">問題文</label>
+        <textarea id="edit-q-text" rows="3" class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-xs"></textarea>
+      </div>
+
+      <!-- 選択肢 4つ -->
+      <div class="space-y-2 text-xs">
+        <label class="block text-slate-300 font-semibold">回答選択肢 (4つ) と 正解のラジオボタン選択</label>
+        <div class="grid grid-cols-1 gap-2">
+          <div class="flex items-center space-x-2">
+            <input type="radio" name="edit-q-answer" value="0" id="edit-ans-0" class="accent-indigo-500">
+            <span class="text-slate-400 w-6 font-bold">1.</span>
+            <input type="text" id="edit-q-opt-0" class="flex-1 bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-1.5 focus:outline-none">
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="radio" name="edit-q-answer" value="1" id="edit-ans-1" class="accent-indigo-500">
+            <span class="text-slate-400 w-6 font-bold">2.</span>
+            <input type="text" id="edit-q-opt-1" class="flex-1 bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-1.5 focus:outline-none">
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="radio" name="edit-q-answer" value="2" id="edit-ans-2" class="accent-indigo-500">
+            <span class="text-slate-400 w-6 font-bold">3.</span>
+            <input type="text" id="edit-q-opt-2" class="flex-1 bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-1.5 focus:outline-none">
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="radio" name="edit-q-answer" value="3" id="edit-ans-3" class="accent-indigo-500">
+            <span class="text-slate-400 w-6 font-bold">4.</span>
+            <input type="text" id="edit-q-opt-3" class="flex-1 bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-1.5 focus:outline-none">
+          </div>
+        </div>
+      </div>
+
+      <div class="text-xs space-y-1">
+        <label class="block text-slate-300 font-semibold">詳細解説</label>
+        <textarea id="edit-q-explanation" rows="3" class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-xs"></textarea>
+      </div>
+
+      <div class="flex items-center justify-end space-x-3 pt-2 border-t border-slate-800">
+        <button onclick="closeEditQuestionModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
+          キャンセル
+        </button>
+        <button onclick="saveEditedQuestion()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow">
+          保存する
         </button>
       </div>
     </div>
@@ -814,7 +898,6 @@
       updateAnalyticsUI();
       toggleStudentInfoVisibility();
 
-      // クラウドから問題データを自動取得
       await syncQuestionsFromCloud();
 
       const dropZone = document.getElementById('pdf-drop-zone');
@@ -831,11 +914,6 @@
       }
     });
 
-    /* =========================================================
-       クラウド(GAS) / JSON データ共有関連処理
-       ========================================================= */
-
-    // クラウドから問題一覧を取得・更新
     async function syncQuestionsFromCloud() {
       const gasUrl = document.getElementById('gas-url-input').value.trim();
       if (!gasUrl) return;
@@ -847,16 +925,15 @@
           const cloudQuestions = await res.json();
           if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
             questions = cloudQuestions;
-            saveQuestions(); // localStorageも同期して画面表示更新
+            saveQuestions();
             showToast(`クラウドから ${questions.length} 問の同期が完了しました`);
           }
         }
       } catch (e) {
-        console.warn("クラウド同期エラー（オフライン保存データを使用します）:", e);
+        console.warn("クラウド同期エラー:", e);
       }
     }
 
-    // クラウド(GAS)へ現在の問題データを一括送信・保存
     async function uploadQuestionsToCloud() {
       const gasUrl = document.getElementById('gas-url-input').value.trim();
       if (!gasUrl) {
@@ -881,7 +958,6 @@
       }
     }
 
-    // JSONファイル出力
     function exportQuestionsJSON() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions, null, 2));
       const downloadAnchor = document.createElement('a');
@@ -892,7 +968,6 @@
       downloadAnchor.remove();
     }
 
-    // JSONファイル読み込み
     function importQuestionsJSON(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -914,8 +989,6 @@
       };
       reader.readAsText(file);
     }
-
-    /* ========================================================= */
 
     function handleFileSelect(event) {
       if (event.target.files && event.target.files[0]) {
@@ -1004,10 +1077,76 @@
 
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+    /**
+     * 【完全に修復されたJSONサニタイズ処理】
+     * JSON文字列リテラルの内部を走査し、不正なバックスラッシュ（LaTeXコマンドや数式括弧）を2重化する
+     */
     function sanitizeJsonString(str) {
-      return str.replace(/\\(?:[^"\\\/bfnrtu]|u(?![0-9a-fA-F]{4}))/g, (match) => {
-        return '\\' + match;
-      });
+      if (!str) return "[]";
+
+      let cleaned = str.trim();
+
+      // 1. ```json ... ``` マークダウンブロックを除去
+      cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+
+      let result = '';
+      let inString = false;
+      let isEscaped = false;
+
+      // 文字列を1文字ずつスキャンしてJSON規格違反の制御文字・単一エスケープを補正
+      for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+
+        if (!inString) {
+          if (char === '"') {
+            inString = true;
+          }
+          result += char;
+        } else {
+          if (isEscaped) {
+            // 有効なJSONエスケープ文字の検証
+            const remaining = cleaned.slice(i);
+            let isLatexCommand = false;
+
+            // \times, \tan, \text, \right, \begin, \frac 等の誤認防止判定
+            if (char === 't' && /^(imes|an|ext|heta|riangle|op|ransform)/.test(remaining)) isLatexCommand = true;
+            if (char === 'r' && /^(ight|ho)/.test(remaining)) isLatexCommand = true;
+            if (char === 'b' && /^(egin|ar)/.test(remaining)) isLatexCommand = true;
+            if (char === 'f' && /^(rac|orall)/.test(remaining)) isLatexCommand = true;
+
+            // 正規のエスケープ文字（" \ / b f n r t u）以外のLaTeXコマンドや記号（( [ ] )等）を検知
+            if (isLatexCommand || !'\"\\/bfnrtu'.includes(char)) {
+              // 前の単一バックスラッシュをエスケープ化 '\\'
+              result = result.slice(0, -1) + '\\\\' + char;
+            } else {
+              result += char;
+            }
+            isEscaped = false;
+          } else {
+            if (char === '\\') {
+              isEscaped = true;
+              result += char;
+            } else if (char === '"') {
+              inString = false;
+              result += char;
+            } else if (char === '\n') {
+              result += '\\n';
+            } else if (char === '\r') {
+              result += '\\r';
+            } else if (char === '\t') {
+              result += '\\t';
+            } else {
+              result += char;
+            }
+          }
+        }
+      }
+
+      if (isEscaped) {
+        result += '\\';
+      }
+
+      return result;
     }
 
     async function fetchGeminiWithRetry(model, apiKey, contents, maxRetries = 2) {
@@ -1032,7 +1171,7 @@
         lastErrText = await res.text();
         if (res.status !== 503 && res.status !== 429) break;
       }
-      throw { status: 503, text: lastErrText, model: model };
+      throw new Error(`[API Error] Model: ${model}\n${lastErrText}`);
     }
 
     async function generateQuestionsWithAI() {
@@ -1060,16 +1199,19 @@
         const promptText = `
 あなたは高校数学の教師です。提供された画像から数学の問題を抽出し、以下のJSONフォーマットの純粋なJSON配列を出力してください。
 
-【重要：思考プロセス（丸写し防止）と二重エスケープ規則】
-- 各問題に「解法のアプローチ（方針）」を問う選択肢 (thinkingOptions: 4つ) とその正解インデックス (thinkingAnswer: 0〜3) を必ず含めてください。
-- LaTeX数式（\\( x^2 \\) や \\[ \\int \\]）のバックスラッシュは必ず2重エスケープ（\\\\( や \\\\{）にしてください。
+【最重要：小問の個別分離ルール】
+- 1つの大問の中に (1), (2), (3) や ①, ② などのように小問が分かれている場合は、必ず【(1)で1問】、【(2)で1問】のように小問ごとに独立した問題オブジェクトとして分割して出力してください。
+- 小問ごとに分割する際は、大問の共通前提・設定文（例：「2次関数 y = x^2 - 4x + k...」や「△ABCにおいて...」）を各小問の問題文の冒頭に必ず含め、1問単体で完結して解けるように文章を構成してください。
+
+【重要：LaTeX表記とJSONエスケープ】
+- 数式（\\( x^2 \\) や \\[ \\int \\] や \\frac{a}{b} や \\times）を含める場合、JSONの文字列として正しくパースできるように、すべてのバックスラッシュは必ず2重バックスラッシュ（例: \\\\( や \\\\frac や \\\\sqrt や \\\\times）で記述してください。
 
 [
   {
     "subject": "数学Ⅰ",
     "unit": "2次関数",
     "difficulty": 1,
-    "question": "問題文...",
+    "question": "【前提条件＋(1)の問題文】...",
     "thinkingOptions": ["方針1", "方針2", "方針3", "方針4"],
     "thinkingAnswer": 0,
     "options": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"],
@@ -1082,7 +1224,7 @@
 
         const contents = [{ parts: [{ text: promptText }, ...imageParts] }];
         let selectedModel = document.getElementById('gemini-model-select').value || "gemini-3.8-flash";
-        const modelCandidates = [selectedModel, "gemini-3.8-flash-lite", "gemini-3.0-flash"].filter((v, i, a) => a.indexOf(v) === i);
+        const modelCandidates = [selectedModel, "gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"].filter((v, i, a) => a.indexOf(v) === i);
 
         let response = null;
         for (const model of modelCandidates) {
@@ -1090,20 +1232,28 @@
             response = await fetchGeminiWithRetry(model, apiKey, contents, 1);
             if (response && response.ok) break;
           } catch (err) {
-            console.warn(`Model error:`, err);
+            console.warn(`Model ${model} error:`, err);
           }
         }
 
-        if (!response || !response.ok) throw new Error("API呼び出しエラーが発生しました");
+        if (!response || !response.ok) {
+          throw new Error(`Gemini API 呼び出しに失敗しました (ステータス: ${response ? response.status : '不明'})`);
+        }
 
         const data = await response.json();
         const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        let jsonStr = responseText;
-        const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-        if (codeBlockMatch) jsonStr = codeBlockMatch[1];
+        
+        const sanitizedJsonStr = sanitizeJsonString(responseText);
+        
+        let generatedList;
+        try {
+          generatedList = JSON.parse(sanitizedJsonStr);
+        } catch (jsonErr) {
+          console.error("Raw response:", responseText);
+          console.error("Sanitized string:", sanitizedJsonStr);
+          throw new Error(`JSON解析エラー: ${jsonErr.message}\n\n【AIレスポンス文】\n${responseText.slice(0, 300)}...`);
+        }
 
-        const sanitizedJsonStr = sanitizeJsonString(jsonStr.trim());
-        let generatedList = JSON.parse(sanitizedJsonStr);
         if (!Array.isArray(generatedList)) generatedList = [generatedList];
 
         let addedCount = 0;
@@ -1142,7 +1292,6 @@
       }
     }
 
-    // 動的類題生成機能
     async function generateSimilarQuestionAI() {
       const apiKey = cleanApiKeyString(document.getElementById('gemini-api-key-input').value);
       if (!apiKey) {
@@ -1155,7 +1304,7 @@
 
       try {
         const promptText = `
-以下の数学問題の【数値や設定を変更した類似問題（同単元・同難易度）】を1問だけ作成し、JSON形式で返してください。
+以下の数学問題の【数値や設定を変更した類似問題（同単元・同難易度）】を1問だけ作成し、JSON形式で返してください。数式バックスラッシュは\\\\のように2重化してください。
 
 【元問題】
 科目: ${q.subject}
@@ -1181,10 +1330,8 @@
         const data = await response.json();
         const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-        let jsonStr = responseText;
-        const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-        if (codeBlockMatch) jsonStr = codeBlockMatch[1];
-        const newQItem = JSON.parse(sanitizeJsonString(jsonStr.trim()));
+        const sanitized = sanitizeJsonString(responseText);
+        const newQItem = JSON.parse(sanitized);
 
         const generatedQ = {
           id: 'q_similar_' + Date.now(),
@@ -1201,7 +1348,6 @@
           figureImage: null
         };
 
-        // 現在のクイズキューの直後に差し込み
         currentQuizQuestions.splice(currentQuestionIdx + 1, 0, generatedQ);
         showToast("類題を作成しました！「次の問題へ」で挑戦できます");
       } catch (err) {
@@ -1388,7 +1534,6 @@
         figBox.classList.add('hidden');
       }
 
-      // 思考プロセス選択の制御
       const thinkingBox = document.getElementById('thinking-process-box');
       const thinkingContainer = document.getElementById('thinking-options-container');
       if (currentMode === 'THINKING_CHECK' && q.thinkingOptions) {
@@ -1495,7 +1640,6 @@
       } else {
         resBanner.className = "font-bold text-base flex items-center space-x-2 text-rose-400";
         resBanner.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解です (正解: ${q.answer + 1})</span>`;
-        // 不正解時のつまずき診断を表示
         document.getElementById('misconception-diagnosis-box').classList.remove('hidden');
       }
 
@@ -1504,7 +1648,6 @@
       expBox.classList.remove('hidden');
     }
 
-    // つまずき原因記録
     function recordMisconception(type) {
       misconceptionStats[type] = (misconceptionStats[type] || 0) + 1;
       localStorage.setItem('math_app_misconceptions', JSON.stringify(misconceptionStats));
@@ -1599,7 +1742,6 @@
       const accPct = Math.round((correctCnt / totalAnswers) * 100);
       document.getElementById('overall-accuracy-pct').innerHTML = `${accPct} <span class="text-xs font-normal text-slate-400">%</span>`;
 
-      // 単元別集計
       const unitMap = {};
       historyData.forEach(h => {
         if (!unitMap[h.unit]) unitMap[h.unit] = { total: 0, correct: 0 };
@@ -1637,7 +1779,6 @@
 
       document.getElementById('weakest-unit-name').textContent = weakestUnit;
 
-      // つまずき原因別集計表示
       const misconceptionMap = {
         CALC: "🧮 計算ミス",
         FORMULA: "📖 公式の誤用・失念",
@@ -1708,15 +1849,91 @@
               ${q.tag ? `<span class="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded">${q.tag}</span>` : ''}
               <span class="text-amber-400 font-bold">★${q.difficulty}</span>
             </div>
-            <button onclick="deleteQuestion('${q.id}')" class="text-rose-400 hover:text-rose-300">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+            <div class="flex items-center space-x-3">
+              <button onclick="openEditQuestionModal('${q.id}')" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center space-x-1">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>編集</span>
+              </button>
+              <button onclick="deleteQuestion('${q.id}')" class="text-rose-400 hover:text-rose-300">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
           </div>
           <div class="text-slate-200 font-medium line-clamp-2">${q.question}</div>
         `;
         listEl.appendChild(div);
         renderMathInContainer(div);
       });
+    }
+
+    let currentEditingQuestionId = null;
+
+    function openEditQuestionModal(qId) {
+      const q = questions.find(item => item.id === qId);
+      if (!q) return;
+
+      currentEditingQuestionId = qId;
+      document.getElementById('edit-q-id').value = q.id;
+      document.getElementById('edit-q-subject').value = q.subject || "数学Ⅰ";
+      document.getElementById('edit-q-unit').value = q.unit || "";
+      document.getElementById('edit-q-tag').value = q.tag || "";
+      document.getElementById('edit-q-diff').value = q.difficulty || 1;
+      document.getElementById('edit-q-text').value = q.question || "";
+      document.getElementById('edit-q-explanation').value = q.explanation || "";
+
+      const options = q.options || ["", "", "", ""];
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`edit-q-opt-${i}`).value = options[i] || "";
+      }
+
+      const ansIdx = typeof q.answer === 'number' ? q.answer : 0;
+      const radio = document.getElementById(`edit-ans-${ansIdx}`);
+      if (radio) radio.checked = true;
+
+      document.getElementById('edit-question-modal').classList.remove('hidden');
+    }
+
+    function closeEditQuestionModal() {
+      document.getElementById('edit-question-modal').classList.add('hidden');
+      currentEditingQuestionId = null;
+    }
+
+    function saveEditedQuestion() {
+      if (!currentEditingQuestionId) return;
+
+      const qIndex = questions.findIndex(item => item.id === currentEditingQuestionId);
+      if (qIndex === -1) return;
+
+      const subject = document.getElementById('edit-q-subject').value;
+      const unit = document.getElementById('edit-q-unit').value.trim() || "全般";
+      const tag = document.getElementById('edit-q-tag').value.trim();
+      const difficulty = parseInt(document.getElementById('edit-q-diff').value) || 1;
+      const questionText = document.getElementById('edit-q-text').value;
+      const explanationText = document.getElementById('edit-q-explanation').value;
+
+      const opts = [];
+      for (let i = 0; i < 4; i++) {
+        opts.push(document.getElementById(`edit-q-opt-${i}`).value);
+      }
+
+      const checkedRadio = document.querySelector('input[name="edit-q-answer"]:checked');
+      const answerIdx = checkedRadio ? parseInt(checkedRadio.value) : 0;
+
+      questions[qIndex] = {
+        ...questions[qIndex],
+        subject: subject,
+        unit: unit,
+        tag: tag,
+        difficulty: difficulty,
+        question: questionText,
+        options: opts,
+        answer: answerIdx,
+        explanation: explanationText
+      };
+
+      saveQuestions();
+      closeEditQuestionModal();
+      showToast("問題タグおよび内容の変更を保存しました！");
     }
 
     function onAdminFilterSubjectChange() {
@@ -1806,7 +2023,25 @@
     function showErrorModal(err) {
       const modal = document.getElementById('error-modal');
       const content = document.getElementById('modal-error-content');
-      content.textContent = typeof err === 'object' ? JSON.stringify(err, null, 2) : String(err);
+      
+      let errorMsg = "";
+      if (err instanceof Error) {
+        errorMsg = err.stack || err.message;
+      } else if (typeof err === 'object' && err !== null) {
+        const keys = Object.getOwnPropertyNames(err);
+        if (keys.length > 0) {
+          const obj = {};
+          keys.forEach(k => obj[k] = err[k]);
+          errorMsg = JSON.stringify(obj, null, 2);
+        } else {
+          const str = JSON.stringify(err, null, 2);
+          errorMsg = (str === '{}') ? String(err) : str;
+        }
+      } else {
+        errorMsg = String(err);
+      }
+
+      content.textContent = errorMsg;
       modal.classList.remove('hidden');
     }
 
