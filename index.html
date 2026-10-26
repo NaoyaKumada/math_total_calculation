@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 & 弱点分析アプリ ver44 (端末間データ共有統合版)</title>
+  <title>数学総合演習 & 弱点分析アプリ ver45 (端末間データ共有統合版)</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +40,7 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver44</span></h1>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver45</span></h1>
             <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・クラウド同期搭載</p>
           </div>
         </div>
@@ -814,7 +814,7 @@
       updateAnalyticsUI();
       toggleStudentInfoVisibility();
 
-      // 【新規】起動時にGASから問題データを自動取得
+      // クラウドから問題データを自動取得
       await syncQuestionsFromCloud();
 
       const dropZone = document.getElementById('pdf-drop-zone');
@@ -832,7 +832,7 @@
     });
 
     /* =========================================================
-       クラウド(GAS) / JSON データ共有関連処理 (新規追加・拡張)
+       クラウド(GAS) / JSON データ共有関連処理
        ========================================================= */
 
     // クラウドから問題一覧を取得・更新
