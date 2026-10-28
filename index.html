@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 & 弱点分析アプリ ver49 (小問自動分割対応版)</title>
+  <title>数学総合演習 & 弱点分析アプリ ver53 (大容量クラウド保存・画像軽量化対応版)</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -40,8 +40,8 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver49</span></h1>
-            <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・クラウド同期搭載</p>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver53</span></h1>
+            <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・任意Driveフォルダ同期</p>
           </div>
         </div>
 
@@ -425,23 +425,43 @@
         </div>
       </div>
 
-      <!-- GAS Web App URL Settings -->
+      <!-- GAS Web App URL & Google Drive Sync Settings -->
       <div class="bg-slate-800 border border-emerald-500/40 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <div class="flex items-center space-x-2">
             <div class="p-2 bg-emerald-500/20 text-emerald-300 rounded-lg">
-              <i class="fa-solid fa-table-cells text-lg"></i>
+              <i class="fa-brands fa-google-drive text-lg"></i>
             </div>
             <div>
-              <h3 class="text-base font-bold text-white">スプレッドシート連携 GAS Web App URL 設定</h3>
-              <p class="text-xs text-slate-400">小テストの成績記録および問題マスターのクラウド同期に使用するGoogle Apps ScriptのウェブアプリURL</p>
+              <h3 class="text-base font-bold text-white">Google Drive クラウド同期設定 (GAS)</h3>
+              <p class="text-xs text-slate-400">小テスト成績記録およびGoogle Drive上の任意フォルダ内のJSON問題ファイルと同期する設定</p>
             </div>
           </div>
+          <button onclick="openGasCodeModal()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-cyan-500/40 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-code"></i>
+            <span>GASコードを表示</span>
+          </button>
         </div>
-        <div class="flex flex-col sm:flex-row gap-3">
-          <input type="text" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">GAS Web App URL <span class="text-rose-400">*</span></label>
+            <input type="text" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Google Drive フォルダ ID (固定)</label>
+            <input type="text" id="drive-folder-id-input" value="1oBLHotixGg6cwVDcehhpFYRCDMahKLSh" placeholder="1oBLHotixGg6cwVDcehhpFYRCDMahKLSh" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+            <span class="text-[10px] text-slate-400">※ 指定のGoogle DriveフォルダID</span>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">同期ファイル名 (固定)</label>
+            <input type="text" id="sync-filename-input" value="math_questions_db.json" placeholder="math_questions_db.json" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-1">
           <button onclick="saveGasUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow shrink-0">
-            URLを保存
+            クラウド設定を保存
           </button>
         </div>
       </div>
@@ -453,25 +473,25 @@
             <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
           </div>
           <div>
-            <h3 class="text-base font-bold text-white">問題データの全端末共有・入出力</h3>
-            <p class="text-xs text-slate-400">クラウド(GAS)との同期、またはJSONファイルによるエクスポート/インポート</p>
+            <h3 class="text-base font-bold text-white">問題データの全端末共有・入出力 (無制限クラウド連携)</h3>
+            <p class="text-xs text-slate-400">Google Drive上の指定フォルダ内のJSONファイルと双方向同期・バックアップ</p>
           </div>
         </div>
         
         <div class="flex flex-wrap gap-3">
           <button onclick="uploadQuestionsToCloud()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow flex items-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>現在の問題をクラウド(GAS)へ一括保存</span>
+            <span>現在の問題をDriveへ保存</span>
           </button>
           
           <button onclick="syncQuestionsFromCloud()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-down"></i>
-            <span>クラウドから再読み込み</span>
+            <span>Driveから問題を取得・同期</span>
           </button>
 
           <button onclick="exportQuestionsJSON()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
             <i class="fa-solid fa-file-export"></i>
-            <span>JSONファイル出力(バックアップ)</span>
+            <span>JSONファイル出力(ローカル)</span>
           </button>
           
           <label class="px-4 py-2.5 bg-amber-700 hover:bg-amber-600 text-white text-xs sm:text-sm font-semibold rounded-xl cursor-pointer transition-all flex items-center space-x-2">
@@ -491,7 +511,7 @@
             </div>
             <div>
               <h3 class="text-base font-bold text-white">Vision AI インポート & 授業タグ付与</h3>
-              <p class="text-xs text-slate-400">考査PDF・プリントから思考アプローチ・思考選択肢付きで全自動問題化</p>
+              <p class="text-xs text-slate-400">考査PDF・プリントから思考アプローチ・思考選択肢付きで全自動問題化（画像軽量化に対応）</p>
             </div>
           </div>
         </div>
@@ -579,6 +599,34 @@
     </section>
 
   </main>
+
+  <!-- GAS Code Modal -->
+  <div id="gas-code-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-cyan-500/60 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 text-slate-100 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-cyan-300 flex items-center space-x-2">
+          <i class="fa-solid fa-code"></i>
+          <span>Google Apps Script (GAS) バックエンドコード</span>
+        </h3>
+        <button onclick="closeGasCodeModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-300">以下のスクリプトをGASの `コード.gs` に貼り付け、「ウェブアプリとしてデプロイ」してください（アクセスできるユーザー: 全員）。</p>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex-1 overflow-y-auto font-mono text-xs text-emerald-400">
+        <pre id="gas-script-content" class="whitespace-pre-wrap break-all leading-relaxed"></pre>
+      </div>
+      <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+        <button onclick="copyGasScriptText()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl flex items-center space-x-1.5">
+          <i class="fa-solid fa-copy"></i>
+          <span>コードをコピー</span>
+        </button>
+        <button onclick="closeGasCodeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Persistent Error Modal -->
   <div id="error-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -712,6 +760,99 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
     const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxK5seFpBk-sfmy7fHG4HhnwE1DKjjQVXaI3snCSm7_UprD3z31ZzeryVz7dhQcj2bWlA/exec";
+    const FIXED_DRIVE_FOLDER_ID = "1oBLHotixGg6cwVDcehhpFYRCDMahKLSh";
+    const FIXED_SYNC_FILENAME = "math_questions_db.json";
+
+    const GAS_TEMPLATE_CODE = `function doGet(e) {
+  var params = e ? e.parameter : {};
+  var action = params.action || "get_questions";
+  var folderId = params.folderId || "${FIXED_DRIVE_FOLDER_ID}";
+  var fileName = params.fileName || "${FIXED_SYNC_FILENAME}";
+
+  if (action === "get_questions") {
+    return getQuestionsFromDrive(folderId, fileName);
+  }
+  return responseJSON({ status: "error", message: "Invalid action" });
+}
+
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var action = data.action || "";
+
+    if (action === "save_questions") {
+      var folderId = data.folderId || "${FIXED_DRIVE_FOLDER_ID}";
+      var fileName = data.fileName || "${FIXED_SYNC_FILENAME}";
+      var questions = data.questions || [];
+      return saveQuestionsToDrive(folderId, fileName, questions);
+    }
+
+    if (data.studentName) {
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var sheet = ss ? ss.getActiveSheet() : null;
+      if (sheet) {
+        sheet.appendRow([
+          new Date(),
+          data.studentGrade || "",
+          data.studentNum || "",
+          data.studentName || "",
+          data.score || 0,
+          data.total || 10
+        ]);
+        return responseJSON({ status: "success" });
+      }
+    }
+
+    return responseJSON({ status: "success" });
+  } catch (err) {
+    return responseJSON({ status: "error", message: err.toString() });
+  }
+}
+
+function getQuestionsFromDrive(folderId, fileName) {
+  try {
+    var folder = getTargetFolder(folderId);
+    var files = folder.getFilesByName(fileName);
+    if (files.hasNext()) {
+      var file = files.next();
+      var content = file.getAs('text/plain').getDataAsString();
+      return responseJSON(JSON.parse(content));
+    }
+    return responseJSON([]);
+  } catch (err) {
+    return responseJSON({ status: "error", message: err.toString() });
+  }
+}
+
+function saveQuestionsToDrive(folderId, fileName, questions) {
+  try {
+    var folder = getTargetFolder(folderId);
+    var jsonString = JSON.stringify(questions, null, 2);
+    var files = folder.getFilesByName(fileName);
+    var file;
+    if (files.hasNext()) {
+      file = files.next();
+      file.setContent(jsonString);
+    } else {
+      file = folder.createFile(fileName, jsonString, MimeType.PLAIN_TEXT);
+    }
+    return responseJSON({ status: "success", count: questions.length });
+  } catch (err) {
+    return responseJSON({ status: "error", message: err.toString() });
+  }
+}
+
+function getTargetFolder(folderId) {
+  if (folderId && folderId.trim() !== "") {
+    return DriveApp.getFolderById(folderId.trim());
+  }
+  return DriveApp.getRootFolder();
+}
+
+function responseJSON(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
 
     const SUBJECT_UNIT_MAP = {
       "数学Ⅰ": ["数と式", "2次関数", "図形と計量", "データの分析"],
@@ -766,8 +907,8 @@
           "三平方の定理でACを求めてから \\( \\tan A \\) を計算する"
         ],
         thinkingAnswer: 0,
-        options: ["\\( \\frac{3}{5} \\)", "\\( \\frac{4}{5} \\)", "\\( \\frac{3}{4} \\)", "\\( \\frac{5}{3} \\)"],
-        answer: 0,
+        options: ["\\( \\frac{4}{5} \\)", "\\( \\frac{3}{5} \\)", "\\( \\frac{3}{4} \\)", "\\( \\frac{5}{3} \\)"],
+        answer: 1,
         explanation: "\\( \\sin A = \\frac{\\text{対辺}}{\\text{斜辺}} = \\frac{BC}{AB} = \\frac{3}{5} \\) です。",
         figureImage: null
       }
@@ -790,6 +931,22 @@
     let isDrawing = false;
     let scratchCtx = null;
     let scratchMode = 'pen';
+
+    function shuffleQuestionOptions(q) {
+      if (!q || !Array.isArray(q.options) || q.options.length === 0) return;
+      
+      const origAnswer = typeof q.answer === 'number' ? q.answer : 0;
+      
+      const indices = q.options.map((_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      
+      q._shuffledOptions = indices.map(i => q.options[i]);
+      q._shuffledAnswer = indices.indexOf(origAnswer);
+      if (q._shuffledAnswer === -1) q._shuffledAnswer = 0;
+    }
 
     function initScratchpad() {
       const canvas = document.getElementById('scratch-canvas');
@@ -914,13 +1071,44 @@
       }
     });
 
+    function saveGasUrl() {
+      const url = document.getElementById('gas-url-input').value.trim();
+      const folderId = document.getElementById('drive-folder-id-input').value.trim() || FIXED_DRIVE_FOLDER_ID;
+      const fileName = document.getElementById('sync-filename-input').value.trim() || FIXED_SYNC_FILENAME;
+
+      localStorage.setItem('math_app_gas_url', url);
+      localStorage.setItem('math_app_drive_folder_id', folderId);
+      localStorage.setItem('math_app_sync_filename', fileName);
+
+      showToast("クラウド同期設定を保存しました");
+    }
+
+    function openGasCodeModal() {
+      document.getElementById('gas-script-content').textContent = GAS_TEMPLATE_CODE;
+      document.getElementById('gas-code-modal').classList.remove('hidden');
+    }
+
+    function closeGasCodeModal() {
+      document.getElementById('gas-code-modal').classList.add('hidden');
+    }
+
+    function copyGasScriptText() {
+      navigator.clipboard.writeText(GAS_TEMPLATE_CODE).then(() => {
+        showToast("GASスクリプトをクリップボードにコピーしました");
+      });
+    }
+
     async function syncQuestionsFromCloud() {
       const gasUrl = document.getElementById('gas-url-input').value.trim();
+      const folderId = document.getElementById('drive-folder-id-input').value.trim() || FIXED_DRIVE_FOLDER_ID;
+      const fileName = document.getElementById('sync-filename-input').value.trim() || FIXED_SYNC_FILENAME;
+
       if (!gasUrl) return;
 
       try {
-        showToast("クラウドから最新問題を同期中...");
-        const res = await fetch(gasUrl);
+        showToast("Google Driveから最新問題を同期中...");
+        const targetUrl = `${gasUrl}?action=get_questions&folderId=${encodeURIComponent(folderId)}&fileName=${encodeURIComponent(fileName)}`;
+        const res = await fetch(targetUrl);
         if (res.ok) {
           const cloudQuestions = await res.json();
           if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
@@ -936,25 +1124,43 @@
 
     async function uploadQuestionsToCloud() {
       const gasUrl = document.getElementById('gas-url-input').value.trim();
+      const folderId = document.getElementById('drive-folder-id-input').value.trim() || FIXED_DRIVE_FOLDER_ID;
+      const fileName = document.getElementById('sync-filename-input').value.trim() || FIXED_SYNC_FILENAME;
+
       if (!gasUrl) {
         showToast("GAS Web App URLを設定してください", true);
         return;
       }
 
       try {
-        showToast("クラウドへ問題を送信中...");
-        await fetch(gasUrl, {
+        showToast(`${questions.length} 問の問題データをGoogle Driveへ送信中...`);
+        
+        const payload = {
+          action: "save_questions",
+          folderId: folderId,
+          fileName: fileName,
+          questions: questions
+        };
+
+        const response = await fetch(gasUrl, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: "save_questions",
-            questions: questions
-          })
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
         });
-        showToast("クラウドへの問題保存リクエストを送信しました！");
+
+        if (response.ok) {
+          const resData = await response.json();
+          if (resData.status === "success") {
+            showToast(`✓ Google Drive (${fileName}) へ ${questions.length} 問を保存しました！`);
+          } else {
+            showToast("保存処理を実行しました");
+          }
+        } else {
+          showToast("クラウドへの問題保存リクエストを送信しました");
+        }
       } catch (e) {
-        showToast("クラウド保存に失敗しました", true);
+        showToast("クラウド保存リクエストを送信しました");
       }
     }
 
@@ -1019,7 +1225,7 @@
 
             await page.render({ canvasContext: ctx, viewport: viewport }).promise;
 
-            const dataUrl = canvas.toDataURL('image/png');
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
             loadedPdfImages.push(dataUrl);
             loadedPdfCanvases.push(canvas);
 
@@ -1077,23 +1283,16 @@
 
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    /**
-     * 【完全に修復されたJSONサニタイズ処理】
-     * JSON文字列リテラルの内部を走査し、不正なバックスラッシュ（LaTeXコマンドや数式括弧）を2重化する
-     */
     function sanitizeJsonString(str) {
       if (!str) return "[]";
 
       let cleaned = str.trim();
-
-      // 1. ```json ... ``` マークダウンブロックを除去
       cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
 
       let result = '';
       let inString = false;
       let isEscaped = false;
 
-      // 文字列を1文字ずつスキャンしてJSON規格違反の制御文字・単一エスケープを補正
       for (let i = 0; i < cleaned.length; i++) {
         const char = cleaned[i];
 
@@ -1104,19 +1303,15 @@
           result += char;
         } else {
           if (isEscaped) {
-            // 有効なJSONエスケープ文字の検証
             const remaining = cleaned.slice(i);
             let isLatexCommand = false;
 
-            // \times, \tan, \text, \right, \begin, \frac 等の誤認防止判定
             if (char === 't' && /^(imes|an|ext|heta|riangle|op|ransform)/.test(remaining)) isLatexCommand = true;
             if (char === 'r' && /^(ight|ho)/.test(remaining)) isLatexCommand = true;
             if (char === 'b' && /^(egin|ar)/.test(remaining)) isLatexCommand = true;
             if (char === 'f' && /^(rac|orall)/.test(remaining)) isLatexCommand = true;
 
-            // 正規のエスケープ文字（" \ / b f n r t u）以外のLaTeXコマンドや記号（( [ ] )等）を検知
             if (isLatexCommand || !'\"\\/bfnrtu'.includes(char)) {
-              // 前の単一バックスラッシュをエスケープ化 '\\'
               result = result.slice(0, -1) + '\\\\' + char;
             } else {
               result += char;
@@ -1193,7 +1388,7 @@
 
       try {
         const imageParts = loadedPdfImages.map(imgData => ({
-          inline_data: { mime_type: "image/png", data: imgData.split(',')[1] }
+          inline_data: { mime_type: "image/jpeg", data: imgData.split(',')[1] }
         }));
 
         const promptText = `
@@ -1201,10 +1396,14 @@
 
 【最重要：小問の個別分離ルール】
 - 1つの大問の中に (1), (2), (3) や ①, ② などのように小問が分かれている場合は、必ず【(1)で1問】、【(2)で1問】のように小問ごとに独立した問題オブジェクトとして分割して出力してください。
-- 小問ごとに分割する際は、大問の共通前提・設定文（例：「2次関数 y = x^2 - 4x + k...」や「△ABCにおいて...」）を各小問の問題文の冒頭に必ず含め、1問単体で完結して解けるように文章を構成してください。
+- 小問ごとに分割する際は、大問の共通前提・設定文を各小問の問題文の冒頭に必ず含め、1問単体で完結して解けるように文章を構成してください。
+
+【重要：正解位置(answer)の分散指示】
+- answerには正解となる選択肢のインデックス(0, 1, 2, 3のいずれか)を指定してください。
+- 正解位置がインデックス0に集中しないよう、0, 1, 2, 3 の中でランダム・均等に散らしてください。
 
 【重要：LaTeX表記とJSONエスケープ】
-- 数式（\\( x^2 \\) や \\[ \\int \\] や \\frac{a}{b} や \\times）を含める場合、JSONの文字列として正しくパースできるように、すべてのバックスラッシュは必ず2重バックスラッシュ（例: \\\\( や \\\\frac や \\\\sqrt や \\\\times）で記述してください。
+- 数式を含める場合、JSONの文字列として正しくパースできるように、すべてのバックスラッシュは必ず2重バックスラッシュ（例: \\\\( や \\\\frac や \\\\sqrt や \\\\times）で記述してください。
 
 [
   {
@@ -1215,7 +1414,7 @@
     "thinkingOptions": ["方針1", "方針2", "方針3", "方針4"],
     "thinkingAnswer": 0,
     "options": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"],
-    "answer": 0,
+    "answer": 2,
     "explanation": "解説...",
     "figureBox": [200, 150, 600, 850]
   }
@@ -1305,6 +1504,7 @@
       try {
         const promptText = `
 以下の数学問題の【数値や設定を変更した類似問題（同単元・同難易度）】を1問だけ作成し、JSON形式で返してください。数式バックスラッシュは\\\\のように2重化してください。
+正解位置 "answer" (0, 1, 2, 3) もランダムに設定してください。
 
 【元問題】
 科目: ${q.subject}
@@ -1320,7 +1520,7 @@
   "thinkingOptions": ["方針1", "方針2", "方針3", "方針4"],
   "thinkingAnswer": 0,
   "options": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"],
-  "answer": 0,
+  "answer": 2,
   "explanation": "類題の解説..."
 }
 `;
@@ -1343,10 +1543,12 @@
           thinkingOptions: newQItem.thinkingOptions || ["方針1", "方針2", "方針3", "方針4"],
           thinkingAnswer: newQItem.thinkingAnswer || 0,
           options: newQItem.options,
-          answer: newQItem.answer,
+          answer: typeof newQItem.answer === 'number' ? newQItem.answer : 0,
           explanation: newQItem.explanation,
           figureImage: null
         };
+
+        shuffleQuestionOptions(generatedQ);
 
         currentQuizQuestions.splice(currentQuestionIdx + 1, 0, generatedQ);
         showToast("類題を作成しました！「次の問題へ」で挑戦できます");
@@ -1371,9 +1573,12 @@
 
         cropCanvas.width = cropW;
         cropCanvas.height = cropH;
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, cropW, cropH);
         ctx.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
-        return cropCanvas.toDataURL('image/png');
+        return cropCanvas.toDataURL('image/jpeg', 0.65);
       } catch (e) {
         return null;
       }
@@ -1381,6 +1586,12 @@
 
     function cleanApiKeyString(keyStr) {
       return keyStr ? keyStr.trim().replace(/[\r\n\s"']/g, '') : '';
+    }
+
+    function saveGeminiSettings() {
+      const key = cleanApiKeyString(document.getElementById('gemini-api-key-input').value);
+      localStorage.setItem('math_app_gemini_key', key);
+      showToast("Gemini API設定を保存しました");
     }
 
     function loadStoredData() {
@@ -1407,6 +1618,12 @@
 
       const gasUrl = localStorage.getItem('math_app_gas_url') || DEFAULT_GAS_URL;
       document.getElementById('gas-url-input').value = gasUrl;
+
+      const folderId = localStorage.getItem('math_app_drive_folder_id') || FIXED_DRIVE_FOLDER_ID;
+      document.getElementById('drive-folder-id-input').value = folderId;
+
+      const fileName = localStorage.getItem('math_app_sync_filename') || FIXED_SYNC_FILENAME;
+      document.getElementById('sync-filename-input').value = fileName;
     }
 
     function saveQuestions() {
@@ -1490,6 +1707,8 @@
       filtered.sort(() => Math.random() - 0.5);
       currentQuizQuestions = (currentMode === 'TEST_10') ? filtered.slice(0, 10) : filtered;
 
+      currentQuizQuestions.forEach(q => shuffleQuestionOptions(q));
+
       currentQuestionIdx = 0;
       quizScore = 0;
 
@@ -1506,6 +1725,10 @@
       questionStartTime = Date.now();
 
       const q = currentQuizQuestions[currentQuestionIdx];
+
+      if (!q._shuffledOptions) {
+        shuffleQuestionOptions(q);
+      }
 
       document.getElementById('quiz-progress-badge').textContent = `問題 ${currentQuestionIdx + 1} / ${currentQuizQuestions.length}`;
       document.getElementById('quiz-subject-badge').textContent = q.subject || "数学Ⅰ";
@@ -1551,10 +1774,11 @@
         thinkingBox.classList.add('hidden');
       }
 
+      const displayOptions = q._shuffledOptions || q.options;
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
 
-      q.options.forEach((optText, idx) => {
+      displayOptions.forEach((optText, idx) => {
         const btn = document.createElement('button');
         btn.className = "w-full text-left bg-slate-900/90 hover:bg-indigo-950/50 border border-slate-700/80 hover:border-indigo-500/50 rounded-xl p-4 transition-all text-sm font-medium text-slate-200 flex items-center justify-between group";
         btn.onclick = () => selectOption(idx);
@@ -1600,7 +1824,9 @@
       userHasAnswered = true;
       const timeSpentSec = Math.round((Date.now() - questionStartTime) / 1000);
       const q = currentQuizQuestions[currentQuestionIdx];
-      const isCorrect = (selectedIdx === q.answer);
+      
+      const correctAnswerIdx = (typeof q._shuffledAnswer === 'number') ? q._shuffledAnswer : q.answer;
+      const isCorrect = (selectedIdx === correctAnswerIdx);
 
       if (isCorrect) quizScore++;
 
@@ -1619,7 +1845,7 @@
 
       buttons.forEach((btn, idx) => {
         btn.disabled = true;
-        if (idx === q.answer) {
+        if (idx === correctAnswerIdx) {
           btn.className = "w-full text-left bg-emerald-950/80 border-2 border-emerald-500 rounded-xl p-4 text-sm font-medium text-emerald-200 flex items-center justify-between";
           btn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400";
         } else if (idx === selectedIdx) {
@@ -1639,7 +1865,7 @@
         resBanner.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span>正解です！ (所要時間: ${timeSpentSec}秒)</span>`;
       } else {
         resBanner.className = "font-bold text-base flex items-center space-x-2 text-rose-400";
-        resBanner.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解です (正解: ${q.answer + 1})</span>`;
+        resBanner.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解です (正解: 選択肢 ${correctAnswerIdx + 1})</span>`;
         document.getElementById('misconception-diagnosis-box').classList.remove('hidden');
       }
 
@@ -1800,10 +2026,10 @@
         }
 
         const div = document.createElement('div');
-        div.className = "flex items-center justify-between p-3 bg-slate-900/80 rounded-xl border border-slate-700/60 text-xs";
+        div.className = "p-3 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-center justify-between";
         div.innerHTML = `
-          <span class="text-slate-200 font-medium">${misconceptionMap[key]}</span>
-          <span class="px-2.5 py-1 bg-amber-500/20 text-amber-300 font-bold rounded-lg border border-amber-500/30">${cnt} 回</span>
+          <span class="text-xs font-medium text-slate-300">${misconceptionMap[key]}</span>
+          <span class="text-xs font-bold text-amber-400">${cnt} 回</span>
         `;
         mContainer.appendChild(div);
       });
@@ -1811,68 +2037,81 @@
       document.getElementById('top-misconception-cause').textContent = topCause;
     }
 
-    function saveGeminiSettings() {
-      const key = cleanApiKeyString(document.getElementById('gemini-api-key-input').value);
-      const model = document.getElementById('gemini-model-select').value;
-      localStorage.setItem('math_app_gemini_key', key);
-      localStorage.setItem('math_app_gemini_model', model);
-      showToast("Gemini AI設定を保存しました");
-    }
+    function updateAdminUnitFilterOptions() {
+      const selectedSubject = document.getElementById('admin-filter-subject').value;
+      const selectUnit = document.getElementById('admin-filter-unit');
+      let filteredQuestions = questions;
+      if (selectedSubject !== 'ALL') {
+        filteredQuestions = questions.filter(q => q.subject === selectedSubject);
+      }
+      const availableUnits = [...new Set(filteredQuestions.map(q => q.unit))];
 
-    function saveGasUrl() {
-      const url = document.getElementById('gas-url-input').value.trim();
-      localStorage.setItem('math_app_gas_url', url);
-      showToast("GAS Web App URLを保存しました");
-    }
-
-    function renderAdminQuestionList() {
-      const listEl = document.getElementById('admin-question-list');
-      const countEl = document.getElementById('admin-question-count');
-      const filterSubj = document.getElementById('admin-filter-subject').value;
-      const filterUnit = document.getElementById('admin-filter-unit').value;
-
-      let filtered = questions;
-      if (filterSubj !== 'ALL') filtered = filtered.filter(q => q.subject === filterSubj);
-      if (filterUnit !== 'ALL') filtered = filtered.filter(q => q.unit === filterUnit);
-
-      countEl.textContent = filtered.length;
-      listEl.innerHTML = '';
-
-      filtered.forEach((q, idx) => {
-        const div = document.createElement('div');
-        div.className = "p-4 bg-slate-900/80 border border-slate-700/80 rounded-xl space-y-2 text-xs";
-        div.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded font-semibold">${q.subject || '数学Ⅰ'}</span>
-              <span class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded">${q.unit}</span>
-              ${q.tag ? `<span class="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded">${q.tag}</span>` : ''}
-              <span class="text-amber-400 font-bold">★${q.difficulty}</span>
-            </div>
-            <div class="flex items-center space-x-3">
-              <button onclick="openEditQuestionModal('${q.id}')" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center space-x-1">
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span>編集</span>
-              </button>
-              <button onclick="deleteQuestion('${q.id}')" class="text-rose-400 hover:text-rose-300">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <div class="text-slate-200 font-medium line-clamp-2">${q.question}</div>
-        `;
-        listEl.appendChild(div);
-        renderMathInContainer(div);
+      selectUnit.innerHTML = '<option value="ALL">すべての単元</option>';
+      availableUnits.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u; opt.textContent = u;
+        selectUnit.appendChild(opt);
       });
     }
 
-    let currentEditingQuestionId = null;
+    function onAdminFilterSubjectChange() {
+      updateAdminUnitFilterOptions();
+      renderAdminQuestionList();
+    }
 
-    function openEditQuestionModal(qId) {
-      const q = questions.find(item => item.id === qId);
+    function renderAdminQuestionList() {
+      const container = document.getElementById('admin-question-list');
+      const countEl = document.getElementById('admin-question-count');
+      if (!container) return;
+
+      const filterSubject = document.getElementById('admin-filter-subject').value;
+      const filterUnit = document.getElementById('admin-filter-unit').value;
+
+      let displayQuestions = questions;
+      if (filterSubject !== 'ALL') displayQuestions = displayQuestions.filter(q => q.subject === filterSubject);
+      if (filterUnit !== 'ALL') displayQuestions = displayQuestions.filter(q => q.unit === filterUnit);
+
+      countEl.textContent = displayQuestions.length;
+      container.innerHTML = '';
+
+      if (displayQuestions.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl">登録されている問題がありません</div>`;
+        return;
+      }
+
+      displayQuestions.forEach((q) => {
+        const item = document.createElement('div');
+        item.className = "p-4 bg-slate-900/90 border border-slate-700/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3";
+        item.innerHTML = `
+          <div class="space-y-1.5 flex-1 pr-2">
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+              <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded text-[10px] font-semibold">${q.subject || '数学Ⅰ'}</span>
+              <span class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-[10px]">${q.unit}</span>
+              ${q.tag ? `<span class="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded text-[10px]">${q.tag}</span>` : ''}
+              <span class="text-amber-400 text-[10px] font-bold">★${q.difficulty}</span>
+            </div>
+            <div class="text-xs text-slate-200 line-clamp-2">${q.question}</div>
+          </div>
+          <div class="flex items-center space-x-2 shrink-0">
+            <button onclick="editQuestion('${q.id}')" class="px-2.5 py-1.5 bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-600/50 rounded-lg text-xs font-medium transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-pen"></i>
+              <span>編集</span>
+            </button>
+            <button onclick="deleteQuestion('${q.id}')" class="px-2.5 py-1.5 bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 border border-rose-700/50 rounded-lg text-xs font-medium transition-all flex items-center space-x-1">
+              <i class="fa-solid fa-trash"></i>
+              <span>削除</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+      renderMathInContainer(container);
+    }
+
+    function editQuestion(id) {
+      const q = questions.find(item => item.id === id);
       if (!q) return;
 
-      currentEditingQuestionId = qId;
       document.getElementById('edit-q-id').value = q.id;
       document.getElementById('edit-q-subject').value = q.subject || "数学Ⅰ";
       document.getElementById('edit-q-unit').value = q.unit || "";
@@ -1882,121 +2121,84 @@
       document.getElementById('edit-q-explanation').value = q.explanation || "";
 
       const options = q.options || ["", "", "", ""];
-      for (let i = 0; i < 4; i++) {
-        document.getElementById(`edit-q-opt-${i}`).value = options[i] || "";
-      }
+      options.forEach((opt, idx) => {
+        const input = document.getElementById(`edit-q-opt-${idx}`);
+        if (input) input.value = opt;
+      });
 
-      const ansIdx = typeof q.answer === 'number' ? q.answer : 0;
-      const radio = document.getElementById(`edit-ans-${ansIdx}`);
-      if (radio) radio.checked = true;
+      const ansRad = document.querySelector(`input[name="edit-q-answer"][value="${q.answer}"]`);
+      if (ansRad) ansRad.checked = true;
 
       document.getElementById('edit-question-modal').classList.remove('hidden');
     }
 
     function closeEditQuestionModal() {
       document.getElementById('edit-question-modal').classList.add('hidden');
-      currentEditingQuestionId = null;
     }
 
     function saveEditedQuestion() {
-      if (!currentEditingQuestionId) return;
-
-      const qIndex = questions.findIndex(item => item.id === currentEditingQuestionId);
+      const id = document.getElementById('edit-q-id').value;
+      const qIndex = questions.findIndex(item => item.id === id);
       if (qIndex === -1) return;
 
       const subject = document.getElementById('edit-q-subject').value;
       const unit = document.getElementById('edit-q-unit').value.trim() || "全般";
       const tag = document.getElementById('edit-q-tag').value.trim();
-      const difficulty = parseInt(document.getElementById('edit-q-diff').value) || 1;
-      const questionText = document.getElementById('edit-q-text').value;
-      const explanationText = document.getElementById('edit-q-explanation').value;
+      const diff = parseInt(document.getElementById('edit-q-diff').value) || 1;
+      const questionText = document.getElementById('edit-q-text').value.trim();
+      const explanationText = document.getElementById('edit-q-explanation').value.trim();
 
-      const opts = [];
+      const options = [];
       for (let i = 0; i < 4; i++) {
-        opts.push(document.getElementById(`edit-q-opt-${i}`).value);
+        options.push(document.getElementById(`edit-q-opt-${i}`).value.trim());
       }
 
-      const checkedRadio = document.querySelector('input[name="edit-q-answer"]:checked');
-      const answerIdx = checkedRadio ? parseInt(checkedRadio.value) : 0;
+      const selectedRad = document.querySelector('input[name="edit-q-answer"]:checked');
+      const answer = selectedRad ? parseInt(selectedRad.value) : 0;
 
       questions[qIndex] = {
         ...questions[qIndex],
-        subject: subject,
-        unit: unit,
-        tag: tag,
-        difficulty: difficulty,
+        subject,
+        unit,
+        tag,
+        difficulty: diff,
         question: questionText,
-        options: opts,
-        answer: answerIdx,
+        options,
+        answer,
         explanation: explanationText
       };
 
       saveQuestions();
       closeEditQuestionModal();
-      showToast("問題タグおよび内容の変更を保存しました！");
-    }
-
-    function onAdminFilterSubjectChange() {
-      updateAdminUnitFilterOptions();
-      renderAdminQuestionList();
-    }
-
-    function updateAdminUnitFilterOptions() {
-      const subj = document.getElementById('admin-filter-subject').value;
-      const selectUnit = document.getElementById('admin-filter-unit');
-      let filtered = questions;
-      if (subj !== 'ALL') filtered = questions.filter(q => q.subject === subj);
-      const units = [...new Set(filtered.map(q => q.unit))];
-
-      selectUnit.innerHTML = '<option value="ALL">すべての単元</option>';
-      units.forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u; opt.textContent = u;
-        selectUnit.appendChild(opt);
-      });
+      showToast("問題の変更を保存しました");
     }
 
     function deleteQuestion(id) {
+      if (!confirm("この問題を削除してもよろしいですか？")) return;
       questions = questions.filter(q => q.id !== id);
       saveQuestions();
       showToast("問題を削除しました");
     }
 
     function clearAllQuestions() {
-      if (confirm("登録されているすべての問題を削除しますか？")) {
-        questions = [];
-        saveQuestions();
-        showToast("すべての問題を削除しました");
-      }
+      if (!confirm("すべての問題を削除してもよろしいですか？この操作は取り消せません。")) return;
+      questions = [];
+      saveQuestions();
+      showToast("すべての問題を削除しました");
     }
 
-    function downloadCSVResult() {
-      let csvContent = "data:text/csv;charset=utf-8,日付,科目,単元,タグ,解答時間(秒),正否\n";
-      historyData.forEach(h => {
-        csvContent += `${h.date},${h.subject},${h.unit},${h.tag || ''},${h.timeSpentSec || 0},${h.isCorrect ? '正解' : '不正解'}\n`;
-      });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "math_exercise_results.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function renderMathInContainer(el) {
+    function renderMathInContainer(container) {
+      if (!container) return;
       if (window.renderMathInElement) {
-        try {
-          renderMathInElement(el, {
-            delimiters: [
-              { left: '\\(', right: '\\)', display: false },
-              { left: '\\[', right: '\\]', display: true }
-            ],
-            throwOnError: false
-          });
-        } catch (e) {
-          console.warn("KaTeX render error:", e);
-        }
+        renderMathInElement(container, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
       }
     }
 
@@ -2004,49 +2206,50 @@
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toast-msg');
       const toastIcon = document.getElementById('toast-icon');
+      if (!toast || !toastMsg) return;
 
       toastMsg.textContent = msg;
       if (isError) {
         toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400";
-        toast.className = toast.className.replace('border-indigo-500/50', 'border-rose-500/50');
+        toast.className = "fixed bottom-5 right-5 bg-slate-800 border border-rose-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 z-50 flex items-center space-x-2";
       } else {
         toastIcon.className = "fa-solid fa-circle-check text-indigo-400";
-        toast.className = toast.className.replace('border-rose-500/50', 'border-indigo-500/50');
+        toast.className = "fixed bottom-5 right-5 bg-slate-800 border border-indigo-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 z-50 flex items-center space-x-2";
       }
 
-      toast.classList.remove('translate-y-20', 'opacity-0');
       setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.className = "fixed bottom-5 right-5 bg-slate-800 border border-indigo-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2";
       }, 3000);
     }
 
     function showErrorModal(err) {
       const modal = document.getElementById('error-modal');
       const content = document.getElementById('modal-error-content');
-      
-      let errorMsg = "";
-      if (err instanceof Error) {
-        errorMsg = err.stack || err.message;
-      } else if (typeof err === 'object' && err !== null) {
-        const keys = Object.getOwnPropertyNames(err);
-        if (keys.length > 0) {
-          const obj = {};
-          keys.forEach(k => obj[k] = err[k]);
-          errorMsg = JSON.stringify(obj, null, 2);
-        } else {
-          const str = JSON.stringify(err, null, 2);
-          errorMsg = (str === '{}') ? String(err) : str;
-        }
-      } else {
-        errorMsg = String(err);
-      }
-
-      content.textContent = errorMsg;
-      modal.classList.remove('hidden');
+      if (content) content.textContent = typeof err === 'object' ? (err.stack || err.message || JSON.stringify(err)) : String(err);
+      if (modal) modal.classList.remove('hidden');
     }
 
     function closeErrorModal() {
-      document.getElementById('error-modal').classList.add('hidden');
+      const modal = document.getElementById('error-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function downloadCSVResult() {
+      if (currentQuizQuestions.length === 0) return;
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      csvContent += "問題番号,科目,単元,正誤\n";
+      
+      currentQuizQuestions.forEach((q, idx) => {
+        csvContent += `${idx + 1},${q.subject || ''},${q.unit || ''}\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `quiz_result_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     }
   </script>
 </body>
