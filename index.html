@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 & 弱点分析アプリ ver56 (選択肢シャッフル・単元絞り込み対応版)</title>
+  <title>数学総合演習 & 弱点分析アプリ ver57 (GAS URL初期値設定版)</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -39,7 +39,7 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ver56 選択肢ランダム版</span></h1>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ver57 GAS URL初期値版</span></h1>
             <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・選択肢ランダムシャッフル・50問分割セル保存同期</p>
           </div>
         </div>
@@ -441,7 +441,7 @@
         <div class="grid grid-cols-1 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">GAS Web App URL <span class="text-rose-400">*</span></label>
-            <input type="text" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+            <input type="text" id="gas-url-input" value="https://script.google.com/macros/s/AKfycbwXSOSb7o8il4fP8gQ3cMd2ifKtnsj2ddDbqqjvvDdQSFWeFfdIl1CmTHo_C1PIFTbigQ/exec" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
           </div>
         </div>
 
@@ -743,6 +743,9 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
+    // GAS Web App URL のデフォルト初期値設定
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwXSOSb7o8il4fP8gQ3cMd2ifKtnsj2ddDbqqjvvDdQSFWeFfdIl1CmTHo_C1PIFTbigQ/exec";
+
     // GAS用テンプレートコード (スプレッドシート完全連携：50問分割保存対応)
     const GAS_TEMPLATE_CODE = `function doGet(e) {
   var params = e ? e.parameter : {};
@@ -953,7 +956,8 @@ function responseJSON(obj) {
         try { historyData = JSON.parse(hData); } catch(e) { historyData = []; }
       }
 
-      const gasUrl = localStorage.getItem('math_app_gas_url') || "";
+      // localStorageになければデフォルトのGAS URLを使用
+      const gasUrl = localStorage.getItem('math_app_gas_url') || DEFAULT_GAS_URL;
       document.getElementById('gas-url-input').value = gasUrl;
 
       const geminiKey = localStorage.getItem('math_app_gemini_key') || "";
@@ -974,7 +978,7 @@ function responseJSON(obj) {
 
     // スプレッドシートから問題を自動取得（GET）
     async function syncQuestionsFromCloud() {
-      const gasUrl = document.getElementById('gas-url-input').value.trim();
+      const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
       if (!gasUrl) return;
 
       try {
@@ -998,7 +1002,7 @@ function responseJSON(obj) {
 
     // スプレッドシートへ問題データを一括保存（POST）
     async function uploadQuestionsToCloud() {
-      const gasUrl = document.getElementById('gas-url-input').value.trim();
+      const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
       if (!gasUrl) {
         showToast("GAS Web App URLを設定してください", true);
         return;
@@ -1070,7 +1074,7 @@ function responseJSON(obj) {
 
           showToast(`✓ JSONファイルから ${questions.length} 問を取り込みました！`);
 
-          const gasUrl = document.getElementById('gas-url-input').value.trim();
+          const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
           if (gasUrl) {
             await uploadQuestionsToCloud();
           }
@@ -1286,7 +1290,7 @@ function responseJSON(obj) {
         thinkingBox.classList.add('hidden');
       }
 
-      // ★【機能追加】回答選択肢のランダムシャッフル機能 ★
+      // ★回答選択肢のランダムシャッフル機能★
       const originalOptions = q.options || [];
       const origCorrectIdx = q.answer || 0;
 
@@ -1416,7 +1420,7 @@ function responseJSON(obj) {
       const statusEl = document.getElementById('gas-submit-status');
 
       if (mode === 'TEST_10') {
-        const gasUrl = document.getElementById('gas-url-input').value.trim();
+        const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
         if (gasUrl) {
           statusEl.textContent = "スプレッドシートへ小テスト成績を自動送信中...";
           fetch(gasUrl, {
@@ -1536,7 +1540,7 @@ function responseJSON(obj) {
       document.getElementById('top-misconception-cause').textContent = topCauseText;
     }
 
-    // ★【強化】管理画面問題フィルタ & 一覧表示（初期表示時にも全単元をドロップダウンに生成）★
+    // 管理画面問題フィルタ & 一覧表示
     function onAdminFilterSubjectChange() {
       const selectedSubject = document.getElementById('admin-filter-subject').value;
       const selectUnit = document.getElementById('admin-filter-unit');
