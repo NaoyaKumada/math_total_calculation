@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 & 弱点分析アプリ ver53 (大容量クラウド保存・画像軽量化対応版)</title>
+  <title>数学総合演習 & 弱点分析アプリ ver56 (選択肢シャッフル・単元絞り込み対応版)</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* Custom Scrollbar & KaTeX Adjustments */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -40,8 +39,8 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">ver53</span></h1>
-            <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・任意Driveフォルダ同期</p>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ver56 選択肢ランダム版</span></h1>
+            <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・選択肢ランダムシャッフル・50問分割セル保存同期</p>
           </div>
         </div>
 
@@ -78,7 +77,7 @@
               <i class="fa-solid fa-sliders text-indigo-400"></i>
               <span>演習・テスト条件の設定</span>
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">科目・単元、授業プリント連動タグ、演習モード（思考プロセスモード等）を選択してください</p>
+            <p class="text-xs text-slate-400 mt-0.5">科目・単元、授業プリント連動タグ、演習モードを選択してください</p>
           </div>
           <button onclick="startQuiz()" class="w-full md:w-auto px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center space-x-2">
             <i class="fa-solid fa-play"></i>
@@ -172,10 +171,10 @@
               数学Ⅰ
             </span>
             <span id="quiz-unit-badge" class="px-2.5 py-1 bg-slate-700 text-slate-300 rounded-lg text-xs">
-              図形と計量
+              数と式
             </span>
             <span id="quiz-tag-badge" class="hidden px-2.5 py-1 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded-lg text-xs">
-              教科書 P.45
+              授業プリント
             </span>
             <span id="quiz-diff-badge" class="text-amber-400 text-xs font-bold">
               ★1
@@ -267,10 +266,6 @@
 
           <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider flex items-center justify-between">
             <span>【詳細解説】</span>
-            <button onclick="toggleStepByStepHint()" class="text-xs text-cyan-400 hover:underline flex items-center space-x-1">
-              <i class="fa-solid fa-layer-group"></i>
-              <span>ヒント段階表示</span>
-            </button>
           </div>
           <div id="explanation-text" class="text-sm text-slate-200 leading-relaxed"></div>
 
@@ -425,16 +420,16 @@
         </div>
       </div>
 
-      <!-- GAS Web App URL & Google Drive Sync Settings -->
+      <!-- GAS Web App URL & Spreadsheet Sync Settings -->
       <div class="bg-slate-800 border border-emerald-500/40 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
           <div class="flex items-center space-x-2">
             <div class="p-2 bg-emerald-500/20 text-emerald-300 rounded-lg">
-              <i class="fa-brands fa-google-drive text-lg"></i>
+              <i class="fa-solid fa-table text-lg"></i>
             </div>
             <div>
-              <h3 class="text-base font-bold text-white">Google Drive クラウド同期設定 (GAS)</h3>
-              <p class="text-xs text-slate-400">小テスト成績記録およびGoogle Drive上の任意フォルダ内のJSON問題ファイルと同期する設定</p>
+              <h3 class="text-base font-bold text-white">Google スプレッドシート クラウド同期設定 (GAS)</h3>
+              <p class="text-xs text-slate-400">小テスト成績の自動保存、およびスプレッドシート上の問題データベースとの完全同期（50問分割セル保存対応）</p>
             </div>
           </div>
           <button onclick="openGasCodeModal()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-cyan-500/40 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5">
@@ -443,25 +438,16 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div class="md:col-span-2">
+        <div class="grid grid-cols-1 gap-3">
+          <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">GAS Web App URL <span class="text-rose-400">*</span></label>
             <input type="text" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Google Drive フォルダ ID (固定)</label>
-            <input type="text" id="drive-folder-id-input" value="1oBLHotixGg6cwVDcehhpFYRCDMahKLSh" placeholder="1oBLHotixGg6cwVDcehhpFYRCDMahKLSh" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
-            <span class="text-[10px] text-slate-400">※ 指定のGoogle DriveフォルダID</span>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">同期ファイル名 (固定)</label>
-            <input type="text" id="sync-filename-input" value="math_questions_db.json" placeholder="math_questions_db.json" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
           </div>
         </div>
 
         <div class="flex justify-end pt-1">
           <button onclick="saveGasUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow shrink-0">
-            クラウド設定を保存
+            GAS URLを保存
           </button>
         </div>
       </div>
@@ -473,20 +459,20 @@
             <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
           </div>
           <div>
-            <h3 class="text-base font-bold text-white">問題データの全端末共有・入出力 (無制限クラウド連携)</h3>
-            <p class="text-xs text-slate-400">Google Drive上の指定フォルダ内のJSONファイルと双方向同期・バックアップ</p>
+            <h3 class="text-base font-bold text-white">スプレッドシート連携問題共有・全端末自動同期</h3>
+            <p class="text-xs text-slate-400">Google スプレッドシートに問題データを一括バックアップ & 全生徒の端末に反映（文字数上限対策済）</p>
           </div>
         </div>
         
         <div class="flex flex-wrap gap-3">
           <button onclick="uploadQuestionsToCloud()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow flex items-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>現在の問題をDriveへ保存</span>
+            <span>現在の問題をスプレッドシートへ保存</span>
           </button>
           
           <button onclick="syncQuestionsFromCloud()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-down"></i>
-            <span>Driveから問題を取得・同期</span>
+            <span>スプレッドシートから最新問題を取得・同期</span>
           </button>
 
           <button onclick="exportQuestionsJSON()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
@@ -511,7 +497,7 @@
             </div>
             <div>
               <h3 class="text-base font-bold text-white">Vision AI インポート & 授業タグ付与</h3>
-              <p class="text-xs text-slate-400">考査PDF・プリントから思考アプローチ・思考選択肢付きで全自動問題化（画像軽量化に対応）</p>
+              <p class="text-xs text-slate-400">考査PDF・プリントから思考アプローチ・思考選択肢付きで全自動問題化</p>
             </div>
           </div>
         </div>
@@ -606,13 +592,13 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-cyan-300 flex items-center space-x-2">
           <i class="fa-solid fa-code"></i>
-          <span>Google Apps Script (GAS) バックエンドコード</span>
+          <span>Google Apps Script (GAS) スプレッドシート連携コード (50問分割保存対応)</span>
         </h3>
         <button onclick="closeGasCodeModal()" class="text-slate-400 hover:text-white text-lg">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <p class="text-xs text-slate-300">以下のスクリプトをGASの `コード.gs` に貼り付け、「ウェブアプリとしてデプロイ」してください（アクセスできるユーザー: 全員）。</p>
+      <p class="text-xs text-slate-300">Google スプレッドシートの「拡張機能」>「Apps Script」に貼り付け、「ウェブアプリとしてデプロイ」してください（アクセスできるユーザー: 全員）。<br><span class="text-amber-300">※ セルの文字数オーバーを防止するため、50問ごとに分割して A1, A2, A3... セルへ保存します。</span></p>
       <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex-1 overflow-y-auto font-mono text-xs text-emerald-400">
         <pre id="gas-script-content" class="whitespace-pre-wrap break-all leading-relaxed"></pre>
       </div>
@@ -622,29 +608,6 @@
           <span>コードをコピー</span>
         </button>
         <button onclick="closeGasCodeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
-          閉じる
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Persistent Error Modal -->
-  <div id="error-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border-2 border-rose-500/80 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 text-slate-100">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center space-x-2 text-rose-400 font-bold text-base">
-          <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-          <span>エラーが発生しました</span>
-        </div>
-        <button onclick="closeErrorModal()" class="text-slate-400 hover:text-white text-lg">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="bg-slate-950 border border-rose-900/60 rounded-xl p-3">
-        <pre id="modal-error-content" class="text-xs text-rose-300 font-mono whitespace-pre-wrap break-all max-h-60 overflow-y-auto leading-relaxed"></pre>
-      </div>
-      <div class="flex items-center justify-end space-x-3 pt-2">
-        <button onclick="closeErrorModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
           閉じる
         </button>
       </div>
@@ -748,29 +711,45 @@
     </div>
   </div>
 
+  <!-- Persistent Error Modal -->
+  <div id="error-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-rose-500/80 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 text-slate-100">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2 text-rose-400 font-bold text-base">
+          <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+          <span>エラーが発生しました</span>
+        </div>
+        <button onclick="closeErrorModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="bg-slate-950 border border-rose-900/60 rounded-xl p-3">
+        <pre id="modal-error-content" class="text-xs text-rose-300 font-mono whitespace-pre-wrap break-all max-h-60 overflow-y-auto leading-relaxed"></pre>
+      </div>
+      <div class="flex items-center justify-end space-x-3 pt-2">
+        <button onclick="closeErrorModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 border border-indigo-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
     <i id="toast-icon" class="fa-solid fa-circle-check text-indigo-400"></i>
     <span id="toast-msg">メッセージ</span>
   </div>
 
-  <canvas id="crop-canvas" class="hidden"></canvas>
-
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwYy7zknWMs1yJMKfT8PxPHcZEGq3PGQAZdNuGl5fpXMhnjf5rrIBJMFMC1sl6tlbz3Cw/exec";
-    const FIXED_DRIVE_FOLDER_ID = "1oBLHotixGg6cwVDcehhpFYRCDMahKLSh";
-    const FIXED_SYNC_FILENAME = "math_questions_db.json";
-
+    // GAS用テンプレートコード (スプレッドシート完全連携：50問分割保存対応)
     const GAS_TEMPLATE_CODE = `function doGet(e) {
   var params = e ? e.parameter : {};
   var action = params.action || "get_questions";
-  var folderId = params.folderId || "${FIXED_DRIVE_FOLDER_ID}";
-  var fileName = params.fileName || "${FIXED_SYNC_FILENAME}";
 
   if (action === "get_questions") {
-    return getQuestionsFromDrive(folderId, fileName);
+    return getQuestionsFromSpreadsheet();
   }
   return responseJSON({ status: "error", message: "Invalid action" });
 }
@@ -780,27 +759,15 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     var action = data.action || "";
 
+    // 1. 問題データのスプレッドシート一括保存 (50問分割保存)
     if (action === "save_questions") {
-      var folderId = data.folderId || "${FIXED_DRIVE_FOLDER_ID}";
-      var fileName = data.fileName || "${FIXED_SYNC_FILENAME}";
       var questions = data.questions || [];
-      return saveQuestionsToDrive(folderId, fileName, questions);
+      return saveQuestionsToSpreadsheet(questions);
     }
 
+    // 2. 成績データの送信（スプレッドシート蓄積）
     if (data.studentName) {
-      var ss = SpreadsheetApp.getActiveSpreadsheet();
-      var sheet = ss ? ss.getActiveSheet() : null;
-      if (sheet) {
-        sheet.appendRow([
-          new Date(),
-          data.studentGrade || "",
-          data.studentNum || "",
-          data.studentName || "",
-          data.score || 0,
-          data.total || 10
-        ]);
-        return responseJSON({ status: "success" });
-      }
+      return recordStudentScore(data);
     }
 
     return responseJSON({ status: "success" });
@@ -809,69 +776,105 @@ function doPost(e) {
   }
 }
 
-function getQuestionsFromDrive(folderId, fileName) {
+// スプレッドシートから問題データを取得 (複数セル分割対応)
+function getQuestionsFromSpreadsheet() {
   try {
-    var folder = getTargetFolder(folderId);
-    var files = folder.getFilesByName(fileName);
-    if (files.hasNext()) {
-      var file = files.next();
-      var content = file.getAs('text/plain').getDataAsString();
-      return responseJSON(JSON.parse(content));
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("問題データベース");
+    if (!sheet) {
+      return responseJSON([]);
     }
-    return responseJSON([]);
+    
+    var lastRow = sheet.getLastRow();
+    if (lastRow === 0) {
+      return responseJSON([]);
+    }
+    
+    var values = sheet.getRange(1, 1, lastRow, 1).getValues();
+    var allQuestions = [];
+    
+    for (var i = 0; i < values.length; i++) {
+      var cellValue = values[i][0];
+      if (cellValue && cellValue.toString().trim() !== "") {
+        try {
+          var parsed = JSON.parse(cellValue);
+          if (Array.isArray(parsed)) {
+            allQuestions = allQuestions.concat(parsed);
+          } else if (typeof parsed === 'object') {
+            allQuestions.push(parsed);
+          }
+        } catch (e) {
+          // 単一文字列や構文エラー時のフォールバック
+        }
+      }
+    }
+    
+    return responseJSON(allQuestions);
   } catch (err) {
     return responseJSON({ status: "error", message: err.toString() });
   }
 }
 
-function saveQuestionsToDrive(folderId, fileName, questions) {
+// スプレッドシートへ問題データを保存 (セルの文字数上限対策：50問ごとにセルを分割)
+function saveQuestionsToSpreadsheet(questions) {
   try {
-    var folder = getTargetFolder(folderId);
-    var jsonString = JSON.stringify(questions, null, 2);
-    var files = folder.getFilesByName(fileName);
-    var file;
-    if (files.hasNext()) {
-      file = files.next();
-      file.setContent(jsonString);
-    } else {
-      file = folder.createFile(fileName, jsonString, MimeType.PLAIN_TEXT);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("問題データベース");
+    if (!sheet) {
+      sheet = ss.insertSheet("問題データベース");
     }
-    return responseJSON({ status: "success", count: questions.length });
+    
+    // シートの既存内容をクリア
+    sheet.clearContents();
+    
+    if (!questions || questions.length === 0) {
+      return responseJSON({ status: "success", count: 0, chunks: 0 });
+    }
+    
+    var chunkSize = 50; // 50問ごとに分割してセルに格納
+    var rows = [];
+    
+    for (var i = 0; i < questions.length; i += chunkSize) {
+      var chunk = questions.slice(i, i + chunkSize);
+      rows.push([JSON.stringify(chunk)]);
+    }
+    
+    // A1 からまとめて一括書き込み (A1, A2, A3...)
+    sheet.getRange(1, 1, rows.length, 1).setValues(rows);
+    
+    return responseJSON({ status: "success", count: questions.length, chunks: rows.length });
   } catch (err) {
     return responseJSON({ status: "error", message: err.toString() });
   }
 }
 
-function getTargetFolder(folderId) {
-  if (folderId && folderId.trim() !== "") {
-    return DriveApp.getFolderById(folderId.trim());
+// 成績を「成績記録」シートに追記
+function recordStudentScore(data) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("成績記録");
+    if (!sheet) {
+      sheet = ss.insertSheet("成績記録");
+      sheet.appendRow(["日時", "学年・組", "出席番号", "氏名", "スコア", "全問題数"]);
+    }
+    sheet.appendRow([
+      new Date(),
+      data.studentGrade || "",
+      data.studentNum || "",
+      data.studentName || "",
+      data.score || 0,
+      data.total || 10
+    ]);
+    return responseJSON({ status: "success" });
+  } catch (err) {
+    return responseJSON({ status: "error", message: err.toString() });
   }
-  return DriveApp.getRootFolder();
 }
 
 function responseJSON(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }`;
-
-    const SUBJECT_UNIT_MAP = {
-      "数学Ⅰ": ["数と式", "2次関数", "図形と計量", "データの分析"],
-      "数学Ⅱ": ["方程式・式と証明", "図形と方程式", "三角関数", "指数関数・対数関数", "微分法・積分法(Ⅱ)"],
-      "数学Ⅲ": ["複素数平面", "式と曲線", "極限", "微分法(Ⅲ)", "積分法(Ⅲ)"],
-      "数学A": ["場合の数と確率", "図形の性質", "数学と人間活動"],
-      "数学B": ["数列", "統計的な推測"],
-      "数学C": ["ベクトル", "平面上の曲線と複素数平面", "行列とその応用"]
-    };
-
-    function inferSubjectFromUnit(unitName) {
-      if (!unitName) return "その他";
-      for (const [subj, units] of Object.entries(SUBJECT_UNIT_MAP)) {
-        if (units.some(u => unitName.includes(u) || u.includes(unitName))) {
-          return subj;
-        }
-      }
-      return "数学Ⅰ";
-    }
 
     const DEFAULT_QUESTIONS = [
       {
@@ -880,36 +883,17 @@ function responseJSON(obj) {
         unit: "2次関数",
         tag: "教科書 P.45",
         difficulty: 1,
-        question: "2次関数 \\( y = x^2 - 4x + 3 \\) の頂点の座標を求めよ。",
+        question: "2次関数 $y = x^2 - 4x + 3$ の頂点の座標を求めよ。",
         thinkingOptions: [
-          "平方完成をして \\( y = (x-p)^2 + q \\) の形に変形する",
-          "因数分解をして \\( x \\) 軸との交点を求める",
+          "平方完成をして $y = (x-p)^2 + q$ の形に変形する",
+          "因数分解をして $x$ 軸との交点を求める",
           "微分して傾きが0になる点を探す",
-          "判別式 \\( D \\) を計算する"
+          "判別式 $D$ を計算する"
         ],
         thinkingAnswer: 0,
         options: ["(2, -1)", "(2, 1)", "(-2, -1)", "(4, 3)"],
         answer: 0,
-        explanation: "【着眼点】頂点を求めるには平方完成を行います。\\( y = (x - 2)^2 - 4 + 3 = (x - 2)^2 - 1 \\) より、頂点座標は \\( (2, -1) \\) です。",
-        figureImage: null
-      },
-      {
-        id: "q_preset_2",
-        subject: "数学Ⅰ",
-        unit: "図形と計量",
-        tag: "章末問題 No.2",
-        difficulty: 1,
-        question: "直角三角形ABCにおいて、\\( \\angle C = 90^\\circ \\), \\( AB = 5 \\), \\( BC = 3 \\) のとき、\\( \\sin A \\) の値を求めよ。",
-        thinkingOptions: [
-          "\\( \\sin A = \\frac{\\text{対辺}}{\\text{斜辺}} \\) の定義を用いる",
-          "余弦定理を用いる",
-          "正弦定理を用いる",
-          "三平方の定理でACを求めてから \\( \\tan A \\) を計算する"
-        ],
-        thinkingAnswer: 0,
-        options: ["\\( \\frac{4}{5} \\)", "\\( \\frac{3}{5} \\)", "\\( \\frac{3}{4} \\)", "\\( \\frac{5}{3} \\)"],
-        answer: 1,
-        explanation: "\\( \\sin A = \\frac{\\text{対辺}}{\\text{斜辺}} = \\frac{BC}{AB} = \\frac{3}{5} \\) です。",
+        explanation: "【着眼点】頂点を求めるには平方完成を行います。\n$y = (x - 2)^2 - 4 + 3 = (x - 2)^2 - 1$ より、頂点座標は $(2, -1)$ です。",
         figureImage: null
       }
     ];
@@ -917,90 +901,276 @@ function responseJSON(obj) {
     let questions = [];
     let historyData = [];
     let misconceptionStats = { CALC: 0, FORMULA: 0, STRATEGY: 0, READING: 0 };
-    let loadedPdfImages = [];
-    let loadedPdfCanvases = [];
-
     let currentQuizQuestions = [];
     let currentQuestionIdx = 0;
     let quizScore = 0;
-    let userHasAnswered = false;
     let selectedThinkingIdx = null;
-    let currentMode = "NORMAL";
-    let questionStartTime = Date.now();
+    let selectedAnswerIdx = null;
 
-    let isDrawing = false;
-    let scratchCtx = null;
-    let scratchMode = 'pen';
+    // 現在出題中問題のシャッフル後選択肢と正解インデックス
+    let currentShuffledOptions = [];
+    let currentShuffledCorrectIdx = 0;
 
-    function shuffleQuestionOptions(q) {
-      if (!q || !Array.isArray(q.options) || q.options.length === 0) return;
-      
-      const origAnswer = typeof q.answer === 'number' ? q.answer : 0;
-      
-      const indices = q.options.map((_, i) => i);
-      for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
+    // Canvas Scratchpad State
+    let scratchCanvas, scratchCtx, isDrawing = false, scratchMode = 'pen';
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      loadStoredData();
+      initScratchpad();
+      updateUnitSelectOptions();
+      updateTagSelectOptions();
+      onAdminFilterSubjectChange(); // 管理画面の単元絞り込みドロップダウンを初期化
+
+      // 起動時にスプレッドシートから最新問題を自動同期
+      await syncQuestionsFromCloud();
+    });
+
+    function renderMath(element) {
+      if (!element) return;
+      if (window.renderMathInElement) {
+        renderMathInElement(element, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false}
+          ],
+          throwOnError: false
+        });
       }
-      
-      q._shuffledOptions = indices.map(i => q.options[i]);
-      q._shuffledAnswer = indices.indexOf(origAnswer);
-      if (q._shuffledAnswer === -1) q._shuffledAnswer = 0;
     }
 
-    function initScratchpad() {
-      const canvas = document.getElementById('scratch-canvas');
-      if (!canvas) return;
-      
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width || 600;
-      canvas.height = rect.height || 200;
-      
-      scratchCtx = canvas.getContext('2d');
-      scratchCtx.strokeStyle = '#818cf8';
-      scratchCtx.lineWidth = 2.5;
-      scratchCtx.lineCap = 'round';
+    function loadStoredData() {
+      const qData = localStorage.getItem('math_app_questions');
+      if (qData) {
+        try { questions = JSON.parse(qData); } catch(e) { questions = [...DEFAULT_QUESTIONS]; }
+      } else {
+        questions = [...DEFAULT_QUESTIONS];
+      }
 
-      const getPos = (e) => {
-        const cRect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: clientX - cRect.left, y: clientY - cRect.top };
-      };
+      const hData = localStorage.getItem('math_app_history');
+      if (hData) {
+        try { historyData = JSON.parse(hData); } catch(e) { historyData = []; }
+      }
 
-      const startDraw = (e) => {
-        isDrawing = true;
-        const pos = getPos(e);
-        scratchCtx.beginPath();
-        scratchCtx.moveTo(pos.x, pos.y);
-      };
+      const gasUrl = localStorage.getItem('math_app_gas_url') || "";
+      document.getElementById('gas-url-input').value = gasUrl;
 
-      const draw = (e) => {
-        if (!isDrawing) return;
-        const pos = getPos(e);
-        if (scratchMode === 'eraser') {
-          scratchCtx.clearRect(pos.x - 10, pos.y - 10, 20, 20);
+      const geminiKey = localStorage.getItem('math_app_gemini_key') || "";
+      document.getElementById('gemini-api-key-input').value = geminiKey;
+    }
+
+    function saveGasUrl() {
+      const url = document.getElementById('gas-url-input').value.trim();
+      localStorage.setItem('math_app_gas_url', url);
+      showToast("GAS Web App URLを保存しました");
+    }
+
+    function saveGeminiSettings() {
+      const key = document.getElementById('gemini-api-key-input').value.trim();
+      localStorage.setItem('math_app_gemini_key', key);
+      showToast("Gemini API設定を保存しました");
+    }
+
+    // スプレッドシートから問題を自動取得（GET）
+    async function syncQuestionsFromCloud() {
+      const gasUrl = document.getElementById('gas-url-input').value.trim();
+      if (!gasUrl) return;
+
+      try {
+        showToast("スプレッドシートから問題を自動同期中...", false);
+        const res = await fetch(`${gasUrl}?action=get_questions`);
+        if (res.ok) {
+          const cloudQuestions = await res.json();
+          if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
+            questions = cloudQuestions;
+            localStorage.setItem('math_app_questions', JSON.stringify(questions));
+            updateUnitSelectOptions();
+            updateTagSelectOptions();
+            onAdminFilterSubjectChange();
+            showToast(`スプレッドシートから ${questions.length} 問の問題を同期しました！`);
+          }
+        }
+      } catch (e) {
+        console.warn("スプレッドシート同期エラー:", e);
+      }
+    }
+
+    // スプレッドシートへ問題データを一括保存（POST）
+    async function uploadQuestionsToCloud() {
+      const gasUrl = document.getElementById('gas-url-input').value.trim();
+      if (!gasUrl) {
+        showToast("GAS Web App URLを設定してください", true);
+        return;
+      }
+
+      try {
+        showToast(`${questions.length} 問の問題データをスプレッドシートへ送信中...`);
+        const payload = {
+          action: "save_questions",
+          questions: questions
+        };
+
+        const jsonString = JSON.stringify(payload);
+        const res = await fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: jsonString
+        });
+
+        if (!res.ok) throw new Error(`HTTPエラー: ステータス ${res.status}`);
+
+        const resData = await res.json();
+        if (resData.status === "success") {
+          const chunkMsg = resData.chunks ? ` (${resData.chunks}つのセルに分割保存)` : '';
+          showToast(`✓ スプレッドシートへ ${questions.length} 問のデータを保存しました！${chunkMsg}`);
         } else {
-          scratchCtx.lineTo(pos.x, pos.y);
-          scratchCtx.stroke();
+          showErrorModal("GASエラー: " + (resData.message || "スプレッドシートの保存中にエラーが発生しました"));
+        }
+      } catch (e) {
+        console.error("Upload error:", e);
+        showErrorModal(
+          "【通信エラー: Failed to fetch】\n\n" +
+          "＜主な解決方法＞\n" +
+          "1. GASエディタで「デプロイ」>「デプロイを管理」を開き、鉛筆マークから【新バージョン】として再デプロイしてください。\n" +
+          "2. 「アクセスできるユーザー」が【全員】になっているか確認してください。\n" +
+          "3. GASエディタ上で関数を1度「実行」し、アクセス権限の承認を完了させてください。"
+        );
+      }
+    }
+
+    // JSON取り込み処理
+    function importQuestionsJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (!Array.isArray(importedData)) {
+            throw new Error("JSONデータの形式が正しくありません (配列ではありません)");
+          }
+
+          if (importedData.length === 0) {
+            throw new Error("ファイル内の問題データが空です");
+          }
+
+          const sample = importedData[0];
+          if (!sample.question || !Array.isArray(sample.options)) {
+            throw new Error("問題データに必要な項目（question, options等）が見つかりません");
+          }
+
+          questions = importedData;
+          localStorage.setItem('math_app_questions', JSON.stringify(questions));
+
+          updateUnitSelectOptions();
+          updateTagSelectOptions();
+          onAdminFilterSubjectChange();
+
+          showToast(`✓ JSONファイルから ${questions.length} 問を取り込みました！`);
+
+          const gasUrl = document.getElementById('gas-url-input').value.trim();
+          if (gasUrl) {
+            await uploadQuestionsToCloud();
+          }
+        } catch (err) {
+          showErrorModal("JSON取り込みエラー:\n" + err.message);
         }
       };
-
-      const stopDraw = () => { isDrawing = false; };
-
-      canvas.addEventListener('mousedown', startDraw);
-      canvas.addEventListener('mousemove', draw);
-      canvas.addEventListener('mouseup', stopDraw);
-      canvas.addEventListener('touchstart', startDraw);
-      canvas.addEventListener('touchmove', draw);
-      canvas.addEventListener('touchend', stopDraw);
+      reader.readAsText(file, 'UTF-8');
+      event.target.value = '';
     }
 
+    // JSON書き出し
+    function exportQuestionsJSON() {
+      if (questions.length === 0) {
+        showToast("エクスポートする問題がありません", true);
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `math_questions_db_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast("JSONファイルをダウンロードしました");
+    }
+
+    function clearAllQuestions() {
+      if (!confirm("本当に登録済みのすべての問題（" + questions.length + "問）を削除しますか？")) return;
+      questions = [];
+      localStorage.setItem('math_app_questions', JSON.stringify(questions));
+      updateUnitSelectOptions();
+      updateTagSelectOptions();
+      onAdminFilterSubjectChange();
+      showToast("すべての問題を削除しました");
+    }
+
+    // 手書きメモ (Scratchpad) 処理
+    function initScratchpad() {
+      scratchCanvas = document.getElementById('scratch-canvas');
+      if (!scratchCanvas) return;
+      scratchCtx = scratchCanvas.getContext('2d');
+      resizeScratchCanvas();
+
+      scratchCanvas.addEventListener('mousedown', startDraw);
+      scratchCanvas.addEventListener('mousemove', draw);
+      scratchCanvas.addEventListener('mouseup', stopDraw);
+      scratchCanvas.addEventListener('mouseleave', stopDraw);
+
+      scratchCanvas.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY });
+        scratchCanvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+      }, { passive: false });
+
+      scratchCanvas.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent("mousemove", { clientX: touch.clientX, clientY: touch.clientY });
+        scratchCanvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+      }, { passive: false });
+
+      scratchCanvas.addEventListener('touchend', stopDraw);
+    }
+
+    function resizeScratchCanvas() {
+      if (!scratchCanvas) return;
+      scratchCanvas.width = scratchCanvas.clientWidth || 600;
+      scratchCanvas.height = scratchCanvas.clientHeight || 200;
+    }
+
+    function startDraw(e) {
+      isDrawing = true;
+      const rect = scratchCanvas.getBoundingClientRect();
+      scratchCtx.beginPath();
+      scratchCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = scratchCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      scratchCtx.lineWidth = scratchMode === 'eraser' ? 16 : 2;
+      scratchCtx.strokeStyle = scratchMode === 'eraser' ? '#0f172a' : '#818cf8';
+      scratchCtx.lineCap = 'round';
+
+      scratchCtx.lineTo(x, y);
+      scratchCtx.stroke();
+    }
+
+    function stopDraw() { isDrawing = false; }
+
     function toggleScratchpad() {
-      const wrap = document.getElementById('scratchpad-wrapper');
-      wrap.classList.toggle('hidden');
-      if (!wrap.classList.contains('hidden')) {
-        setTimeout(initScratchpad, 50);
+      const wrapper = document.getElementById('scratchpad-wrapper');
+      wrapper.classList.toggle('hidden');
+      if (!wrapper.classList.contains('hidden')) {
+        resizeScratchCanvas();
       }
     }
 
@@ -1011,704 +1181,46 @@ function responseJSON(obj) {
     }
 
     function clearScratchpad() {
-      const canvas = document.getElementById('scratch-canvas');
-      if (canvas && scratchCtx) {
-        scratchCtx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+      if (!scratchCtx || !scratchCanvas) return;
+      scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
     }
 
-    function switchTab(viewId) {
-      document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
-      const target = document.getElementById(viewId);
-      if (target) target.classList.remove('hidden');
-
-      const tabs = [
-        { id: 'tab-student-btn', view: 'student-view' },
-        { id: 'tab-analytics-btn', view: 'analytics-view' },
-        { id: 'tab-admin-btn', view: 'admin-view' }
-      ];
-
-      tabs.forEach(t => {
-        const btn = document.getElementById(t.id);
-        if (btn) {
-          if (t.view === viewId) {
-            btn.className = 'tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all flex items-center space-x-2 bg-indigo-600 text-white shadow';
-          } else {
-            btn.className = 'tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all flex items-center space-x-2';
-          }
-        }
-      });
-
-      if (viewId === 'analytics-view') {
-        updateAnalyticsUI();
-      } else if (viewId === 'admin-view') {
-        renderAdminQuestionList();
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      loadStoredData();
-      updateUnitSelectOptions();
-      updateTagSelectOptions();
-      updateAdminUnitFilterOptions();
-      renderAdminQuestionList();
-      updateAnalyticsUI();
-      toggleStudentInfoVisibility();
-
-      await syncQuestionsFromCloud();
-
-      const dropZone = document.getElementById('pdf-drop-zone');
-      if (dropZone) {
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-indigo-400', 'bg-slate-800'); });
-        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-indigo-400', 'bg-slate-800'); });
-        dropZone.addEventListener('drop', (e) => {
-          e.preventDefault();
-          dropZone.classList.remove('border-indigo-400', 'bg-slate-800');
-          if (e.dataTransfer.files.length > 0) {
-            handleFileInput(e.dataTransfer.files[0]);
-          }
-        });
-      }
-    });
-
-    function saveGasUrl() {
-      const url = document.getElementById('gas-url-input').value.trim();
-      const folderId = document.getElementById('drive-folder-id-input').value.trim() || FIXED_DRIVE_FOLDER_ID;
-      const fileName = document.getElementById('sync-filename-input').value.trim() || FIXED_SYNC_FILENAME;
-
-      localStorage.setItem('math_app_gas_url', url);
-      localStorage.setItem('math_app_drive_folder_id', folderId);
-      localStorage.setItem('math_app_sync_filename', fileName);
-
-      showToast("クラウド同期設定を保存しました");
-    }
-
-    function openGasCodeModal() {
-      document.getElementById('gas-script-content').textContent = GAS_TEMPLATE_CODE;
-      document.getElementById('gas-code-modal').classList.remove('hidden');
-    }
-
-    function closeGasCodeModal() {
-      document.getElementById('gas-code-modal').classList.add('hidden');
-    }
-
-    function copyGasScriptText() {
-      navigator.clipboard.writeText(GAS_TEMPLATE_CODE).then(() => {
-        showToast("GASスクリプトをクリップボードにコピーしました");
-      });
-    }
-
-    async function syncQuestionsFromCloud() {
-      const gasUrl = document.getElementById('gas-url-input').value.trim();
-      const folderId = document.getElementById('drive-folder-id-input').value.trim() || FIXED_DRIVE_FOLDER_ID;
-      const fileName = document.getElementById('sync-filename-input').value.trim() || FIXED_SYNC_FILENAME;
-
-      if (!gasUrl) return;
-
-      try {
-        showToast("Google Driveから最新問題を同期中...");
-        const targetUrl = `${gasUrl}?action=get_questions&folderId=${encodeURIComponent(folderId)}&fileName=${encodeURIComponent(fileName)}`;
-        const res = await fetch(targetUrl);
-        if (res.ok) {
-          const cloudQuestions = await res.json();
-          if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
-            questions = cloudQuestions;
-            saveQuestions();
-            showToast(`クラウドから ${questions.length} 問の同期が完了しました`);
-          }
-        }
-      } catch (e) {
-        console.warn("クラウド同期エラー:", e);
-      }
-    }
-
-    async function uploadQuestionsToCloud() {
-      const gasUrl = document.getElementById('gas-url-input').value.trim();
-      const folderId = document.getElementById('drive-folder-id-input').value.trim() || FIXED_DRIVE_FOLDER_ID;
-      const fileName = document.getElementById('sync-filename-input').value.trim() || FIXED_SYNC_FILENAME;
-
-      if (!gasUrl) {
-        showToast("GAS Web App URLを設定してください", true);
-        return;
-      }
-
-      try {
-        showToast(`${questions.length} 問の問題データをGoogle Driveへ送信中...`);
-        
-        const payload = {
-          action: "save_questions",
-          folderId: folderId,
-          fileName: fileName,
-          questions: questions
-        };
-
-        const response = await fetch(gasUrl, {
-          method: 'POST',
-          mode: 'cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload)
-        });
-
-        if (response.ok) {
-          const resData = await response.json();
-          if (resData.status === "success") {
-            showToast(`✓ Google Drive (${fileName}) へ ${questions.length} 問を保存しました！`);
-          } else {
-            showToast("保存処理を実行しました");
-          }
-        } else {
-          showToast("クラウドへの問題保存リクエストを送信しました");
-        }
-      } catch (e) {
-        showToast("クラウド保存リクエストを送信しました");
-      }
-    }
-
-    function exportQuestionsJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `math_questions_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
-    function importQuestionsJSON(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            questions = imported;
-            saveQuestions();
-            showToast(`${questions.length} 問の問題を取り込みました！`);
-          } else {
-            showToast("無効なJSONフォーマットです", true);
-          }
-        } catch (err) {
-          showToast("ファイル解析エラーが発生しました", true);
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function handleFileSelect(event) {
-      if (event.target.files && event.target.files[0]) {
-        handleFileInput(event.target.files[0]);
-      }
-    }
-
-    async function handleFileInput(file) {
-      const previewContainer = document.getElementById('pdf-image-preview-container');
-      const thumbsBox = document.getElementById('pdf-image-thumbnails');
-
-      loadedPdfImages = [];
-      loadedPdfCanvases = [];
-      thumbsBox.innerHTML = '';
-
-      try {
-        if (file.type.includes('pdf')) {
-          const arrayBuffer = await file.arrayBuffer();
-          const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-          for (let pageNum = 1; pageNum <= Math.min(pdfDoc.numPages, 3); pageNum++) {
-            const page = await pdfDoc.getPage(pageNum);
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            loadedPdfImages.push(dataUrl);
-            loadedPdfCanvases.push(canvas);
-
-            addThumbnailPreview(dataUrl, `Page ${pageNum}`, thumbsBox);
-          }
-        } else if (file.type.includes('image')) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const dataUrl = e.target.result;
-            const img = new Image();
-            img.onload = () => {
-              const maxDim = 1600;
-              let w = img.width;
-              let h = img.height;
-              if (w > maxDim || h > maxDim) {
-                if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-                else { w = Math.round((w * maxDim) / h); h = maxDim; }
-              }
-              const canvas = document.createElement('canvas');
-              canvas.width = w; canvas.height = h;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, w, h);
-              
-              const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-              loadedPdfImages.push(resizedDataUrl);
-              loadedPdfCanvases.push(canvas);
-
-              addThumbnailPreview(resizedDataUrl, file.name, thumbsBox);
-            };
-            img.src = dataUrl;
-          };
-          reader.readAsDataURL(file);
-        } else {
-          showToast("PDFまたは画像ファイル (PNG/JPG) を指定してください", true);
-          return;
-        }
-
-        previewContainer.classList.remove('hidden');
-        showToast("ファイルを読み込みました");
-      } catch (err) {
-        console.error("File input error:", err);
-        showErrorModal(err);
-      }
-    }
-
-    function addThumbnailPreview(dataUrl, labelText, container) {
-      const wrap = document.createElement('div');
-      wrap.className = 'flex flex-col items-center shrink-0';
-      wrap.innerHTML = `
-        <img src="${dataUrl}" class="h-20 w-auto object-contain rounded border border-slate-600 bg-white" />
-        <span class="text-[10px] text-slate-400 mt-1">${labelText}</span>
-      `;
-      container.appendChild(wrap);
-    }
-
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-    function sanitizeJsonString(str) {
-      if (!str) return "[]";
-
-      let cleaned = str.trim();
-      cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
-
-      let result = '';
-      let inString = false;
-      let isEscaped = false;
-
-      for (let i = 0; i < cleaned.length; i++) {
-        const char = cleaned[i];
-
-        if (!inString) {
-          if (char === '"') {
-            inString = true;
-          }
-          result += char;
-        } else {
-          if (isEscaped) {
-            const remaining = cleaned.slice(i);
-            let isLatexCommand = false;
-
-            if (char === 't' && /^(imes|an|ext|heta|riangle|op|ransform)/.test(remaining)) isLatexCommand = true;
-            if (char === 'r' && /^(ight|ho)/.test(remaining)) isLatexCommand = true;
-            if (char === 'b' && /^(egin|ar)/.test(remaining)) isLatexCommand = true;
-            if (char === 'f' && /^(rac|orall)/.test(remaining)) isLatexCommand = true;
-
-            if (isLatexCommand || !'\"\\/bfnrtu'.includes(char)) {
-              result = result.slice(0, -1) + '\\\\' + char;
-            } else {
-              result += char;
-            }
-            isEscaped = false;
-          } else {
-            if (char === '\\') {
-              isEscaped = true;
-              result += char;
-            } else if (char === '"') {
-              inString = false;
-              result += char;
-            } else if (char === '\n') {
-              result += '\\n';
-            } else if (char === '\r') {
-              result += '\\r';
-            } else if (char === '\t') {
-              result += '\\t';
-            } else {
-              result += char;
-            }
-          }
-        }
-      }
-
-      if (isEscaped) {
-        result += '\\';
-      }
-
-      return result;
-    }
-
-    async function fetchGeminiWithRetry(model, apiKey, contents, maxRetries = 2) {
-      let lastErrText = "";
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        if (attempt > 0) {
-          const loadingMsg = document.getElementById('ai-loading-msg');
-          if (loadingMsg) loadingMsg.textContent = `再試行中 (${attempt}/${maxRetries}) [モデル: ${model}]...`;
-          await delay(2000 * attempt);
-        }
-
-        let res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: contents,
-            generationConfig: { responseMimeType: "application/json" }
-          })
-        });
-
-        if (res.ok) return res;
-        lastErrText = await res.text();
-        if (res.status !== 503 && res.status !== 429) break;
-      }
-      throw new Error(`[API Error] Model: ${model}\n${lastErrText}`);
-    }
-
-    async function generateQuestionsWithAI() {
-      const apiKey = cleanApiKeyString(document.getElementById('gemini-api-key-input').value);
-      if (!apiKey) {
-        showToast("Gemini APIキーを設定してください", true);
-        return;
-      }
-      if (loadedPdfImages.length === 0) {
-        showToast("解析するPDFまたは画像ファイルを先に選択してください", true);
-        return;
-      }
-
-      const lessonTag = document.getElementById('import-lesson-tag').value.trim() || "授業プリント";
-      const spinner = document.getElementById('ai-loading-spinner');
-      const loadingMsg = document.getElementById('ai-loading-msg');
-      spinner.classList.remove('hidden');
-      if (loadingMsg) loadingMsg.textContent = "Gemini Visionが問題文・解法アプローチ（思考ステップ）・選択肢を自動生成中...";
-
-      try {
-        const imageParts = loadedPdfImages.map(imgData => ({
-          inline_data: { mime_type: "image/jpeg", data: imgData.split(',')[1] }
-        }));
-
-        const promptText = `
-あなたは高校数学の教師です。提供された画像から数学の問題を抽出し、以下のJSONフォーマットの純粋なJSON配列を出力してください。
-
-【最重要：小問の個別分離ルール】
-- 1つの大問の中に (1), (2), (3) や ①, ② などのように小問が分かれている場合は、必ず【(1)で1問】、【(2)で1問】のように小問ごとに独立した問題オブジェクトとして分割して出力してください。
-- 小問ごとに分割する際は、大問の共通前提・設定文を各小問の問題文の冒頭に必ず含め、1問単体で完結して解けるように文章を構成してください。
-
-【重要：正解位置(answer)の分散指示】
-- answerには正解となる選択肢のインデックス(0, 1, 2, 3のいずれか)を指定してください。
-- 正解位置がインデックス0に集中しないよう、0, 1, 2, 3 の中でランダム・均等に散らしてください。
-
-【重要：LaTeX表記とJSONエスケープ】
-- 数式を含める場合、JSONの文字列として正しくパースできるように、すべてのバックスラッシュは必ず2重バックスラッシュ（例: \\\\( や \\\\frac や \\\\sqrt や \\\\times）で記述してください。
-
-[
-  {
-    "subject": "数学Ⅰ",
-    "unit": "2次関数",
-    "difficulty": 1,
-    "question": "【前提条件＋(1)の問題文】...",
-    "thinkingOptions": ["方針1", "方針2", "方針3", "方針4"],
-    "thinkingAnswer": 0,
-    "options": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"],
-    "answer": 2,
-    "explanation": "解説...",
-    "figureBox": [200, 150, 600, 850]
-  }
-]
-`;
-
-        const contents = [{ parts: [{ text: promptText }, ...imageParts] }];
-        let selectedModel = document.getElementById('gemini-model-select').value || "gemini-3.8-flash";
-        const modelCandidates = [selectedModel, "gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"].filter((v, i, a) => a.indexOf(v) === i);
-
-        let response = null;
-        for (const model of modelCandidates) {
-          try {
-            response = await fetchGeminiWithRetry(model, apiKey, contents, 1);
-            if (response && response.ok) break;
-          } catch (err) {
-            console.warn(`Model ${model} error:`, err);
-          }
-        }
-
-        if (!response || !response.ok) {
-          throw new Error(`Gemini API 呼び出しに失敗しました (ステータス: ${response ? response.status : '不明'})`);
-        }
-
-        const data = await response.json();
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        
-        const sanitizedJsonStr = sanitizeJsonString(responseText);
-        
-        let generatedList;
-        try {
-          generatedList = JSON.parse(sanitizedJsonStr);
-        } catch (jsonErr) {
-          console.error("Raw response:", responseText);
-          console.error("Sanitized string:", sanitizedJsonStr);
-          throw new Error(`JSON解析エラー: ${jsonErr.message}\n\n【AIレスポンス文】\n${responseText.slice(0, 300)}...`);
-        }
-
-        if (!Array.isArray(generatedList)) generatedList = [generatedList];
-
-        let addedCount = 0;
-        generatedList.forEach((qItem, idx) => {
-          let figureBase64 = null;
-          if (qItem.figureBox && Array.isArray(qItem.figureBox) && qItem.figureBox.length === 4 && loadedPdfCanvases.length > 0) {
-            figureBase64 = cropFigureFromCanvas(loadedPdfCanvases[0], qItem.figureBox);
-          }
-
-          const newQ = {
-            id: 'q_ai_' + Date.now() + '_' + idx,
-            subject: qItem.subject || inferSubjectFromUnit(qItem.unit),
-            unit: qItem.unit || '全般',
-            tag: lessonTag,
-            difficulty: parseInt(qItem.difficulty) || 1,
-            question: qItem.question || '',
-            thinkingOptions: Array.isArray(qItem.thinkingOptions) && qItem.thinkingOptions.length === 4 ? qItem.thinkingOptions : ["公式を適用", "因数分解", "グラフ描画", "場合分け"],
-            thinkingAnswer: typeof qItem.thinkingAnswer === 'number' ? qItem.thinkingAnswer : 0,
-            options: Array.isArray(qItem.options) && qItem.options.length === 4 ? qItem.options : ["A", "B", "C", "D"],
-            answer: typeof qItem.answer === 'number' ? qItem.answer : 0,
-            explanation: qItem.explanation || '',
-            figureImage: figureBase64
-          };
-
-          questions.push(newQ);
-          addedCount++;
-        });
-
-        saveQuestions();
-        showToast(`${addedCount} 件の問題を登録しました！`);
-      } catch (err) {
-        console.error("AI Generation failed:", err);
-        showErrorModal(err);
-      } finally {
-        spinner.classList.add('hidden');
-      }
-    }
-
-    async function generateSimilarQuestionAI() {
-      const apiKey = cleanApiKeyString(document.getElementById('gemini-api-key-input').value);
-      if (!apiKey) {
-        showToast("Gemini APIキーを管理画面で設定してください", true);
-        return;
-      }
-
-      const q = currentQuizQuestions[currentQuestionIdx];
-      showToast("✨ AIが類題を生成中...");
-
-      try {
-        const promptText = `
-以下の数学問題の【数値や設定を変更した類似問題（同単元・同難易度）】を1問だけ作成し、JSON形式で返してください。数式バックスラッシュは\\\\のように2重化してください。
-正解位置 "answer" (0, 1, 2, 3) もランダムに設定してください。
-
-【元問題】
-科目: ${q.subject}
-単元: ${q.unit}
-問題: ${q.question}
-
-【出力JSON構造】
-{
-  "subject": "${q.subject}",
-  "unit": "${q.unit}",
-  "difficulty": ${q.difficulty},
-  "question": "類題の問題文...",
-  "thinkingOptions": ["方針1", "方針2", "方針3", "方針4"],
-  "thinkingAnswer": 0,
-  "options": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"],
-  "answer": 2,
-  "explanation": "類題の解説..."
-}
-`;
-        const contents = [{ parts: [{ text: promptText }] }];
-        let selectedModel = document.getElementById('gemini-model-select').value || "gemini-3.8-flash";
-        const response = await fetchGeminiWithRetry(selectedModel, apiKey, contents, 1);
-        const data = await response.json();
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-        const sanitized = sanitizeJsonString(responseText);
-        const newQItem = JSON.parse(sanitized);
-
-        const generatedQ = {
-          id: 'q_similar_' + Date.now(),
-          subject: newQItem.subject,
-          unit: newQItem.unit,
-          tag: (q.tag || '') + " (類題)",
-          difficulty: newQItem.difficulty,
-          question: newQItem.question,
-          thinkingOptions: newQItem.thinkingOptions || ["方針1", "方針2", "方針3", "方針4"],
-          thinkingAnswer: newQItem.thinkingAnswer || 0,
-          options: newQItem.options,
-          answer: typeof newQItem.answer === 'number' ? newQItem.answer : 0,
-          explanation: newQItem.explanation,
-          figureImage: null
-        };
-
-        shuffleQuestionOptions(generatedQ);
-
-        currentQuizQuestions.splice(currentQuestionIdx + 1, 0, generatedQ);
-        showToast("類題を作成しました！「次の問題へ」で挑戦できます");
-      } catch (err) {
-        console.error("Similar Q gen failed:", err);
-        showToast("類題の生成に失敗しました", true);
-      }
-    }
-
-    function cropFigureFromCanvas(sourceCanvas, box) {
-      try {
-        const [ymin, xmin, ymax, xmax] = box;
-        const cropCanvas = document.getElementById('crop-canvas');
-        const ctx = cropCanvas.getContext('2d');
-        const srcWidth = sourceCanvas.width;
-        const srcHeight = sourceCanvas.height;
-
-        const cropX = Math.floor((xmin / 1000) * srcWidth);
-        const cropY = Math.floor((ymin / 1000) * srcHeight);
-        const cropW = Math.max(10, Math.floor(((xmax - xmin) / 1000) * srcWidth));
-        const cropH = Math.max(10, Math.floor(((ymax - ymin) / 1000) * srcHeight));
-
-        cropCanvas.width = cropW;
-        cropCanvas.height = cropH;
-        
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, cropW, cropH);
-        ctx.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-
-        return cropCanvas.toDataURL('image/jpeg', 0.65);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function cleanApiKeyString(keyStr) {
-      return keyStr ? keyStr.trim().replace(/[\r\n\s"']/g, '') : '';
-    }
-
-    function saveGeminiSettings() {
-      const key = cleanApiKeyString(document.getElementById('gemini-api-key-input').value);
-      localStorage.setItem('math_app_gemini_key', key);
-      showToast("Gemini API設定を保存しました");
-    }
-
-    function loadStoredData() {
-      const qData = localStorage.getItem('math_app_questions');
-      if (qData) {
-        try { questions = JSON.parse(qData); } catch(e) { questions = [...DEFAULT_QUESTIONS]; }
-      } else {
-        questions = [...DEFAULT_QUESTIONS];
-        saveQuestions();
-      }
-
-      const hData = localStorage.getItem('math_app_history');
-      if (hData) {
-        try { historyData = JSON.parse(hData); } catch(e) { historyData = []; }
-      }
-
-      const mData = localStorage.getItem('math_app_misconceptions');
-      if (mData) {
-        try { misconceptionStats = JSON.parse(mData); } catch(e) {}
-      }
-
-      const geminiKey = localStorage.getItem('math_app_gemini_key');
-      if (geminiKey) document.getElementById('gemini-api-key-input').value = cleanApiKeyString(geminiKey);
-
-      const gasUrl = localStorage.getItem('math_app_gas_url') || DEFAULT_GAS_URL;
-      document.getElementById('gas-url-input').value = gasUrl;
-
-      const folderId = localStorage.getItem('math_app_drive_folder_id') || FIXED_DRIVE_FOLDER_ID;
-      document.getElementById('drive-folder-id-input').value = folderId;
-
-      const fileName = localStorage.getItem('math_app_sync_filename') || FIXED_SYNC_FILENAME;
-      document.getElementById('sync-filename-input').value = fileName;
-    }
-
-    function saveQuestions() {
-      localStorage.setItem('math_app_questions', JSON.stringify(questions));
-      updateUnitSelectOptions();
-      updateTagSelectOptions();
-      updateAdminUnitFilterOptions();
-      renderAdminQuestionList();
-    }
-
-    function onSubjectChange() {
-      updateUnitSelectOptions();
-    }
-
-    function updateUnitSelectOptions() {
-      const selectedSubject = document.getElementById('quiz-subject-select').value;
-      const selectUnit = document.getElementById('quiz-unit-select');
-      let filteredQuestions = questions;
-      if (selectedSubject !== 'ALL') {
-        filteredQuestions = questions.filter(q => q.subject === selectedSubject);
-      }
-      const availableUnits = [...new Set(filteredQuestions.map(q => q.unit))];
-
-      selectUnit.innerHTML = '<option value="ALL">すべての単元</option>';
-      availableUnits.forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u; opt.textContent = u;
-        selectUnit.appendChild(opt);
-      });
-    }
-
-    function updateTagSelectOptions() {
-      const selectTag = document.getElementById('quiz-tag-select');
-      const tags = [...new Set(questions.map(q => q.tag).filter(Boolean))];
-      selectTag.innerHTML = '<option value="ALL">指定なし (全問題)</option>';
-      tags.forEach(t => {
-        const opt = document.createElement('option');
-        opt.value = t; opt.textContent = t;
-        selectTag.appendChild(opt);
-      });
-    }
-
-    function toggleStudentInfoVisibility() {
-      const mode = document.getElementById('quiz-mode-select').value;
-      const infoBox = document.getElementById('student-info-box');
-      if (mode === 'TEST_10') {
-        infoBox.classList.remove('hidden');
-      } else {
-        infoBox.classList.add('hidden');
-      }
-    }
-
+    // 演習開始ロジック
     function startQuiz() {
-      const subj = document.getElementById('quiz-subject-select').value;
+      const subject = document.getElementById('quiz-subject-select').value;
       const unit = document.getElementById('quiz-unit-select').value;
       const tag = document.getElementById('quiz-tag-select').value;
       const diff = document.getElementById('quiz-diff-select').value;
-      currentMode = document.getElementById('quiz-mode-select').value;
+      const mode = document.getElementById('quiz-mode-select').value;
 
-      if (currentMode === 'TEST_10') {
+      if (mode === 'TEST_10') {
         const grade = document.getElementById('student-grade').value.trim();
         const num = document.getElementById('student-num').value.trim();
         const name = document.getElementById('student-name').value.trim();
         if (!grade || !num || !name) {
-          showToast("学年・組、出席番号、氏名を入力してください", true);
+          showToast("小テストモードでは学年・出席番号・氏名の入力が必須です", true);
           return;
         }
       }
 
-      let filtered = [...questions];
-      if (subj !== 'ALL') filtered = filtered.filter(q => q.subject === subj);
-      if (unit !== 'ALL') filtered = filtered.filter(q => q.unit === unit);
-      if (tag !== 'ALL') filtered = filtered.filter(q => q.tag === tag);
-      if (diff !== 'ALL') filtered = filtered.filter(q => q.difficulty === parseInt(diff));
+      let pool = questions.filter(q => {
+        if (subject !== 'ALL' && q.subject !== subject) return false;
+        if (unit !== 'ALL' && q.unit !== unit) return false;
+        if (tag !== 'ALL' && (q.tag || q.lessonTag) !== tag) return false;
+        if (diff !== 'ALL' && String(q.difficulty) !== String(diff)) return false;
+        return true;
+      });
 
-      if (filtered.length === 0) {
-        showToast("条件に該当する問題が見つかりません", true);
+      if (pool.length === 0) {
+        showToast("指定された条件に該当する問題が登録されていません", true);
         return;
       }
 
-      filtered.sort(() => Math.random() - 0.5);
-      currentQuizQuestions = (currentMode === 'TEST_10') ? filtered.slice(0, 10) : filtered;
+      // 出題順のシャッフル
+      pool = [...pool].sort(() => Math.random() - 0.5);
+      if (mode === 'TEST_10') pool = pool.slice(0, 10);
 
-      currentQuizQuestions.forEach(q => shuffleQuestionOptions(q));
-
+      currentQuizQuestions = pool;
       currentQuestionIdx = 0;
       quizScore = 0;
 
@@ -1720,174 +1232,169 @@ function responseJSON(obj) {
     }
 
     function renderCurrentQuestion() {
-      userHasAnswered = false;
-      selectedThinkingIdx = null;
-      questionStartTime = Date.now();
-
       const q = currentQuizQuestions[currentQuestionIdx];
+      const mode = document.getElementById('quiz-mode-select').value;
 
-      if (!q._shuffledOptions) {
-        shuffleQuestionOptions(q);
-      }
+      selectedThinkingIdx = null;
+      selectedAnswerIdx = null;
 
       document.getElementById('quiz-progress-badge').textContent = `問題 ${currentQuestionIdx + 1} / ${currentQuizQuestions.length}`;
-      document.getElementById('quiz-subject-badge').textContent = q.subject || "数学Ⅰ";
-      document.getElementById('quiz-unit-badge').textContent = q.unit;
-      
+      document.getElementById('quiz-subject-badge').textContent = q.subject || '数学';
+      document.getElementById('quiz-unit-badge').textContent = q.unit || '単元';
+
       const tagBadge = document.getElementById('quiz-tag-badge');
-      if (q.tag) {
-        tagBadge.textContent = q.tag;
+      if (q.tag || q.lessonTag) {
+        tagBadge.textContent = q.tag || q.lessonTag;
         tagBadge.classList.remove('hidden');
       } else {
         tagBadge.classList.add('hidden');
       }
 
-      document.getElementById('quiz-diff-badge').textContent = `★${q.difficulty}`;
+      document.getElementById('quiz-diff-badge').textContent = `★${q.difficulty || 1}`;
 
+      // 問題文
       const qTextEl = document.getElementById('question-text');
-      qTextEl.innerHTML = q.question;
-      renderMathInContainer(qTextEl);
+      qTextEl.textContent = q.question;
+      renderMath(qTextEl);
 
-      const figBox = document.getElementById('question-figure-box');
-      const figImg = document.getElementById('question-figure-img');
+      // 図形
+      const figureBox = document.getElementById('question-figure-box');
+      const figureImg = document.getElementById('question-figure-img');
       if (q.figureImage) {
-        figImg.src = q.figureImage;
-        figBox.classList.remove('hidden');
+        figureImg.src = q.figureImage;
+        figureBox.classList.remove('hidden');
       } else {
-        figBox.classList.add('hidden');
+        figureBox.classList.add('hidden');
       }
 
+      // 思考プロセスボックス
       const thinkingBox = document.getElementById('thinking-process-box');
       const thinkingContainer = document.getElementById('thinking-options-container');
-      if (currentMode === 'THINKING_CHECK' && q.thinkingOptions) {
+      thinkingContainer.innerHTML = '';
+
+      if (mode === 'THINKING_CHECK' && Array.isArray(q.thinkingOptions) && q.thinkingOptions.length > 0) {
         thinkingBox.classList.remove('hidden');
-        thinkingContainer.innerHTML = '';
-        q.thinkingOptions.forEach((tOpt, idx) => {
+        q.thinkingOptions.forEach((opt, idx) => {
           const btn = document.createElement('button');
-          btn.className = "w-full text-left bg-slate-900 border border-slate-700 hover:border-amber-400 rounded-lg p-2.5 text-xs text-slate-200 transition-all flex items-center justify-between";
+          btn.className = "w-full text-left p-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 rounded-lg text-xs text-slate-200 transition-all";
+          btn.textContent = `${idx + 1}. ${opt}`;
           btn.onclick = () => selectThinkingOption(idx);
-          btn.innerHTML = `<span>💡 方針 ${idx+1}: ${tOpt}</span><i class="fa-regular fa-circle text-slate-500"></i>`;
           thinkingContainer.appendChild(btn);
-          renderMathInContainer(btn);
         });
+        renderMath(thinkingContainer);
       } else {
         thinkingBox.classList.add('hidden');
       }
 
-      const displayOptions = q._shuffledOptions || q.options;
+      // ★【機能追加】回答選択肢のランダムシャッフル機能 ★
+      const originalOptions = q.options || [];
+      const origCorrectIdx = q.answer || 0;
+
+      // インデックスとテキストをペアにしてシャッフル
+      const mapped = originalOptions.map((opt, idx) => ({ text: opt, isCorrect: idx === origCorrectIdx }));
+      mapped.sort(() => Math.random() - 0.5);
+
+      currentShuffledOptions = mapped.map(item => item.text);
+      currentShuffledCorrectIdx = mapped.findIndex(item => item.isCorrect);
+
+      // 回答選択肢の描画
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
-
-      displayOptions.forEach((optText, idx) => {
+      currentShuffledOptions.forEach((optText, idx) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left bg-slate-900/90 hover:bg-indigo-950/50 border border-slate-700/80 hover:border-indigo-500/50 rounded-xl p-4 transition-all text-sm font-medium text-slate-200 flex items-center justify-between group";
-        btn.onclick = () => selectOption(idx);
-
-        const textSpan = document.createElement('span');
-        textSpan.innerHTML = `${idx + 1}. ${optText}`;
-
-        const iconI = document.createElement('i');
-        iconI.className = "fa-regular fa-circle text-slate-500 group-hover:text-indigo-400";
-
-        btn.appendChild(textSpan);
-        btn.appendChild(iconI);
+        btn.className = "w-full text-left p-3.5 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700/80 rounded-xl text-sm font-medium text-slate-100 transition-all flex items-center justify-between group";
+        btn.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="w-6 h-6 rounded-full bg-slate-800 group-hover:bg-indigo-600 text-slate-400 group-hover:text-white flex items-center justify-center text-xs font-bold transition-colors">${idx + 1}</span>
+            <span>${optText}</span>
+          </div>
+          <i class="fa-solid fa-chevron-right text-xs text-slate-600 group-hover:text-slate-300"></i>
+        `;
+        btn.onclick = () => selectAnswerOption(idx);
         optionsContainer.appendChild(btn);
-
-        renderMathInContainer(textSpan);
       });
+      renderMath(optionsContainer);
 
+      // 解説・診断非表示
       document.getElementById('explanation-box').classList.add('hidden');
       document.getElementById('misconception-diagnosis-box').classList.add('hidden');
-      clearScratchpad();
     }
 
     function selectThinkingOption(idx) {
       selectedThinkingIdx = idx;
-      const btns = document.querySelectorAll('#thinking-options-container button');
-      btns.forEach((btn, i) => {
+      const container = document.getElementById('thinking-options-container');
+      Array.from(container.children).forEach((btn, i) => {
         if (i === idx) {
-          btn.className = "w-full text-left bg-amber-950/80 border-2 border-amber-400 rounded-lg p-2.5 text-xs text-amber-200 flex items-center justify-between";
+          btn.className = "w-full text-left p-2.5 bg-amber-600 text-white border border-amber-500 rounded-lg text-xs font-semibold shadow";
         } else {
-          btn.className = "w-full text-left bg-slate-900 border border-slate-700 opacity-60 rounded-lg p-2.5 text-xs text-slate-400 flex items-center justify-between";
+          btn.className = "w-full text-left p-2.5 bg-slate-900 text-slate-400 border border-slate-800 rounded-lg text-xs opacity-60";
         }
       });
     }
 
-    function selectOption(selectedIdx) {
-      if (userHasAnswered) return;
-      
-      if (currentMode === 'THINKING_CHECK' && selectedThinkingIdx === null) {
-        showToast("先に【思考ステップ】の解法方針を選択してください", true);
-        return;
-      }
+    function selectAnswerOption(idx) {
+      if (selectedAnswerIdx !== null) return; // 二重回答防止
+      selectedAnswerIdx = idx;
 
-      userHasAnswered = true;
-      const timeSpentSec = Math.round((Date.now() - questionStartTime) / 1000);
       const q = currentQuizQuestions[currentQuestionIdx];
-      
-      const correctAnswerIdx = (typeof q._shuffledAnswer === 'number') ? q._shuffledAnswer : q.answer;
-      const isCorrect = (selectedIdx === correctAnswerIdx);
+      const isCorrect = idx === currentShuffledCorrectIdx;
 
       if (isCorrect) quizScore++;
 
-      historyData.push({
-        date: new Date().toISOString(),
-        subject: q.subject || "数学Ⅰ",
-        unit: q.unit,
-        tag: q.tag,
-        timeSpentSec: timeSpentSec,
-        isCorrect: isCorrect
-      });
-      localStorage.setItem('math_app_history', JSON.stringify(historyData));
-
+      // 解答ボタンハイライト
       const container = document.getElementById('options-container');
-      const buttons = container.querySelectorAll('button');
-
-      buttons.forEach((btn, idx) => {
-        btn.disabled = true;
-        if (idx === correctAnswerIdx) {
-          btn.className = "w-full text-left bg-emerald-950/80 border-2 border-emerald-500 rounded-xl p-4 text-sm font-medium text-emerald-200 flex items-center justify-between";
-          btn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400";
-        } else if (idx === selectedIdx) {
-          btn.className = "w-full text-left bg-rose-950/80 border-2 border-rose-500 rounded-xl p-4 text-sm font-medium text-rose-200 flex items-center justify-between";
-          btn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400";
+      Array.from(container.children).forEach((btn, i) => {
+        if (i === currentShuffledCorrectIdx) {
+          btn.className = "w-full text-left p-3.5 bg-emerald-950/80 border-2 border-emerald-500 rounded-xl text-sm font-semibold text-emerald-200 flex items-center justify-between shadow";
+        } else if (i === idx && !isCorrect) {
+          btn.className = "w-full text-left p-3.5 bg-rose-950/80 border-2 border-rose-500 rounded-xl text-sm font-semibold text-rose-200 flex items-center justify-between";
         } else {
-          btn.className = "w-full text-left bg-slate-900/50 border border-slate-800 opacity-50 rounded-xl p-4 text-sm text-slate-400 flex items-center justify-between";
+          btn.className = "w-full text-left p-3.5 bg-slate-900/40 border border-slate-800 rounded-xl text-sm text-slate-500 opacity-50";
         }
       });
 
+      // 結果表示
       const expBox = document.getElementById('explanation-box');
-      const resBanner = document.getElementById('answer-result-banner');
+      const resultBanner = document.getElementById('answer-result-banner');
       const expText = document.getElementById('explanation-text');
 
       if (isCorrect) {
-        resBanner.className = "font-bold text-base flex items-center space-x-2 text-emerald-400";
-        resBanner.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span>正解です！ (所要時間: ${timeSpentSec}秒)</span>`;
+        resultBanner.className = "font-bold text-base text-emerald-400 flex items-center space-x-2";
+        resultBanner.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span>正解です！</span>`;
       } else {
-        resBanner.className = "font-bold text-base flex items-center space-x-2 text-rose-400";
-        resBanner.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解です (正解: 選択肢 ${correctAnswerIdx + 1})</span>`;
+        resultBanner.className = "font-bold text-base text-rose-400 flex items-center space-x-2";
+        resultBanner.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解（正解: 選択肢 ${currentShuffledCorrectIdx + 1}）</span>`;
+        // 間違えた場合はつまずき診断表示
         document.getElementById('misconception-diagnosis-box').classList.remove('hidden');
       }
 
-      expText.innerHTML = q.explanation || "解説はありません。";
-      renderMathInContainer(expText);
+      expText.textContent = q.explanation || "解説が登録されていません。";
+      renderMath(expText);
       expBox.classList.remove('hidden');
+
+      // 履歴追加
+      historyData.push({
+        date: new Date().toISOString(),
+        subject: q.subject,
+        unit: q.unit,
+        isCorrect: isCorrect
+      });
+      localStorage.setItem('math_app_history', JSON.stringify(historyData));
+      updateAnalyticsView();
     }
 
-    function recordMisconception(type) {
-      misconceptionStats[type] = (misconceptionStats[type] || 0) + 1;
-      localStorage.setItem('math_app_misconceptions', JSON.stringify(misconceptionStats));
-      showToast("つまずき原因を記録しました（弱点分析に統合）");
+    function recordMisconception(cause) {
+      if (misconceptionStats[cause] !== undefined) {
+        misconceptionStats[cause]++;
+      }
+      showToast("つまずき理由を記録しました");
       document.getElementById('misconception-diagnosis-box').classList.add('hidden');
-    }
-
-    function toggleStepByStepHint() {
-      showToast("解説の着眼点とステップを強調表示しました");
+      updateAnalyticsView();
     }
 
     function nextQuestion() {
-      currentQuestionIdx++;
-      if (currentQuestionIdx < currentQuizQuestions.length) {
+      if (currentQuestionIdx < currentQuizQuestions.length - 1) {
+        currentQuestionIdx++;
         renderCurrentQuestion();
       } else {
         finishQuiz();
@@ -1905,69 +1412,67 @@ function responseJSON(obj) {
       const pct = Math.round((quizScore / total) * 100);
       document.getElementById('result-percentage-fill').style.width = `${pct}%`;
 
-      if (currentMode === 'TEST_10') {
-        submitResultToGAS();
+      const mode = document.getElementById('quiz-mode-select').value;
+      const statusEl = document.getElementById('gas-submit-status');
+
+      if (mode === 'TEST_10') {
+        const gasUrl = document.getElementById('gas-url-input').value.trim();
+        if (gasUrl) {
+          statusEl.textContent = "スプレッドシートへ小テスト成績を自動送信中...";
+          fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({
+              studentGrade: document.getElementById('student-grade').value,
+              studentNum: document.getElementById('student-num').value,
+              studentName: document.getElementById('student-name').value,
+              score: quizScore,
+              total: total
+            })
+          }).then(res => res.json()).then(data => {
+            statusEl.textContent = "✓ 成績データをスプレッドシートへ正常送信しました";
+            statusEl.className = "text-xs text-emerald-400 h-6";
+          }).catch(err => {
+            statusEl.textContent = "成績データの送信に失敗しました（GAS設定をご確認ください）";
+            statusEl.className = "text-xs text-rose-400 h-6";
+          });
+        }
       }
     }
 
-    async function submitResultToGAS() {
-      const gasUrl = document.getElementById('gas-url-input').value.trim();
-      const statusEl = document.getElementById('gas-submit-status');
-
-      if (!gasUrl) {
-        if (statusEl) statusEl.textContent = "※ GAS URLが設定されていないため成績は送られませんでした";
-        return;
-      }
-
-      if (statusEl) statusEl.textContent = "成績データをスプレッドシートへ送信中...";
-
-      const payload = {
-        studentGrade: document.getElementById('student-grade').value.trim(),
-        studentNum: document.getElementById('student-num').value.trim(),
-        studentName: document.getElementById('student-name').value.trim(),
-        score: quizScore,
-        total: currentQuizQuestions.length,
-        timestamp: new Date().toISOString()
-      };
-
-      try {
-        await fetch(gasUrl, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (statusEl) statusEl.textContent = "✓ 成績データを送信しました";
-      } catch (e) {
-        if (statusEl) statusEl.textContent = "送信エラーが発生しました";
-      }
+    function abortQuiz() {
+      if (!confirm("演習を中断して戻りますか？")) return;
+      resetQuizView();
     }
 
     function resetQuizView() {
+      document.getElementById('quiz-active-card').classList.add('hidden');
       document.getElementById('quiz-result-card').classList.add('hidden');
       document.getElementById('quiz-setup-card').classList.remove('hidden');
     }
 
-    function abortQuiz() {
-      document.getElementById('quiz-active-card').classList.add('hidden');
-      document.getElementById('quiz-setup-card').classList.remove('hidden');
+    function downloadCSVResult() {
+      const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent("得点,総問題数,正答率\n" + `${quizScore},${currentQuizQuestions.length},${Math.round((quizScore/currentQuizQuestions.length)*100)}%\n`);
+      const link = document.createElement('a');
+      link.setAttribute("href", csvContent);
+      link.setAttribute("download", `quiz_result_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     }
 
-    function updateAnalyticsUI() {
+    // 分析画面更新
+    function updateAnalyticsView() {
       const totalAnswers = historyData.length;
-      document.getElementById('total-answers-cnt').innerHTML = `${totalAnswers} <span class="text-xs font-normal text-slate-400">問</span>`;
+      document.getElementById('total-answers-cnt').textContent = totalAnswers;
 
-      if (totalAnswers === 0) {
-        document.getElementById('overall-accuracy-pct').innerHTML = `0 <span class="text-xs font-normal text-slate-400">%</span>`;
-        document.getElementById('weakest-unit-name').textContent = "データなし";
-        document.getElementById('top-misconception-cause').textContent = "未記録";
-        return;
-      }
+      if (totalAnswers === 0) return;
 
-      const correctCnt = historyData.filter(h => h.isCorrect).length;
-      const accPct = Math.round((correctCnt / totalAnswers) * 100);
-      document.getElementById('overall-accuracy-pct').innerHTML = `${accPct} <span class="text-xs font-normal text-slate-400">%</span>`;
+      const correctAnswers = historyData.filter(h => h.isCorrect).length;
+      const accPct = Math.round((correctAnswers / totalAnswers) * 100);
+      document.getElementById('overall-accuracy-pct').textContent = accPct;
 
+      // 単元別集計
       const unitMap = {};
       historyData.forEach(h => {
         if (!unitMap[h.unit]) unitMap[h.unit] = { total: 0, correct: 0 };
@@ -1975,87 +1480,77 @@ function responseJSON(obj) {
         if (h.isCorrect) unitMap[h.unit].correct++;
       });
 
+      const unitListContainer = document.getElementById('unit-performance-list');
+      unitListContainer.innerHTML = '';
+
       let minAcc = 101;
       let weakestUnit = "なし";
-      const listContainer = document.getElementById('unit-performance-list');
-      listContainer.innerHTML = '';
 
-      Object.keys(unitMap).forEach(unit => {
-        const data = unitMap[unit];
-        const uPct = Math.round((data.correct / data.total) * 100);
+      Object.keys(unitMap).forEach(u => {
+        const uTotal = unitMap[u].total;
+        const uCorr = unitMap[u].correct;
+        const uPct = Math.round((uCorr / uTotal) * 100);
 
         if (uPct < minAcc) {
           minAcc = uPct;
-          weakestUnit = unit;
+          weakestUnit = u;
         }
 
-        const div = document.createElement('div');
-        div.className = "p-3 bg-slate-900/80 rounded-xl border border-slate-700/60 space-y-1";
-        div.innerHTML = `
-          <div class="flex justify-between text-xs font-semibold">
-            <span class="text-slate-200">${unit}</span>
-            <span class="${uPct >= 70 ? 'text-emerald-400' : 'text-rose-400'}">${uPct}% (${data.correct}/${data.total})</span>
+        const bar = document.createElement('div');
+        bar.className = "space-y-1";
+        bar.innerHTML = `
+          <div class="flex justify-between text-xs text-slate-300">
+            <span>${u} (${uTotal}問)</span>
+            <span class="font-bold">${uPct}%</span>
           </div>
-          <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-            <div class="${uPct >= 70 ? 'bg-emerald-500' : 'bg-rose-500'} h-1.5 rounded-full" style="width: ${uPct}%"></div>
+          <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+            <div class="bg-indigo-500 h-2 rounded-full" style="width: ${uPct}%"></div>
           </div>
         `;
-        listContainer.appendChild(div);
+        unitListContainer.appendChild(bar);
       });
 
       document.getElementById('weakest-unit-name').textContent = weakestUnit;
 
-      const misconceptionMap = {
-        CALC: "🧮 計算ミス",
-        FORMULA: "📖 公式の誤用・失念",
-        STRATEGY: "🧩 解法方針の誤り",
-        READING: "🔍 題意・条件誤認"
-      };
+      // つまずき原因集計
+      const causeMap = { CALC: '🧮 計算ミス', FORMULA: '📖 公式欠落', STRATEGY: '🧩 解法方針誤り', READING: '🔍 題意誤認' };
+      let maxCauseVal = -1;
+      let topCauseText = "未記録";
 
-      const mContainer = document.getElementById('misconception-stats-container');
-      mContainer.innerHTML = '';
+      const misconceptionContainer = document.getElementById('misconception-stats-container');
+      misconceptionContainer.innerHTML = '';
 
-      let maxCnt = -1;
-      let topCause = "なし";
-
-      Object.keys(misconceptionMap).forEach(key => {
-        const cnt = misconceptionStats[key] || 0;
-        if (cnt > maxCnt && cnt > 0) {
-          maxCnt = cnt;
-          topCause = misconceptionMap[key];
+      Object.keys(misconceptionStats).forEach(key => {
+        const val = misconceptionStats[key];
+        if (val > maxCauseVal && val > 0) {
+          maxCauseVal = val;
+          topCauseText = causeMap[key];
         }
 
         const div = document.createElement('div');
-        div.className = "p-3 bg-slate-900/80 rounded-xl border border-slate-700/60 flex items-center justify-between";
-        div.innerHTML = `
-          <span class="text-xs font-medium text-slate-300">${misconceptionMap[key]}</span>
-          <span class="text-xs font-bold text-amber-400">${cnt} 回</span>
-        `;
-        mContainer.appendChild(div);
+        div.className = "flex items-center justify-between text-xs bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/60";
+        div.innerHTML = `<span>${causeMap[key]}</span><span class="font-bold text-amber-400">${val} 回</span>`;
+        misconceptionContainer.appendChild(div);
       });
 
-      document.getElementById('top-misconception-cause').textContent = topCause;
+      document.getElementById('top-misconception-cause').textContent = topCauseText;
     }
 
-    function updateAdminUnitFilterOptions() {
+    // ★【強化】管理画面問題フィルタ & 一覧表示（初期表示時にも全単元をドロップダウンに生成）★
+    function onAdminFilterSubjectChange() {
       const selectedSubject = document.getElementById('admin-filter-subject').value;
       const selectUnit = document.getElementById('admin-filter-unit');
-      let filteredQuestions = questions;
+      let filtered = questions;
       if (selectedSubject !== 'ALL') {
-        filteredQuestions = questions.filter(q => q.subject === selectedSubject);
+        filtered = questions.filter(q => q.subject === selectedSubject);
       }
-      const availableUnits = [...new Set(filteredQuestions.map(q => q.unit))];
-
+      const units = [...new Set(filtered.map(q => q.unit).filter(Boolean))];
       selectUnit.innerHTML = '<option value="ALL">すべての単元</option>';
-      availableUnits.forEach(u => {
+      units.forEach(u => {
         const opt = document.createElement('option');
         opt.value = u; opt.textContent = u;
         selectUnit.appendChild(opt);
       });
-    }
-
-    function onAdminFilterSubjectChange() {
-      updateAdminUnitFilterOptions();
       renderAdminQuestionList();
     }
 
@@ -2064,18 +1559,20 @@ function responseJSON(obj) {
       const countEl = document.getElementById('admin-question-count');
       if (!container) return;
 
-      const filterSubject = document.getElementById('admin-filter-subject').value;
-      const filterUnit = document.getElementById('admin-filter-unit').value;
+      const filterSubject = document.getElementById('admin-filter-subject') ? document.getElementById('admin-filter-subject').value : 'ALL';
+      const filterUnit = document.getElementById('admin-filter-unit') ? document.getElementById('admin-filter-unit').value : 'ALL';
 
-      let displayQuestions = questions;
-      if (filterSubject !== 'ALL') displayQuestions = displayQuestions.filter(q => q.subject === filterSubject);
-      if (filterUnit !== 'ALL') displayQuestions = displayQuestions.filter(q => q.unit === filterUnit);
+      let displayQuestions = questions.filter(q => {
+        if (filterSubject !== 'ALL' && q.subject !== filterSubject) return false;
+        if (filterUnit !== 'ALL' && q.unit !== filterUnit) return false;
+        return true;
+      });
 
       countEl.textContent = displayQuestions.length;
       container.innerHTML = '';
 
       if (displayQuestions.length === 0) {
-        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl">登録されている問題がありません</div>`;
+        container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl">条件に一致する問題がありません</div>`;
         return;
       }
 
@@ -2086,48 +1583,46 @@ function responseJSON(obj) {
           <div class="space-y-1.5 flex-1 pr-2">
             <div class="flex items-center space-x-2 flex-wrap gap-y-1">
               <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded text-[10px] font-semibold">${q.subject || '数学Ⅰ'}</span>
-              <span class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-[10px]">${q.unit}</span>
-              ${q.tag ? `<span class="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded text-[10px]">${q.tag}</span>` : ''}
-              <span class="text-amber-400 text-[10px] font-bold">★${q.difficulty}</span>
+              <span class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-[10px]">${q.unit || '共通'}</span>
+              ${(q.tag || q.lessonTag) ? `<span class="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded text-[10px]">${q.tag || q.lessonTag}</span>` : ''}
+              <span class="text-amber-400 text-[10px] font-bold">★${q.difficulty || 1}</span>
             </div>
             <div class="text-xs text-slate-200 line-clamp-2">${q.question}</div>
           </div>
           <div class="flex items-center space-x-2 shrink-0">
-            <button onclick="editQuestion('${q.id}')" class="px-2.5 py-1.5 bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-600/50 rounded-lg text-xs font-medium transition-all flex items-center space-x-1">
-              <i class="fa-solid fa-pen"></i>
-              <span>編集</span>
+            <button onclick="openEditQuestionModal('${q.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded-lg text-xs font-semibold transition-all">
+              編集
             </button>
-            <button onclick="deleteQuestion('${q.id}')" class="px-2.5 py-1.5 bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 border border-rose-700/50 rounded-lg text-xs font-medium transition-all flex items-center space-x-1">
-              <i class="fa-solid fa-trash"></i>
-              <span>削除</span>
+            <button onclick="deleteQuestion('${q.id}')" class="px-3 py-1.5 bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 border border-rose-700/50 rounded-lg text-xs font-semibold transition-all">
+              削除
             </button>
           </div>
         `;
         container.appendChild(item);
       });
-      renderMathInContainer(container);
+
+      renderMath(container);
     }
 
-    function editQuestion(id) {
+    function openEditQuestionModal(id) {
       const q = questions.find(item => item.id === id);
       if (!q) return;
 
       document.getElementById('edit-q-id').value = q.id;
-      document.getElementById('edit-q-subject').value = q.subject || "数学Ⅰ";
-      document.getElementById('edit-q-unit').value = q.unit || "";
-      document.getElementById('edit-q-tag').value = q.tag || "";
+      document.getElementById('edit-q-subject').value = q.subject || '数学Ⅰ';
+      document.getElementById('edit-q-unit').value = q.unit || '';
+      document.getElementById('edit-q-tag').value = q.tag || q.lessonTag || '';
       document.getElementById('edit-q-diff').value = q.difficulty || 1;
-      document.getElementById('edit-q-text').value = q.question || "";
-      document.getElementById('edit-q-explanation').value = q.explanation || "";
+      document.getElementById('edit-q-text').value = q.question || '';
+      document.getElementById('edit-q-explanation').value = q.explanation || '';
 
-      const options = q.options || ["", "", "", ""];
-      options.forEach((opt, idx) => {
-        const input = document.getElementById(`edit-q-opt-${idx}`);
-        if (input) input.value = opt;
+      q.options.forEach((opt, idx) => {
+        const optInput = document.getElementById(`edit-q-opt-${idx}`);
+        if (optInput) optInput.value = opt;
       });
 
-      const ansRad = document.querySelector(`input[name="edit-q-answer"][value="${q.answer}"]`);
-      if (ansRad) ansRad.checked = true;
+      const radio = document.getElementById(`edit-ans-${q.answer}`);
+      if (radio) radio.checked = true;
 
       document.getElementById('edit-question-modal').classList.remove('hidden');
     }
@@ -2138,67 +1633,124 @@ function responseJSON(obj) {
 
     function saveEditedQuestion() {
       const id = document.getElementById('edit-q-id').value;
-      const qIndex = questions.findIndex(item => item.id === id);
-      if (qIndex === -1) return;
+      const qIdx = questions.findIndex(item => item.id === id);
+      if (qIdx === -1) return;
 
-      const subject = document.getElementById('edit-q-subject').value;
-      const unit = document.getElementById('edit-q-unit').value.trim() || "全般";
-      const tag = document.getElementById('edit-q-tag').value.trim();
-      const diff = parseInt(document.getElementById('edit-q-diff').value) || 1;
-      const questionText = document.getElementById('edit-q-text').value.trim();
-      const explanationText = document.getElementById('edit-q-explanation').value.trim();
+      questions[qIdx].subject = document.getElementById('edit-q-subject').value;
+      questions[qIdx].unit = document.getElementById('edit-q-unit').value.trim();
+      questions[qIdx].tag = document.getElementById('edit-q-tag').value.trim();
+      questions[qIdx].difficulty = parseInt(document.getElementById('edit-q-diff').value, 10);
+      questions[qIdx].question = document.getElementById('edit-q-text').value.trim();
+      questions[qIdx].explanation = document.getElementById('edit-q-explanation').value.trim();
 
       const options = [];
       for (let i = 0; i < 4; i++) {
         options.push(document.getElementById(`edit-q-opt-${i}`).value.trim());
       }
+      questions[qIdx].options = options;
 
-      const selectedRad = document.querySelector('input[name="edit-q-answer"]:checked');
-      const answer = selectedRad ? parseInt(selectedRad.value) : 0;
+      const checkedAns = document.querySelector('input[name="edit-q-answer"]:checked');
+      if (checkedAns) {
+        questions[qIdx].answer = parseInt(checkedAns.value, 10);
+      }
 
-      questions[qIndex] = {
-        ...questions[qIndex],
-        subject,
-        unit,
-        tag,
-        difficulty: diff,
-        question: questionText,
-        options,
-        answer,
-        explanation: explanationText
-      };
-
-      saveQuestions();
+      localStorage.setItem('math_app_questions', JSON.stringify(questions));
       closeEditQuestionModal();
-      showToast("問題の変更を保存しました");
+      onAdminFilterSubjectChange();
+      showToast("問題内容を更新・保存しました");
     }
 
     function deleteQuestion(id) {
       if (!confirm("この問題を削除してもよろしいですか？")) return;
       questions = questions.filter(q => q.id !== id);
-      saveQuestions();
+      localStorage.setItem('math_app_questions', JSON.stringify(questions));
+      onAdminFilterSubjectChange();
       showToast("問題を削除しました");
     }
 
-    function clearAllQuestions() {
-      if (!confirm("すべての問題を削除してもよろしいですか？この操作は取り消せません。")) return;
-      questions = [];
-      saveQuestions();
-      showToast("すべての問題を削除しました");
+    // Modal, Toast & Utilities
+    function openGasCodeModal() {
+      document.getElementById('gas-script-content').textContent = GAS_TEMPLATE_CODE;
+      document.getElementById('gas-code-modal').classList.remove('hidden');
     }
 
-    function renderMathInContainer(container) {
-      if (!container) return;
-      if (window.renderMathInElement) {
-        renderMathInElement(container, {
-          delimiters: [
-            { left: '$$', right: '$$', display: true },
-            { left: '\\(', right: '\\)', display: false },
-            { left: '\\[', right: '\\]', display: true },
-            { left: '$', right: '$', display: false }
-          ],
-          throwOnError: false
-        });
+    function closeGasCodeModal() {
+      document.getElementById('gas-code-modal').classList.add('hidden');
+    }
+
+    function copyGasScriptText() {
+      const textarea = document.createElement('textarea');
+      textarea.value = GAS_TEMPLATE_CODE;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast("GASコードをクリップボードにコピーしました");
+      } catch (err) {
+        showToast("コピーに失敗しました", true);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function switchTab(viewId) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+      const target = document.getElementById(viewId);
+      if (target) target.classList.remove('hidden');
+
+      const tabs = ['tab-student-btn', 'tab-analytics-btn', 'tab-admin-btn'];
+      tabs.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          if (id.includes(viewId.split('-')[0])) {
+            btn.className = 'tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all flex items-center space-x-2 bg-indigo-600 text-white shadow';
+          } else {
+            btn.className = 'tab-btn px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-lg text-slate-400 hover:text-slate-200 transition-all flex items-center space-x-2';
+          }
+        }
+      });
+    }
+
+    function updateUnitSelectOptions() {
+      const selectedSubject = document.getElementById('quiz-subject-select').value;
+      const selectUnit = document.getElementById('quiz-unit-select');
+      let filteredQuestions = questions;
+      if (selectedSubject !== 'ALL') {
+        filteredQuestions = questions.filter(q => q.subject === selectedSubject);
+      }
+      const availableUnits = [...new Set(filteredQuestions.map(q => q.unit).filter(Boolean))];
+
+      selectUnit.innerHTML = '<option value="ALL">すべての単元</option>';
+      availableUnits.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u; opt.textContent = u;
+        selectUnit.appendChild(opt);
+      });
+    }
+
+    function updateTagSelectOptions() {
+      const selectTag = document.getElementById('quiz-tag-select');
+      const tags = [...new Set(questions.map(q => q.tag || q.lessonTag).filter(Boolean))];
+      selectTag.innerHTML = '<option value="ALL">指定なし (全問題)</option>';
+      tags.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = t;
+        selectTag.appendChild(opt);
+      });
+    }
+
+    function onSubjectChange() {
+      updateUnitSelectOptions();
+    }
+
+    function toggleStudentInfoVisibility() {
+      const mode = document.getElementById('quiz-mode-select').value;
+      const infoBox = document.getElementById('student-info-box');
+      if (mode === 'TEST_10') {
+        infoBox.classList.remove('hidden');
+      } else {
+        infoBox.classList.add('hidden');
       }
     }
 
@@ -2209,13 +1761,8 @@ function responseJSON(obj) {
       if (!toast || !toastMsg) return;
 
       toastMsg.textContent = msg;
-      if (isError) {
-        toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400";
-        toast.className = "fixed bottom-5 right-5 bg-slate-800 border border-rose-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 z-50 flex items-center space-x-2";
-      } else {
-        toastIcon.className = "fa-solid fa-circle-check text-indigo-400";
-        toast.className = "fixed bottom-5 right-5 bg-slate-800 border border-indigo-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 z-50 flex items-center space-x-2";
-      }
+      toastIcon.className = isError ? "fa-solid fa-circle-exclamation text-rose-400" : "fa-solid fa-circle-check text-indigo-400";
+      toast.className = "fixed bottom-5 right-5 bg-slate-800 border border-indigo-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 z-50 flex items-center space-x-2";
 
       setTimeout(() => {
         toast.className = "fixed bottom-5 right-5 bg-slate-800 border border-indigo-500/50 text-slate-100 text-xs sm:text-sm px-4 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2";
@@ -2232,24 +1779,6 @@ function responseJSON(obj) {
     function closeErrorModal() {
       const modal = document.getElementById('error-modal');
       if (modal) modal.classList.add('hidden');
-    }
-
-    function downloadCSVResult() {
-      if (currentQuizQuestions.length === 0) return;
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      csvContent += "問題番号,科目,単元,正誤\n";
-      
-      currentQuizQuestions.forEach((q, idx) => {
-        csvContent += `${idx + 1},${q.subject || ''},${q.unit || ''}\n`;
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `quiz_result_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
     }
   </script>
 </body>
