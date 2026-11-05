@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 & 弱点分析アプリ ver57 (GAS URL初期値設定版)</title>
+  <title>数学総合演習 アプリ </title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -39,7 +39,7 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ver57 GAS URL初期値版</span></h1>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ver59 ページ分割全問解析対応</span></h1>
             <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・選択肢ランダムシャッフル・50問分割セル保存同期</p>
           </div>
         </div>
@@ -405,10 +405,9 @@
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">使用AIモデル (Model ID)</label>
             <select id="gemini-model-select" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-              <option value="gemini-3.8-flash">gemini-3.8-flash (推奨・最新)</option>
-              <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (軽量・高速版)</option>
-              <option value="gemini-2.5-flash">gemini-2.5-flash (標準版)</option>
-              <option value="gemini-2.0-flash">gemini-2.0-flash (安定版)</option>
+              <option value="gemini-3.8-flash">gemini-3.8-flash (最新・推奨)</option>
+              <option value="gemini-3.6-flash">gemini-3.6-flash (標準版)</option>
+              <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (軽量・高速版)</option>
             </select>
           </div>
         </div>
@@ -496,8 +495,8 @@
               <i class="fa-solid fa-eye"></i>
             </div>
             <div>
-              <h3 class="text-base font-bold text-white">Vision AI インポート & 授業タグ付与</h3>
-              <p class="text-xs text-slate-400">考査PDF・プリントから思考アプローチ・思考選択肢付きで全自動問題化</p>
+              <h3 class="text-base font-bold text-white">Vision AI インポート & 授業タグ付与 (ページ分割全問取り込み対応)</h3>
+              <p class="text-xs text-slate-400">考査PDF・プリントを1ページずつ分割解析し、小問含むすべての問題を取り込みます</p>
             </div>
           </div>
         </div>
@@ -516,14 +515,14 @@
             <i class="fa-solid fa-file-image"></i>
           </div>
           <p class="text-sm text-slate-200 font-semibold">考査PDF または 画像ファイル (PNG/JPG) をドロップ / 選択</p>
-          <p class="text-xs text-slate-400">※ Gemini Visionが問題・思考アプローチ・図形領域を自動解析します</p>
+          <p class="text-xs text-slate-400">※ Gemini Visionが各ページのすべての問題・思考アプローチを漏れなく全件解析します</p>
         </div>
 
         <!-- PDF / Image Preview Images Banner -->
         <div id="pdf-image-preview-container" class="hidden space-y-2">
           <label class="text-xs font-semibold text-slate-300 flex items-center space-x-2">
             <i class="fa-solid fa-image text-cyan-400"></i>
-            <span>解析対象画像 (Gemini Visionへ送信)</span>
+            <span>解析対象画像 (ページ別分割解析)</span>
           </label>
           <div id="pdf-image-thumbnails" class="flex gap-3 overflow-x-auto p-2 bg-slate-900/80 rounded-xl border border-slate-700"></div>
         </div>
@@ -532,7 +531,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
           <button onclick="generateQuestionsWithAI()" class="px-5 py-2.5 bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 hover:opacity-95 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg transition-all flex items-center space-x-2">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span>Gemini Vision で自動問題・図形・思考ステップを作成</span>
+            <span>Gemini Vision で全ページ分割解析（全問取り込み）</span>
           </button>
         </div>
 
@@ -914,12 +913,16 @@ function responseJSON(obj) {
     let currentShuffledOptions = [];
     let currentShuffledCorrectIdx = 0;
 
+    // 解析用画像（Base64DataURLの配列）
+    let uploadedImages = [];
+
     // Canvas Scratchpad State
     let scratchCanvas, scratchCtx, isDrawing = false, scratchMode = 'pen';
 
     window.addEventListener('DOMContentLoaded', async () => {
       loadStoredData();
       initScratchpad();
+      initDropZone();
       updateUnitSelectOptions();
       updateTagSelectOptions();
       onAdminFilterSubjectChange(); // 管理画面の単元絞り込みドロップダウンを初期化
@@ -956,7 +959,6 @@ function responseJSON(obj) {
         try { historyData = JSON.parse(hData); } catch(e) { historyData = []; }
       }
 
-      // localStorageになければデフォルトのGAS URLを使用
       const gasUrl = localStorage.getItem('math_app_gas_url') || DEFAULT_GAS_URL;
       document.getElementById('gas-url-input').value = gasUrl;
 
@@ -974,6 +976,326 @@ function responseJSON(obj) {
       const key = document.getElementById('gemini-api-key-input').value.trim();
       localStorage.setItem('math_app_gemini_key', key);
       showToast("Gemini API設定を保存しました");
+    }
+
+    /* ----------------------------------------------------
+       ドラッグ＆ドロップおよびファイル読み込み処理 (完全対応)
+    ---------------------------------------------------- */
+    function initDropZone() {
+      const dropZone = document.getElementById('pdf-drop-zone');
+      if (!dropZone) return;
+
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('border-indigo-400', 'bg-slate-800'), false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('border-indigo-400', 'bg-slate-800'), false);
+      });
+
+      dropZone.addEventListener('drop', handleDrop, false);
+    }
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        processFiles(files);
+      }
+    }
+
+    function handleFileSelect(e) {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        processFiles(files);
+      }
+    }
+
+    async function processFiles(files) {
+      uploadedImages = [];
+      const previewContainer = document.getElementById('pdf-image-preview-container');
+      const thumbnailsEl = document.getElementById('pdf-image-thumbnails');
+      thumbnailsEl.innerHTML = '';
+      previewContainer.classList.remove('hidden');
+
+      showToast("ファイルを取り込み・高解像度レンダリング処理中...");
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type === 'application/pdf') {
+          await renderPdfPagesToImages(file);
+        } else if (file.type.startsWith('image/')) {
+          await renderImageFileToDataUrl(file);
+        } else if (file.name.endsWith('.json')) {
+          const eventMock = { target: { files: [file] } };
+          importQuestionsJSON(eventMock);
+          return;
+        }
+      }
+
+      showToast(`${uploadedImages.length} ページの画像データを読み込みました`);
+    }
+
+    // PDF全ページを高解像度(scale: 2.0)でCanvas描画経由でDataURLに変換
+    async function renderPdfPagesToImages(file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const thumbnailsEl = document.getElementById('pdf-image-thumbnails');
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 2.0 }); // 文字認識度向上のためスケール2.0に強化
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+        const dataUrl = canvas.toDataURL('image/png');
+        uploadedImages.push(dataUrl);
+
+        // プレビュー表示用サムネイル
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.className = 'h-24 w-auto rounded border border-slate-600 object-contain shadow-md shrink-0';
+        thumbnailsEl.appendChild(img);
+      }
+    }
+
+    function renderImageFileToDataUrl(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          uploadedImages.push(dataUrl);
+
+          const thumbnailsEl = document.getElementById('pdf-image-thumbnails');
+          const img = document.createElement('img');
+          img.src = dataUrl;
+          img.className = 'h-24 w-auto rounded border border-slate-600 object-contain shadow-md shrink-0';
+          thumbnailsEl.appendChild(img);
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    /* ----------------------------------------------------
+       Gemini Vision AI 自動問題解析・生成 (★ページ分割・逐次全問解析対応)
+    ---------------------------------------------------- */
+    async function generateQuestionsWithAI() {
+      const apiKey = document.getElementById('gemini-api-key-input').value.trim();
+      const model = document.getElementById('gemini-model-select').value;
+      const lessonTag = document.getElementById('import-lesson-tag').value.trim() || "授業プリント";
+
+      if (!apiKey) {
+        showToast("Gemini API Key を入力して保存してください", true);
+        return;
+      }
+      if (uploadedImages.length === 0) {
+        showToast("先にPDFまたは画像ファイルを読み込んでください", true);
+        return;
+      }
+
+      const spinner = document.getElementById('ai-loading-spinner');
+      const spinnerMsg = document.getElementById('ai-loading-msg');
+      spinner.classList.remove('hidden');
+
+      let newCreatedQuestions = [];
+      let totalPages = uploadedImages.length;
+
+      try {
+        // ★ ページ単位に分けて逐次APIリクエストを発行（トークン制限回避＆全問漏れなく解析）
+        for (let i = 0; i < totalPages; i++) {
+          spinnerMsg.textContent = `Gemini Vision が解析中... (${i + 1} / ${totalPages} ページ目)`;
+
+          const dataUrl = uploadedImages[i];
+          const base64Data = dataUrl.split(',')[1];
+          const mimeType = dataUrl.split(';')[0].split(':')[1] || 'image/png';
+
+          const contentsParts = [
+            { inline_data: { mime_type: mimeType, data: base64Data } },
+            {
+              text: `
+画像のページ内容に含まれる数学の問題を【1問も漏らさずに】読み取り、4択のクイズ形式問題データを生成してください。
+
+【非常に重要な指示（厳守）】
+1. 画像内に含まれる問題（大問、および小問 (1), (2), (3)... 等）を【すべて例外なく個別の1問ずつ】として抽出してください。
+2. 要約や省略、一部の問題のみのピックアップは絶対に行わないでください。
+3. すべての問題について、4つの選択肢（正解1個＋誤答ダミー3個）と解法のアプローチ（思考ステップ選択肢4つ）、および丁寧な解説を作成してください。
+
+返答は以下のJSON配列形式（JSONコードブロック記法なしの純粋なJSONテキスト）のみで出力してください：
+
+[
+  {
+    "id": "q_ai_${Date.now()}_${i + 1}_1",
+    "subject": "数学Ⅰ (または数学Ⅱ, 数学Ⅲ, 数学A, 数学B, 数学C等)",
+    "unit": "単元名 (例: 2次関数, 三角比, ベクトル等)",
+    "difficulty": 1, 
+    "question": "問題文 (LaTeXの数式は $x^2$ や $$\\frac{a}{b}$$ の形式で記述)",
+    "thinkingOptions": [
+      "解法アプローチ選択肢1",
+      "解法アプローチ選択肢2",
+      "解法アプローチ選択肢3",
+      "解法アプローチ選択肢4"
+    ],
+    "thinkingAnswer": 0,
+    "options": [
+      "選択肢1",
+      "選択肢2",
+      "選択肢3",
+      "選択肢4"
+    ],
+    "answer": 0,
+    "explanation": "解法手順の詳しい解説 (LaTeX数式使用可能)"
+  }
+]
+`
+            }
+          ];
+
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: contentsParts }],
+              generationConfig: {
+                maxOutputTokens: 8192 // 最大出力トークン数を確保
+              }
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(`[Page ${i + 1}] API Error: ${errData.error?.message || res.status}`);
+          }
+
+          const data = await res.json();
+          const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          
+          const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+          try {
+            const parsed = JSON.parse(cleanJson);
+            if (Array.isArray(parsed)) {
+              parsed.forEach((q, idx) => {
+                q.id = q.id || `q_ai_${Date.now()}_p${i+1}_${idx}`;
+                q.tag = lessonTag;
+                newCreatedQuestions.push(q);
+              });
+            }
+          } catch (pErr) {
+            console.warn(`Page ${i + 1} parse error:`, responseText);
+          }
+        }
+
+        if (newCreatedQuestions.length > 0) {
+          questions = questions.concat(newCreatedQuestions);
+          localStorage.setItem('math_app_questions', JSON.stringify(questions));
+          updateUnitSelectOptions();
+          updateTagSelectOptions();
+          onAdminFilterSubjectChange();
+
+          showToast(`✨ 全 ${totalPages} ページから【合計 ${newCreatedQuestions.length} 問】の問題を完全自動取り込みしました！`);
+
+          // スプレッドシート連携があれば全端末自動保存
+          const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
+          if (gasUrl) {
+            await uploadQuestionsToCloud();
+          }
+        } else {
+          showErrorModal("AIからの応答から有効な問題データを検出できませんでした。画像の解像度や明瞭さをご確認ください。");
+        }
+      } catch (err) {
+        showErrorModal("Gemini Vision AI 解析エラー:\n" + err.message);
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    // 動的類題生成AI
+    async function generateSimilarQuestionAI() {
+      const apiKey = document.getElementById('gemini-api-key-input').value.trim();
+      const model = document.getElementById('gemini-model-select').value;
+      const currentQ = currentQuizQuestions[currentQuestionIdx];
+
+      if (!apiKey) {
+        showToast("Gemini API Key が設定されていません。管理画面で設定してください", true);
+        return;
+      }
+
+      showToast("Geminiがこの問題の類題を生成中...");
+
+      try {
+        const promptText = `
+以下の数学問題の【類題】（類似の解法を使うが数値や設定を少し変更した問題）を1問作成してください。
+
+【元問題】
+科目: ${currentQ.subject || '数学'}
+単元: ${currentQ.unit || '共通'}
+問題: ${currentQ.question}
+解説: ${currentQ.explanation}
+
+返答は以下の単一JSONオブジェクト形式（JSONコードブロックなしの純粋なJSONテキスト）のみで出力してください。
+
+{
+  "id": "q_similar_${Date.now()}",
+  "subject": "${currentQ.subject || '数学'}",
+  "unit": "${currentQ.unit || '共通'}",
+  "tag": "${currentQ.tag || 'AI類題'}",
+  "difficulty": ${currentQ.difficulty || 1},
+  "question": "類題の問題文 (LaTeX使用)",
+  "thinkingOptions": [
+    "解法アプローチ1",
+    "解法アプローチ2",
+    "解法アプローチ3",
+    "解法アプローチ4"
+  ],
+  "thinkingAnswer": 0,
+  "options": [
+    "選択肢1",
+    "選択肢2",
+    "選択肢3",
+    "選択肢4"
+  ],
+  "answer": 0,
+  "explanation": "詳細な解説"
+}
+`;
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+        });
+
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+
+        const data = await res.json();
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+        const newQ = JSON.parse(cleanJson);
+
+        // 現在のクイズに類題を差し込んで表示
+        currentQuizQuestions.splice(currentQuestionIdx + 1, 0, newQ);
+        nextQuestion();
+        showToast("✨ AIが生成した類題へジャンプしました！");
+      } catch (err) {
+        showErrorModal("類題生成エラー:\n" + err.message);
+      }
     }
 
     // スプレッドシートから問題を自動取得（GET）
@@ -1290,11 +1612,10 @@ function responseJSON(obj) {
         thinkingBox.classList.add('hidden');
       }
 
-      // ★回答選択肢のランダムシャッフル機能★
+      // 回答選択肢のランダムシャッフル機能
       const originalOptions = q.options || [];
       const origCorrectIdx = q.answer || 0;
 
-      // インデックスとテキストをペアにしてシャッフル
       const mapped = originalOptions.map((opt, idx) => ({ text: opt, isCorrect: idx === origCorrectIdx }));
       mapped.sort(() => Math.random() - 0.5);
 
@@ -1368,7 +1689,6 @@ function responseJSON(obj) {
       } else {
         resultBanner.className = "font-bold text-base text-rose-400 flex items-center space-x-2";
         resultBanner.innerHTML = `<i class="fa-solid fa-circle-xmark text-xl"></i><span>不正解（正解: 選択肢 ${currentShuffledCorrectIdx + 1}）</span>`;
-        // 間違えた場合はつまずき診断表示
         document.getElementById('misconception-diagnosis-box').classList.remove('hidden');
       }
 
