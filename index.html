@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>数学総合演習 アプリ </title>
+  <title>数学総合演習 アプリ</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -39,8 +39,8 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ver59 ページ分割全問解析対応</span></h1>
-            <p class="text-xs text-slate-400">思考プロセス育成・動的類題生成・つまずき診断・選択肢ランダムシャッフル・50問分割セル保存同期</p>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"> 誤タップ防止機能対応版</span></h1>
+           
           </div>
         </div>
 
@@ -235,8 +235,16 @@
           <div id="thinking-options-container" class="grid grid-cols-1 gap-2"></div>
         </div>
 
-        <!-- Options Container -->
-        <div id="options-container" class="grid grid-cols-1 gap-3"></div>
+        <!-- Options Container (修正①: 2行2列のグリッド配置) -->
+        <div id="options-container" class="grid grid-cols-2 gap-3"></div>
+
+        <!-- Confirm Answer Button (修正②: 誤タップ防止用「解答を確定する」ボタン) -->
+        <div class="flex justify-center pt-2">
+          <button id="submit-answer-btn" onclick="submitAnswer()" disabled class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 opacity-40 cursor-not-allowed">
+            <i class="fa-solid fa-check"></i>
+            <span>解答を確定する</span>
+          </button>
+        </div>
 
         <!-- Explanation & Diagnostics Box -->
         <div id="explanation-box" class="hidden bg-slate-900/90 border border-indigo-500/30 rounded-xl p-5 space-y-4">
@@ -246,7 +254,7 @@
           <div id="misconception-diagnosis-box" class="hidden bg-rose-950/30 border border-rose-500/40 rounded-xl p-3.5 space-y-2">
             <div class="text-xs font-bold text-rose-300 flex items-center space-x-1.5">
               <i class="fa-solid fa-stethoscope"></i>
-              <span>つまずき診断：この問題で間違えた主な理由を選択してください（弱点分析に記録されます）</span>
+              <span>つまずき診断：この問題で間違えた主な理由を選択しましょう（弱点分析に記録！）</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
               <button onclick="recordMisconception('CALC')" class="p-2 bg-slate-800 hover:bg-rose-900/50 border border-slate-700 rounded-lg text-slate-200 font-medium transition-all text-center">
@@ -459,7 +467,7 @@
           </div>
           <div>
             <h3 class="text-base font-bold text-white">スプレッドシート連携問題共有・全端末自動同期</h3>
-            <p class="text-xs text-slate-400">Google スプレッドシートに問題データを一括バックアップ & 全生徒の端末に反映（文字数上限対策済）</p>
+            <p class="text-xs text-slate-400">Google スプレッドシートに問題データを一括バックアップ </p>
           </div>
         </div>
         
@@ -496,7 +504,7 @@
             </div>
             <div>
               <h3 class="text-base font-bold text-white">Vision AI インポート & 授業タグ付与 (ページ分割全問取り込み対応)</h3>
-              <p class="text-xs text-slate-400">考査PDF・プリントを1ページずつ分割解析し、小問含むすべての問題を取り込みます</p>
+              <p class="text-xs text-slate-400">PDF・プリントを1ページずつ分割解析し、小問含むすべての問題を取り込みます</p>
             </div>
           </div>
         </div>
@@ -514,8 +522,8 @@
           <div class="text-slate-400 text-3xl mb-1">
             <i class="fa-solid fa-file-image"></i>
           </div>
-          <p class="text-sm text-slate-200 font-semibold">考査PDF または 画像ファイル (PNG/JPG) をドロップ / 選択</p>
-          <p class="text-xs text-slate-400">※ Gemini Visionが各ページのすべての問題・思考アプローチを漏れなく全件解析します</p>
+          <p class="text-sm text-slate-200 font-semibold">PDF または 画像ファイル (PNG/JPG) をドロップ / 選択</p>
+          <p class="text-xs text-slate-400">※ Gemini Visionが各ページのすべての問題・思考アプローチを解析します</p>
         </div>
 
         <!-- PDF / Image Preview Images Banner -->
@@ -761,13 +769,11 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     var action = data.action || "";
 
-    // 1. 問題データのスプレッドシート一括保存 (50問分割保存)
     if (action === "save_questions") {
       var questions = data.questions || [];
       return saveQuestionsToSpreadsheet(questions);
     }
 
-    // 2. 成績データの送信（スプレッドシート蓄積）
     if (data.studentName) {
       return recordStudentScore(data);
     }
@@ -778,19 +784,14 @@ function doPost(e) {
   }
 }
 
-// スプレッドシートから問題データを取得 (複数セル分割対応)
 function getQuestionsFromSpreadsheet() {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName("問題データベース");
-    if (!sheet) {
-      return responseJSON([]);
-    }
+    if (!sheet) return responseJSON([]);
     
     var lastRow = sheet.getLastRow();
-    if (lastRow === 0) {
-      return responseJSON([]);
-    }
+    if (lastRow === 0) return responseJSON([]);
     
     var values = sheet.getRange(1, 1, lastRow, 1).getValues();
     var allQuestions = [];
@@ -805,52 +806,39 @@ function getQuestionsFromSpreadsheet() {
           } else if (typeof parsed === 'object') {
             allQuestions.push(parsed);
           }
-        } catch (e) {
-          // 単一文字列や構文エラー時のフォールバック
-        }
+        } catch (e) {}
       }
     }
-    
     return responseJSON(allQuestions);
   } catch (err) {
     return responseJSON({ status: "error", message: err.toString() });
   }
 }
 
-// スプレッドシートへ問題データを保存 (セルの文字数上限対策：50問ごとにセルを分割)
 function saveQuestionsToSpreadsheet(questions) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName("問題データベース");
-    if (!sheet) {
-      sheet = ss.insertSheet("問題データベース");
-    }
-    
-    // シートの既存内容をクリア
+    if (!sheet) sheet = ss.insertSheet("問題データベース");
     sheet.clearContents();
     
     if (!questions || questions.length === 0) {
       return responseJSON({ status: "success", count: 0, chunks: 0 });
     }
     
-    var chunkSize = 50; // 50問ごとに分割してセルに格納
+    var chunkSize = 50;
     var rows = [];
-    
     for (var i = 0; i < questions.length; i += chunkSize) {
       var chunk = questions.slice(i, i + chunkSize);
       rows.push([JSON.stringify(chunk)]);
     }
-    
-    // A1 からまとめて一括書き込み (A1, A2, A3...)
     sheet.getRange(1, 1, rows.length, 1).setValues(rows);
-    
     return responseJSON({ status: "success", count: questions.length, chunks: rows.length });
   } catch (err) {
     return responseJSON({ status: "error", message: err.toString() });
   }
 }
 
-// 成績を「成績記録」シートに追記
 function recordStudentScore(data) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -908,6 +896,7 @@ function responseJSON(obj) {
     let quizScore = 0;
     let selectedThinkingIdx = null;
     let selectedAnswerIdx = null;
+    let isAnswerSubmitted = false;
 
     // 現在出題中問題のシャッフル後選択肢と正解インデックス
     let currentShuffledOptions = [];
@@ -925,7 +914,7 @@ function responseJSON(obj) {
       initDropZone();
       updateUnitSelectOptions();
       updateTagSelectOptions();
-      onAdminFilterSubjectChange(); // 管理画面の単元絞り込みドロップダウンを初期化
+      onAdminFilterSubjectChange();
 
       // 起動時にスプレッドシートから最新問題を自動同期
       await syncQuestionsFromCloud();
@@ -978,9 +967,6 @@ function responseJSON(obj) {
       showToast("Gemini API設定を保存しました");
     }
 
-    /* ----------------------------------------------------
-       ドラッグ＆ドロップおよびファイル読み込み処理 (完全対応)
-    ---------------------------------------------------- */
     function initDropZone() {
       const dropZone = document.getElementById('pdf-drop-zone');
       if (!dropZone) return;
@@ -1009,16 +995,12 @@ function responseJSON(obj) {
     function handleDrop(e) {
       const dt = e.dataTransfer;
       const files = dt.files;
-      if (files && files.length > 0) {
-        processFiles(files);
-      }
+      if (files && files.length > 0) processFiles(files);
     }
 
     function handleFileSelect(e) {
       const files = e.target.files;
-      if (files && files.length > 0) {
-        processFiles(files);
-      }
+      if (files && files.length > 0) processFiles(files);
     }
 
     async function processFiles(files) {
@@ -1046,7 +1028,6 @@ function responseJSON(obj) {
       showToast(`${uploadedImages.length} ページの画像データを読み込みました`);
     }
 
-    // PDF全ページを高解像度(scale: 2.0)でCanvas描画経由でDataURLに変換
     async function renderPdfPagesToImages(file) {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -1054,7 +1035,7 @@ function responseJSON(obj) {
 
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 2.0 }); // 文字認識度向上のためスケール2.0に強化
+        const viewport = page.getViewport({ scale: 2.0 });
 
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
@@ -1066,7 +1047,6 @@ function responseJSON(obj) {
         const dataUrl = canvas.toDataURL('image/png');
         uploadedImages.push(dataUrl);
 
-        // プレビュー表示用サムネイル
         const img = document.createElement('img');
         img.src = dataUrl;
         img.className = 'h-24 w-auto rounded border border-slate-600 object-contain shadow-md shrink-0';
@@ -1092,9 +1072,6 @@ function responseJSON(obj) {
       });
     }
 
-    /* ----------------------------------------------------
-       Gemini Vision AI 自動問題解析・生成 (★ページ分割・逐次全問解析対応)
-    ---------------------------------------------------- */
     async function generateQuestionsWithAI() {
       const apiKey = document.getElementById('gemini-api-key-input').value.trim();
       const model = document.getElementById('gemini-model-select').value;
@@ -1117,7 +1094,6 @@ function responseJSON(obj) {
       let totalPages = uploadedImages.length;
 
       try {
-        // ★ ページ単位に分けて逐次APIリクエストを発行（トークン制限回避＆全問漏れなく解析）
         for (let i = 0; i < totalPages; i++) {
           spinnerMsg.textContent = `Gemini Vision が解析中... (${i + 1} / ${totalPages} ページ目)`;
 
@@ -1131,35 +1107,22 @@ function responseJSON(obj) {
               text: `
 画像のページ内容に含まれる数学の問題を【1問も漏らさずに】読み取り、4択のクイズ形式問題データを生成してください。
 
-【非常に重要な指示（厳守）】
-1. 画像内に含まれる問題（大問、および小問 (1), (2), (3)... 等）を【すべて例外なく個別の1問ずつ】として抽出してください。
-2. 要約や省略、一部の問題のみのピックアップは絶対に行わないでください。
-3. すべての問題について、4つの選択肢（正解1個＋誤答ダミー3個）と解法のアプローチ（思考ステップ選択肢4つ）、および丁寧な解説を作成してください。
-
-返答は以下のJSON配列形式（JSONコードブロック記法なしの純粋なJSONテキスト）のみで出力してください：
+【指示】
+1. 画像内に含まれる問題（小問を含む）をすべて個別問題として抽出してください。
+2. 返答は以下のJSON配列形式（コードブロック記法なしの純粋JSON）のみで出力してください。
 
 [
   {
     "id": "q_ai_${Date.now()}_${i + 1}_1",
-    "subject": "数学Ⅰ (または数学Ⅱ, 数学Ⅲ, 数学A, 数学B, 数学C等)",
-    "unit": "単元名 (例: 2次関数, 三角比, ベクトル等)",
-    "difficulty": 1, 
-    "question": "問題文 (LaTeXの数式は $x^2$ や $$\\frac{a}{b}$$ の形式で記述)",
-    "thinkingOptions": [
-      "解法アプローチ選択肢1",
-      "解法アプローチ選択肢2",
-      "解法アプローチ選択肢3",
-      "解法アプローチ選択肢4"
-    ],
+    "subject": "数学Ⅰ",
+    "unit": "単元名",
+    "difficulty": 1,
+    "question": "問題文",
+    "thinkingOptions": ["方針1","方針2","方針3","方針4"],
     "thinkingAnswer": 0,
-    "options": [
-      "選択肢1",
-      "選択肢2",
-      "選択肢3",
-      "選択肢4"
-    ],
+    "options": ["選択肢1","選択肢2","選択肢3","選択肢4"],
     "answer": 0,
-    "explanation": "解法手順の詳しい解説 (LaTeX数式使用可能)"
+    "explanation": "解説"
   }
 ]
 `
@@ -1172,9 +1135,7 @@ function responseJSON(obj) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ parts: contentsParts }],
-              generationConfig: {
-                maxOutputTokens: 8192 // 最大出力トークン数を確保
-              }
+              generationConfig: { maxOutputTokens: 8192 }
             })
           });
 
@@ -1185,7 +1146,6 @@ function responseJSON(obj) {
 
           const data = await res.json();
           const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          
           const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
           try {
             const parsed = JSON.parse(cleanJson);
@@ -1196,9 +1156,7 @@ function responseJSON(obj) {
                 newCreatedQuestions.push(q);
               });
             }
-          } catch (pErr) {
-            console.warn(`Page ${i + 1} parse error:`, responseText);
-          }
+          } catch (pErr) {}
         }
 
         if (newCreatedQuestions.length > 0) {
@@ -1208,15 +1166,12 @@ function responseJSON(obj) {
           updateTagSelectOptions();
           onAdminFilterSubjectChange();
 
-          showToast(`✨ 全 ${totalPages} ページから【合計 ${newCreatedQuestions.length} 問】の問題を完全自動取り込みしました！`);
+          showToast(`✨ 全 ${totalPages} ページから【合計 ${newCreatedQuestions.length} 問】を取り込みました！`);
 
-          // スプレッドシート連携があれば全端末自動保存
           const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
-          if (gasUrl) {
-            await uploadQuestionsToCloud();
-          }
+          if (gasUrl) await uploadQuestionsToCloud();
         } else {
-          showErrorModal("AIからの応答から有効な問題データを検出できませんでした。画像の解像度や明瞭さをご確認ください。");
+          showErrorModal("AIからの応答から有効な問題データを検出できませんでした。");
         }
       } catch (err) {
         showErrorModal("Gemini Vision AI 解析エラー:\n" + err.message);
@@ -1225,54 +1180,25 @@ function responseJSON(obj) {
       }
     }
 
-    // 動的類題生成AI
     async function generateSimilarQuestionAI() {
       const apiKey = document.getElementById('gemini-api-key-input').value.trim();
       const model = document.getElementById('gemini-model-select').value;
       const currentQ = currentQuizQuestions[currentQuestionIdx];
 
       if (!apiKey) {
-        showToast("Gemini API Key が設定されていません。管理画面で設定してください", true);
+        showToast("Gemini API Key が設定されていません", true);
         return;
       }
 
-      showToast("Geminiがこの問題の類題を生成中...");
+      showToast("Geminiが類題を生成中...");
 
       try {
         const promptText = `
-以下の数学問題の【類題】（類似の解法を使うが数値や設定を少し変更した問題）を1問作成してください。
-
-【元問題】
-科目: ${currentQ.subject || '数学'}
-単元: ${currentQ.unit || '共通'}
-問題: ${currentQ.question}
+以下の数学問題の類題を1問作成してください。
+元問題: ${currentQ.question}
 解説: ${currentQ.explanation}
 
-返答は以下の単一JSONオブジェクト形式（JSONコードブロックなしの純粋なJSONテキスト）のみで出力してください。
-
-{
-  "id": "q_similar_${Date.now()}",
-  "subject": "${currentQ.subject || '数学'}",
-  "unit": "${currentQ.unit || '共通'}",
-  "tag": "${currentQ.tag || 'AI類題'}",
-  "difficulty": ${currentQ.difficulty || 1},
-  "question": "類題の問題文 (LaTeX使用)",
-  "thinkingOptions": [
-    "解法アプローチ1",
-    "解法アプローチ2",
-    "解法アプローチ3",
-    "解法アプローチ4"
-  ],
-  "thinkingAnswer": 0,
-  "options": [
-    "選択肢1",
-    "選択肢2",
-    "選択肢3",
-    "選択肢4"
-  ],
-  "answer": 0,
-  "explanation": "詳細な解説"
-}
+返答は単一JSON形式のみで出力してください。
 `;
 
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -1289,7 +1215,6 @@ function responseJSON(obj) {
         const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
         const newQ = JSON.parse(cleanJson);
 
-        // 現在のクイズに類題を差し込んで表示
         currentQuizQuestions.splice(currentQuestionIdx + 1, 0, newQ);
         nextQuestion();
         showToast("✨ AIが生成した類題へジャンプしました！");
@@ -1298,7 +1223,6 @@ function responseJSON(obj) {
       }
     }
 
-    // スプレッドシートから問題を自動取得（GET）
     async function syncQuestionsFromCloud() {
       const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
       if (!gasUrl) return;
@@ -1317,12 +1241,9 @@ function responseJSON(obj) {
             showToast(`スプレッドシートから ${questions.length} 問の問題を同期しました！`);
           }
         }
-      } catch (e) {
-        console.warn("スプレッドシート同期エラー:", e);
-      }
+      } catch (e) {}
     }
 
-    // スプレッドシートへ問題データを一括保存（POST）
     async function uploadQuestionsToCloud() {
       const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
       if (!gasUrl) {
@@ -1331,41 +1252,28 @@ function responseJSON(obj) {
       }
 
       try {
-        showToast(`${questions.length} 問の問題データをスプレッドシートへ送信中...`);
-        const payload = {
-          action: "save_questions",
-          questions: questions
-        };
+        showToast(`${questions.length} 問のデータを送信中...`);
+        const payload = { action: "save_questions", questions: questions };
 
-        const jsonString = JSON.stringify(payload);
         const res = await fetch(gasUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: jsonString
+          body: JSON.stringify(payload)
         });
 
-        if (!res.ok) throw new Error(`HTTPエラー: ステータス ${res.status}`);
+        if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
 
         const resData = await res.json();
         if (resData.status === "success") {
-          const chunkMsg = resData.chunks ? ` (${resData.chunks}つのセルに分割保存)` : '';
-          showToast(`✓ スプレッドシートへ ${questions.length} 問のデータを保存しました！${chunkMsg}`);
+          showToast(`✓ スプレッドシートへ ${questions.length} 問のデータを保存しました！`);
         } else {
-          showErrorModal("GASエラー: " + (resData.message || "スプレッドシートの保存中にエラーが発生しました"));
+          showErrorModal("GASエラー: " + (resData.message || "保存中にエラーが発生しました"));
         }
       } catch (e) {
-        console.error("Upload error:", e);
-        showErrorModal(
-          "【通信エラー: Failed to fetch】\n\n" +
-          "＜主な解決方法＞\n" +
-          "1. GASエディタで「デプロイ」>「デプロイを管理」を開き、鉛筆マークから【新バージョン】として再デプロイしてください。\n" +
-          "2. 「アクセスできるユーザー」が【全員】になっているか確認してください。\n" +
-          "3. GASエディタ上で関数を1度「実行」し、アクセス権限の承認を完了させてください。"
-        );
+        showErrorModal("【通信エラー】GAS設定やアクセス権限をご確認ください");
       }
     }
 
-    // JSON取り込み処理
     function importQuestionsJSON(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1374,32 +1282,17 @@ function responseJSON(obj) {
       reader.onload = async (e) => {
         try {
           const importedData = JSON.parse(e.target.result);
-          if (!Array.isArray(importedData)) {
-            throw new Error("JSONデータの形式が正しくありません (配列ではありません)");
-          }
-
-          if (importedData.length === 0) {
-            throw new Error("ファイル内の問題データが空です");
-          }
-
-          const sample = importedData[0];
-          if (!sample.question || !Array.isArray(sample.options)) {
-            throw new Error("問題データに必要な項目（question, options等）が見つかりません");
-          }
+          if (!Array.isArray(importedData)) throw new Error("JSON形式が不正です");
 
           questions = importedData;
           localStorage.setItem('math_app_questions', JSON.stringify(questions));
-
           updateUnitSelectOptions();
           updateTagSelectOptions();
           onAdminFilterSubjectChange();
-
-          showToast(`✓ JSONファイルから ${questions.length} 問を取り込みました！`);
+          showToast(`✓ JSONから ${questions.length} 問を取り込みました！`);
 
           const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
-          if (gasUrl) {
-            await uploadQuestionsToCloud();
-          }
+          if (gasUrl) await uploadQuestionsToCloud();
         } catch (err) {
           showErrorModal("JSON取り込みエラー:\n" + err.message);
         }
@@ -1408,24 +1301,19 @@ function responseJSON(obj) {
       event.target.value = '';
     }
 
-    // JSON書き出し
     function exportQuestionsJSON() {
-      if (questions.length === 0) {
-        showToast("エクスポートする問題がありません", true);
-        return;
-      }
+      if (questions.length === 0) return showToast("保存する問題がありません", true);
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `math_questions_db_${Date.now()}.json`);
+      downloadAnchor.setAttribute("download", `math_questions_${Date.now()}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-      showToast("JSONファイルをダウンロードしました");
     }
 
     function clearAllQuestions() {
-      if (!confirm("本当に登録済みのすべての問題（" + questions.length + "問）を削除しますか？")) return;
+      if (!confirm("すべての問題を削除しますか？")) return;
       questions = [];
       localStorage.setItem('math_app_questions', JSON.stringify(questions));
       updateUnitSelectOptions();
@@ -1434,7 +1322,6 @@ function responseJSON(obj) {
       showToast("すべての問題を削除しました");
     }
 
-    // 手書きメモ (Scratchpad) 処理
     function initScratchpad() {
       scratchCanvas = document.getElementById('scratch-canvas');
       if (!scratchCanvas) return;
@@ -1485,7 +1372,6 @@ function responseJSON(obj) {
       scratchCtx.lineWidth = scratchMode === 'eraser' ? 16 : 2;
       scratchCtx.strokeStyle = scratchMode === 'eraser' ? '#0f172a' : '#818cf8';
       scratchCtx.lineCap = 'round';
-
       scratchCtx.lineTo(x, y);
       scratchCtx.stroke();
     }
@@ -1495,9 +1381,7 @@ function responseJSON(obj) {
     function toggleScratchpad() {
       const wrapper = document.getElementById('scratchpad-wrapper');
       wrapper.classList.toggle('hidden');
-      if (!wrapper.classList.contains('hidden')) {
-        resizeScratchCanvas();
-      }
+      if (!wrapper.classList.contains('hidden')) resizeScratchCanvas();
     }
 
     function setScratchMode(mode) {
@@ -1507,11 +1391,9 @@ function responseJSON(obj) {
     }
 
     function clearScratchpad() {
-      if (!scratchCtx || !scratchCanvas) return;
-      scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+      if (scratchCtx && scratchCanvas) scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
     }
 
-    // 演習開始ロジック
     function startQuiz() {
       const subject = document.getElementById('quiz-subject-select').value;
       const unit = document.getElementById('quiz-unit-select').value;
@@ -1524,7 +1406,7 @@ function responseJSON(obj) {
         const num = document.getElementById('student-num').value.trim();
         const name = document.getElementById('student-name').value.trim();
         if (!grade || !num || !name) {
-          showToast("小テストモードでは学年・出席番号・氏名の入力が必須です", true);
+          showToast("小テストモードでは学年・出席番号・氏名が必要です", true);
           return;
         }
       }
@@ -1538,11 +1420,10 @@ function responseJSON(obj) {
       });
 
       if (pool.length === 0) {
-        showToast("指定された条件に該当する問題が登録されていません", true);
+        showToast("該当する問題が見つかりません", true);
         return;
       }
 
-      // 出題順のシャッフル
       pool = [...pool].sort(() => Math.random() - 0.5);
       if (mode === 'TEST_10') pool = pool.slice(0, 10);
 
@@ -1563,6 +1444,12 @@ function responseJSON(obj) {
 
       selectedThinkingIdx = null;
       selectedAnswerIdx = null;
+      isAnswerSubmitted = false;
+
+      // 「解答を確定する」ボタンを初期化（非活性）
+      const submitBtn = document.getElementById('submit-answer-btn');
+      submitBtn.disabled = true;
+      submitBtn.className = "w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow transition-all flex items-center justify-center space-x-2 opacity-40 cursor-not-allowed";
 
       document.getElementById('quiz-progress-badge').textContent = `問題 ${currentQuestionIdx + 1} / ${currentQuizQuestions.length}`;
       document.getElementById('quiz-subject-badge').textContent = q.subject || '数学';
@@ -1578,12 +1465,10 @@ function responseJSON(obj) {
 
       document.getElementById('quiz-diff-badge').textContent = `★${q.difficulty || 1}`;
 
-      // 問題文
       const qTextEl = document.getElementById('question-text');
       qTextEl.textContent = q.question;
       renderMath(qTextEl);
 
-      // 図形
       const figureBox = document.getElementById('question-figure-box');
       const figureImg = document.getElementById('question-figure-img');
       if (q.figureImage) {
@@ -1593,7 +1478,6 @@ function responseJSON(obj) {
         figureBox.classList.add('hidden');
       }
 
-      // 思考プロセスボックス
       const thinkingBox = document.getElementById('thinking-process-box');
       const thinkingContainer = document.getElementById('thinking-options-container');
       thinkingContainer.innerHTML = '';
@@ -1612,35 +1496,34 @@ function responseJSON(obj) {
         thinkingBox.classList.add('hidden');
       }
 
-      // 回答選択肢のランダムシャッフル機能
+      // 選択肢のシャッフル
       const originalOptions = q.options || [];
       const origCorrectIdx = q.answer || 0;
-
       const mapped = originalOptions.map((opt, idx) => ({ text: opt, isCorrect: idx === origCorrectIdx }));
       mapped.sort(() => Math.random() - 0.5);
 
       currentShuffledOptions = mapped.map(item => item.text);
       currentShuffledCorrectIdx = mapped.findIndex(item => item.isCorrect);
 
-      // 回答選択肢の描画
+      // 選択肢を描画 (2行2列: grid-cols-2)
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
       currentShuffledOptions.forEach((optText, idx) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left p-3.5 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700/80 rounded-xl text-sm font-medium text-slate-100 transition-all flex items-center justify-between group";
+        btn.id = `option-btn-${idx}`;
+        btn.className = "option-btn w-full text-left p-4 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-sm font-medium text-slate-100 transition-all flex items-center justify-between group";
         btn.innerHTML = `
           <div class="flex items-center space-x-3">
             <span class="w-6 h-6 rounded-full bg-slate-800 group-hover:bg-indigo-600 text-slate-400 group-hover:text-white flex items-center justify-center text-xs font-bold transition-colors">${idx + 1}</span>
             <span>${optText}</span>
           </div>
-          <i class="fa-solid fa-chevron-right text-xs text-slate-600 group-hover:text-slate-300"></i>
+          <i class="fa-regular fa-circle text-xs text-slate-600 group-hover:text-slate-300"></i>
         `;
         btn.onclick = () => selectAnswerOption(idx);
         optionsContainer.appendChild(btn);
       });
       renderMath(optionsContainer);
 
-      // 解説・診断非表示
       document.getElementById('explanation-box').classList.add('hidden');
       document.getElementById('misconception-diagnosis-box').classList.add('hidden');
     }
@@ -1657,28 +1540,62 @@ function responseJSON(obj) {
       });
     }
 
+    // 選択肢のタップ選択（仮選択状態）
     function selectAnswerOption(idx) {
-      if (selectedAnswerIdx !== null) return; // 二重回答防止
+      if (isAnswerSubmitted) return; // 解答確定後の変更禁止
+
       selectedAnswerIdx = idx;
 
+      // 「解答を確定する」ボタンを有効化
+      const submitBtn = document.getElementById('submit-answer-btn');
+      submitBtn.disabled = false;
+      submitBtn.className = "w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center space-x-2 opacity-100 cursor-pointer scale-105";
+
+      // 選択肢ボタンの表示状態を更新（仮選択ハイライト）
+      const container = document.getElementById('options-container');
+      Array.from(container.children).forEach((btn, i) => {
+        if (i === idx) {
+          btn.className = "option-btn w-full text-left p-4 bg-indigo-950/90 border-2 border-indigo-500 rounded-xl text-sm font-semibold text-indigo-100 flex items-center justify-between shadow-lg shadow-indigo-500/10";
+          btn.querySelector('i').className = "fa-solid fa-circle-dot text-indigo-400 text-xs";
+        } else {
+          btn.className = "option-btn w-full text-left p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-sm font-medium text-slate-400 transition-all flex items-center justify-between opacity-70";
+          btn.querySelector('i').className = "fa-regular fa-circle text-xs text-slate-600";
+        }
+      });
+    }
+
+    // 「解答を確定する」ボタン押下時の判定処理（誤タップ防止）
+    function submitAnswer() {
+      if (selectedAnswerIdx === null || isAnswerSubmitted) return;
+
+      isAnswerSubmitted = true;
+
+      // 確定ボタンを無効化
+      const submitBtn = document.getElementById('submit-answer-btn');
+      submitBtn.disabled = true;
+      submitBtn.className = "w-full sm:w-auto px-8 py-3 bg-slate-700 text-slate-400 font-bold rounded-xl transition-all flex items-center justify-center space-x-2 opacity-50 cursor-not-allowed scale-100";
+
       const q = currentQuizQuestions[currentQuestionIdx];
-      const isCorrect = idx === currentShuffledCorrectIdx;
+      const isCorrect = selectedAnswerIdx === currentShuffledCorrectIdx;
 
       if (isCorrect) quizScore++;
 
-      // 解答ボタンハイライト
+      // 選択肢の最終正誤ハイライト
       const container = document.getElementById('options-container');
       Array.from(container.children).forEach((btn, i) => {
         if (i === currentShuffledCorrectIdx) {
-          btn.className = "w-full text-left p-3.5 bg-emerald-950/80 border-2 border-emerald-500 rounded-xl text-sm font-semibold text-emerald-200 flex items-center justify-between shadow";
-        } else if (i === idx && !isCorrect) {
-          btn.className = "w-full text-left p-3.5 bg-rose-950/80 border-2 border-rose-500 rounded-xl text-sm font-semibold text-rose-200 flex items-center justify-between";
+          btn.className = "option-btn w-full text-left p-4 bg-emerald-950/80 border-2 border-emerald-500 rounded-xl text-sm font-semibold text-emerald-200 flex items-center justify-between shadow";
+          btn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400 text-sm";
+        } else if (i === selectedAnswerIdx && !isCorrect) {
+          btn.className = "option-btn w-full text-left p-4 bg-rose-950/80 border-2 border-rose-500 rounded-xl text-sm font-semibold text-rose-200 flex items-center justify-between";
+          btn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400 text-sm";
         } else {
-          btn.className = "w-full text-left p-3.5 bg-slate-900/40 border border-slate-800 rounded-xl text-sm text-slate-500 opacity-50";
+          btn.className = "option-btn w-full text-left p-4 bg-slate-900/40 border border-slate-800 rounded-xl text-sm text-slate-500 opacity-40";
+          btn.querySelector('i').className = "fa-regular fa-circle text-xs text-slate-600";
         }
       });
 
-      // 結果表示
+      // 結果・解説の表示
       const expBox = document.getElementById('explanation-box');
       const resultBanner = document.getElementById('answer-result-banner');
       const expText = document.getElementById('explanation-text');
@@ -1696,7 +1613,7 @@ function responseJSON(obj) {
       renderMath(expText);
       expBox.classList.remove('hidden');
 
-      // 履歴追加
+      // 学習履歴に追加
       historyData.push({
         date: new Date().toISOString(),
         subject: q.subject,
@@ -1708,9 +1625,7 @@ function responseJSON(obj) {
     }
 
     function recordMisconception(cause) {
-      if (misconceptionStats[cause] !== undefined) {
-        misconceptionStats[cause]++;
-      }
+      if (misconceptionStats[cause] !== undefined) misconceptionStats[cause]++;
       showToast("つまずき理由を記録しました");
       document.getElementById('misconception-diagnosis-box').classList.add('hidden');
       updateAnalyticsView();
@@ -1757,7 +1672,7 @@ function responseJSON(obj) {
             statusEl.textContent = "✓ 成績データをスプレッドシートへ正常送信しました";
             statusEl.className = "text-xs text-emerald-400 h-6";
           }).catch(err => {
-            statusEl.textContent = "成績データの送信に失敗しました（GAS設定をご確認ください）";
+            statusEl.textContent = "成績データの送信に失敗しました";
             statusEl.className = "text-xs text-rose-400 h-6";
           });
         }
@@ -1785,7 +1700,6 @@ function responseJSON(obj) {
       link.remove();
     }
 
-    // 分析画面更新
     function updateAnalyticsView() {
       const totalAnswers = historyData.length;
       document.getElementById('total-answers-cnt').textContent = totalAnswers;
@@ -1796,7 +1710,6 @@ function responseJSON(obj) {
       const accPct = Math.round((correctAnswers / totalAnswers) * 100);
       document.getElementById('overall-accuracy-pct').textContent = accPct;
 
-      // 単元別集計
       const unitMap = {};
       historyData.forEach(h => {
         if (!unitMap[h.unit]) unitMap[h.unit] = { total: 0, correct: 0 };
@@ -1836,7 +1749,6 @@ function responseJSON(obj) {
 
       document.getElementById('weakest-unit-name').textContent = weakestUnit;
 
-      // つまずき原因集計
       const causeMap = { CALC: '🧮 計算ミス', FORMULA: '📖 公式欠落', STRATEGY: '🧩 解法方針誤り', READING: '🔍 題意誤認' };
       let maxCauseVal = -1;
       let topCauseText = "未記録";
@@ -1860,7 +1772,6 @@ function responseJSON(obj) {
       document.getElementById('top-misconception-cause').textContent = topCauseText;
     }
 
-    // 管理画面問題フィルタ & 一覧表示
     function onAdminFilterSubjectChange() {
       const selectedSubject = document.getElementById('admin-filter-subject').value;
       const selectUnit = document.getElementById('admin-filter-unit');
@@ -1974,9 +1885,7 @@ function responseJSON(obj) {
       questions[qIdx].options = options;
 
       const checkedAns = document.querySelector('input[name="edit-q-answer"]:checked');
-      if (checkedAns) {
-        questions[qIdx].answer = parseInt(checkedAns.value, 10);
-      }
+      if (checkedAns) questions[qIdx].answer = parseInt(checkedAns.value, 10);
 
       localStorage.setItem('math_app_questions', JSON.stringify(questions));
       closeEditQuestionModal();
@@ -1992,7 +1901,6 @@ function responseJSON(obj) {
       showToast("問題を削除しました");
     }
 
-    // Modal, Toast & Utilities
     function openGasCodeModal() {
       document.getElementById('gas-script-content').textContent = GAS_TEMPLATE_CODE;
       document.getElementById('gas-code-modal').classList.remove('hidden');
