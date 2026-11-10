@@ -39,8 +39,7 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"> 誤タップ防止機能対応版</span></h1>
-           
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30"> 間違い直し・プレビュー対応版</span></h1>
           </div>
         </div>
 
@@ -126,6 +125,7 @@
             </label>
             <select id="quiz-mode-select" onchange="toggleStudentInfoVisibility()" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
               <option value="NORMAL">通常演習 (解説＆類題生成)</option>
+              <option value="RETRY">🔄 間違い直しモード (間違えた問題のみ)</option>
               <option value="THINKING_CHECK">💡 思考プロセス重視 (解法方針を入力後に回答)</option>
               <option value="TEST_10">10問小テスト (教員データ送信モード)</option>
             </select>
@@ -140,6 +140,30 @@
               <option value="2">★2 中級</option>
               <option value="3">★3 上級</option>
             </select>
+          </div>
+        </div>
+
+        <!-- 間違い直しモードの設定（演習者が指定） -->
+        <div id="retry-config-box" class="hidden p-4 bg-amber-950/40 border border-amber-500/40 rounded-xl space-y-2">
+          <div class="text-xs font-bold text-amber-300 flex items-center space-x-1.5">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>間違い直しモードの設定 (この端末での解き直し動作)</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-200 pt-1">
+            <label class="flex items-center space-x-2.5 cursor-pointer bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/70 hover:border-amber-500/50 transition-colors">
+              <input type="checkbox" id="remove-on-correct-check" checked class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500">
+              <div>
+                <span class="font-semibold text-white block">解き直しで正解したらリストから外す</span>
+                <span class="text-[11px] text-slate-400 block">正解した問題を間違い直し対象から自動的に除外します</span>
+              </div>
+            </label>
+            <label class="flex items-center space-x-2.5 cursor-pointer bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/70 hover:border-amber-500/50 transition-colors">
+              <input type="checkbox" id="remove-on-attempt-check" class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500">
+              <div>
+                <span class="font-semibold text-white block">1問解くごとに(正誤問わず)リストから外す</span>
+                <span class="text-[11px] text-slate-400 block">解き直しに挑戦しただけで対象リストから除外します</span>
+              </div>
+            </label>
           </div>
         </div>
 
@@ -235,10 +259,10 @@
           <div id="thinking-options-container" class="grid grid-cols-1 gap-2"></div>
         </div>
 
-        <!-- Options Container (修正①: 2行2列のグリッド配置) -->
+        <!-- Options Container (2行2列のグリッド配置) -->
         <div id="options-container" class="grid grid-cols-2 gap-3"></div>
 
-        <!-- Confirm Answer Button (修正②: 誤タップ防止用「解答を確定する」ボタン) -->
+        <!-- Confirm Answer Button (誤タップ防止用「解答を確定する」ボタン) -->
         <div class="flex justify-center pt-2">
           <button id="submit-answer-btn" onclick="submitAnswer()" disabled class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 opacity-40 cursor-not-allowed">
             <i class="fa-solid fa-check"></i>
@@ -326,7 +350,7 @@
 
     <!-- VIEW 2: ANALYTICS DASHBOARD -->
     <section id="analytics-view" class="view-section hidden space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex items-center space-x-4">
           <div class="p-3.5 bg-indigo-500/20 text-indigo-400 rounded-xl">
             <i class="fa-solid fa-list-check text-2xl"></i>
@@ -347,23 +371,39 @@
           </div>
         </div>
 
+        <!-- 端末別間違えた問題数 -->
+        <div class="bg-slate-800 border border-amber-500/40 rounded-2xl p-5 shadow-lg flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="p-3.5 bg-amber-500/20 text-amber-400 rounded-xl">
+              <i class="fa-solid fa-rotate-left text-2xl"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-medium">要復習（間違えた問題）</p>
+              <p id="wrong-questions-cnt" class="text-2xl font-bold text-amber-300">0 <span class="text-xs font-normal text-slate-400">問</span></p>
+            </div>
+          </div>
+          <button onclick="clearWrongQuestions()" class="text-[10px] text-slate-400 hover:text-rose-300 p-1 bg-slate-900 border border-slate-700 rounded transition-colors">
+            リセット
+          </button>
+        </div>
+
         <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex items-center space-x-4">
           <div class="p-3.5 bg-rose-500/20 text-rose-400 rounded-xl">
             <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
           </div>
           <div>
             <p class="text-xs text-slate-400 font-medium">最重点 復習単元</p>
-            <p id="weakest-unit-name" class="text-base font-bold text-rose-300 truncate max-w-[140px]">データなし</p>
+            <p id="weakest-unit-name" class="text-base font-bold text-rose-300 truncate max-w-[120px]">データなし</p>
           </div>
         </div>
 
         <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex items-center space-x-4">
-          <div class="p-3.5 bg-amber-500/20 text-amber-400 rounded-xl">
+          <div class="p-3.5 bg-purple-500/20 text-purple-400 rounded-xl">
             <i class="fa-solid fa-stethoscope text-2xl"></i>
           </div>
           <div>
             <p class="text-xs text-slate-400 font-medium">最多つまずき原因</p>
-            <p id="top-misconception-cause" class="text-base font-bold text-amber-300 truncate max-w-[140px]">未記録</p>
+            <p id="top-misconception-cause" class="text-base font-bold text-purple-300 truncate max-w-[120px]">未記録</p>
           </div>
         </div>
       </div>
@@ -593,6 +633,25 @@
 
   </main>
 
+  <!-- Confirm Dialog Modal -->
+  <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-slate-100">
+      <div class="flex items-center space-x-3 text-amber-400">
+        <i class="fa-solid fa-circle-question text-2xl"></i>
+        <h3 id="confirm-modal-title" class="font-bold text-base text-white">確認</h3>
+      </div>
+      <p id="confirm-modal-msg" class="text-xs text-slate-300 leading-relaxed"></p>
+      <div class="flex items-center justify-end space-x-3 pt-2 border-t border-slate-800">
+        <button onclick="closeConfirmModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors">
+          キャンセル
+        </button>
+        <button onclick="closeConfirmModal(true)" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-xl shadow transition-all">
+          実行する
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- GAS Code Modal -->
   <div id="gas-code-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-cyan-500/60 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 text-slate-100 max-h-[90vh] flex flex-col">
@@ -748,7 +807,9 @@
   </div>
 
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
 
     // GAS Web App URL のデフォルト初期値設定
     const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwXSOSb7o8il4fP8gQ3cMd2ifKtnsj2ddDbqqjvvDdQSFWeFfdIl1CmTHo_C1PIFTbigQ/exec";
@@ -890,6 +951,7 @@ function responseJSON(obj) {
 
     let questions = [];
     let historyData = [];
+    let wrongQuestionIds = []; // 端末ごとに管理する間違い問題IDリスト
     let misconceptionStats = { CALC: 0, FORMULA: 0, STRATEGY: 0, READING: 0 };
     let currentQuizQuestions = [];
     let currentQuestionIdx = 0;
@@ -897,6 +959,7 @@ function responseJSON(obj) {
     let selectedThinkingIdx = null;
     let selectedAnswerIdx = null;
     let isAnswerSubmitted = false;
+    let pendingConfirmCallback = null;
 
     // 現在出題中問題のシャッフル後選択肢と正解インデックス
     let currentShuffledOptions = [];
@@ -915,6 +978,7 @@ function responseJSON(obj) {
       updateUnitSelectOptions();
       updateTagSelectOptions();
       onAdminFilterSubjectChange();
+      updateAnalyticsView();
 
       // 起動時にスプレッドシートから最新問題を自動同期
       await syncQuestionsFromCloud();
@@ -935,6 +999,21 @@ function responseJSON(obj) {
       }
     }
 
+    function showConfirm(title, msg, onConfirm) {
+      document.getElementById('confirm-modal-title').textContent = title;
+      document.getElementById('confirm-modal-msg').textContent = msg;
+      pendingConfirmCallback = onConfirm;
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal(confirmed) {
+      document.getElementById('confirm-modal').classList.add('hidden');
+      if (confirmed && pendingConfirmCallback) {
+        pendingConfirmCallback();
+      }
+      pendingConfirmCallback = null;
+    }
+
     function loadStoredData() {
       const qData = localStorage.getItem('math_app_questions');
       if (qData) {
@@ -948,11 +1027,29 @@ function responseJSON(obj) {
         try { historyData = JSON.parse(hData); } catch(e) { historyData = []; }
       }
 
+      const wData = localStorage.getItem('math_app_wrong_ids');
+      if (wData) {
+        try { wrongQuestionIds = JSON.parse(wData); } catch(e) { wrongQuestionIds = []; }
+      }
+
       const gasUrl = localStorage.getItem('math_app_gas_url') || DEFAULT_GAS_URL;
       document.getElementById('gas-url-input').value = gasUrl;
 
       const geminiKey = localStorage.getItem('math_app_gemini_key') || "";
       document.getElementById('gemini-api-key-input').value = geminiKey;
+    }
+
+    function saveWrongQuestionIds() {
+      localStorage.setItem('math_app_wrong_ids', JSON.stringify(wrongQuestionIds));
+      updateAnalyticsView();
+    }
+
+    function clearWrongQuestions() {
+      showConfirm("間違い直しリストのリセット", "この端末に保存されている間違い直し問題リストをすべてリセットしますか？", () => {
+        wrongQuestionIds = [];
+        saveWrongQuestionIds();
+        showToast("間違い直しリストをリセットしました");
+      });
     }
 
     function saveGasUrl() {
@@ -1029,6 +1126,7 @@ function responseJSON(obj) {
     }
 
     async function renderPdfPagesToImages(file) {
+      if (!window.pdfjsLib) return;
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       const thumbnailsEl = document.getElementById('pdf-image-thumbnails');
@@ -1313,13 +1411,14 @@ function responseJSON(obj) {
     }
 
     function clearAllQuestions() {
-      if (!confirm("すべての問題を削除しますか？")) return;
-      questions = [];
-      localStorage.setItem('math_app_questions', JSON.stringify(questions));
-      updateUnitSelectOptions();
-      updateTagSelectOptions();
-      onAdminFilterSubjectChange();
-      showToast("すべての問題を削除しました");
+      showConfirm("全問題の削除", "保存されているすべての問題を削除しますか？この操作は取り消せません。", () => {
+        questions = [];
+        localStorage.setItem('math_app_questions', JSON.stringify(questions));
+        updateUnitSelectOptions();
+        updateTagSelectOptions();
+        onAdminFilterSubjectChange();
+        showToast("すべての問題を削除しました");
+      });
     }
 
     function initScratchpad() {
@@ -1418,6 +1517,15 @@ function responseJSON(obj) {
         if (diff !== 'ALL' && String(q.difficulty) !== String(diff)) return false;
         return true;
       });
+
+      // 間違い直しモード（RETRY）の場合は、この端末で過去に間違えた問題のみ抽出
+      if (mode === 'RETRY') {
+        pool = pool.filter(q => wrongQuestionIds.includes(q.id));
+        if (pool.length === 0) {
+          showToast("選択された条件に該当する「間違い直し対象の問題」はありません", true);
+          return;
+        }
+      }
 
       if (pool.length === 0) {
         showToast("該当する問題が見つかりません", true);
@@ -1576,9 +1684,40 @@ function responseJSON(obj) {
       submitBtn.className = "w-full sm:w-auto px-8 py-3 bg-slate-700 text-slate-400 font-bold rounded-xl transition-all flex items-center justify-center space-x-2 opacity-50 cursor-not-allowed scale-100";
 
       const q = currentQuizQuestions[currentQuestionIdx];
+      const mode = document.getElementById('quiz-mode-select').value;
       const isCorrect = selectedAnswerIdx === currentShuffledCorrectIdx;
 
       if (isCorrect) quizScore++;
+
+      // --- 間違い直しリストの端末別管理処理 ---
+      const removeOnCorrect = document.getElementById('remove-on-correct-check').checked;
+      const removeOnAttempt = document.getElementById('remove-on-attempt-check').checked;
+
+      if (!isCorrect) {
+        // 不正解の場合：間違い問題リストへ追加（未追加の場合）
+        if (q.id && !wrongQuestionIds.includes(q.id)) {
+          wrongQuestionIds.push(q.id);
+          saveWrongQuestionIds();
+        }
+      } else {
+        // 正解した場合：「解き直しで正解したら削除」設定が有効ならリストから除去
+        if (removeOnCorrect || mode === 'RETRY') {
+          const wIdx = wrongQuestionIds.indexOf(q.id);
+          if (wIdx !== -1 && removeOnCorrect) {
+            wrongQuestionIds.splice(wIdx, 1);
+            saveWrongQuestionIds();
+          }
+        }
+      }
+
+      // 1問解き直す（試行する）ごとに間違えた問題リストから外す設定が有効な場合
+      if (removeOnAttempt) {
+        const wIdx = wrongQuestionIds.indexOf(q.id);
+        if (wIdx !== -1) {
+          wrongQuestionIds.splice(wIdx, 1);
+          saveWrongQuestionIds();
+        }
+      }
 
       // 選択肢の最終正誤ハイライト
       const container = document.getElementById('options-container');
@@ -1680,8 +1819,9 @@ function responseJSON(obj) {
     }
 
     function abortQuiz() {
-      if (!confirm("演習を中断して戻りますか？")) return;
-      resetQuizView();
+      showConfirm("演習の中断", "演習を中断して初期設定画面に戻りますか？", () => {
+        resetQuizView();
+      });
     }
 
     function resetQuizView() {
@@ -1703,6 +1843,7 @@ function responseJSON(obj) {
     function updateAnalyticsView() {
       const totalAnswers = historyData.length;
       document.getElementById('total-answers-cnt').textContent = totalAnswers;
+      document.getElementById('wrong-questions-cnt').textContent = wrongQuestionIds.length;
 
       if (totalAnswers === 0) return;
 
@@ -1894,11 +2035,12 @@ function responseJSON(obj) {
     }
 
     function deleteQuestion(id) {
-      if (!confirm("この問題を削除してもよろしいですか？")) return;
-      questions = questions.filter(q => q.id !== id);
-      localStorage.setItem('math_app_questions', JSON.stringify(questions));
-      onAdminFilterSubjectChange();
-      showToast("問題を削除しました");
+      showConfirm("問題の削除", "この問題を削除してもよろしいですか？", () => {
+        questions = questions.filter(q => q.id !== id);
+        localStorage.setItem('math_app_questions', JSON.stringify(questions));
+        onAdminFilterSubjectChange();
+        showToast("問題を削除しました");
+      });
     }
 
     function openGasCodeModal() {
@@ -1979,10 +2121,18 @@ function responseJSON(obj) {
     function toggleStudentInfoVisibility() {
       const mode = document.getElementById('quiz-mode-select').value;
       const infoBox = document.getElementById('student-info-box');
+      const retryConfigBox = document.getElementById('retry-config-box');
+
       if (mode === 'TEST_10') {
         infoBox.classList.remove('hidden');
       } else {
         infoBox.classList.add('hidden');
+      }
+
+      if (mode === 'RETRY') {
+        retryConfigBox.classList.remove('hidden');
+      } else {
+        retryConfigBox.classList.add('hidden');
       }
     }
 
