@@ -39,7 +39,7 @@
             <i class="fa-solid fa-brain text-xl text-white"></i>
           </div>
           <div>
-            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30"> 間違い直し・プレビュー対応版</span></h1>
+            <h1 class="font-bold text-lg text-white leading-tight">数学総合演習 <span class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30"> 間違い直し・一括編集対応版</span></h1>
           </div>
         </div>
 
@@ -590,48 +590,113 @@
         </div>
       </div>
 
-      <!-- Question List Management -->
+      <!-- Question List Management (一括編集・一括置換・拡張フィルター対応) -->
       <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3 flex-wrap gap-2">
-          <h3 class="text-base font-bold text-white flex items-center space-x-2">
-            <i class="fa-solid fa-database text-indigo-400"></i>
-            <span>登録済み問題一覧 (<span id="admin-question-count">0</span>問)</span>
-          </h3>
           <div class="flex items-center space-x-2">
+            <h3 class="text-base font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-database text-indigo-400"></i>
+              <span>登録済み問題一覧 (表示 <span id="admin-question-count">0</span>件 / 全 <span id="admin-total-question-count">0</span>問)</span>
+            </h3>
+          </div>
+          <div class="flex items-center space-x-2 flex-wrap gap-y-1.5">
+            <!-- 追加アイデア1: 一括置換 (リネーム) ボタン -->
+            <button onclick="openBulkReplaceModal()" class="px-3 py-1.5 bg-cyan-900/50 hover:bg-cyan-800/70 text-cyan-200 border border-cyan-600/60 text-xs font-semibold rounded-lg transition-all flex items-center space-x-1.5">
+              <i class="fa-solid fa-arrow-right-arrow-left"></i>
+              <span>単元名・タグの一括置換</span>
+            </button>
             <button onclick="clearAllQuestions()" class="px-3 py-1.5 bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 border border-rose-700/50 text-xs font-semibold rounded-lg transition-all">
               全削除
             </button>
           </div>
         </div>
 
-        <!-- 管理画面：絞り込みフィルター -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-700/60">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">科目絞り込み</label>
-            <select id="admin-filter-subject" onchange="onAdminFilterSubjectChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:outline-none">
-              <option value="ALL">すべての科目</option>
-              <option value="数学Ⅰ">数学Ⅰ</option>
-              <option value="数学Ⅱ">数学Ⅱ</option>
-              <option value="数学Ⅲ">数学Ⅲ</option>
-              <option value="数学A">数学A</option>
-              <option value="数学B">数学B</option>
-              <option value="数学C">数学C</option>
-              <option value="その他">その他</option>
-            </select>
+        <!-- 管理画面：拡張絞り込みフィルター（科目・単元・タグ・キーワード検索） -->
+        <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/60 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-semibold text-slate-400 flex items-center space-x-1.5">
+              <i class="fa-solid fa-filter text-indigo-400"></i>
+              <span>表示問題の絞り込みフィルター</span>
+            </span>
+            <button onclick="resetAdminFilters()" class="text-[11px] text-slate-400 hover:text-indigo-300 transition-colors flex items-center space-x-1">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>条件をリセット</span>
+            </button>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">単元絞り込み</label>
-            <select id="admin-filter-unit" onchange="renderAdminQuestionList()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:outline-none">
-              <option value="ALL">すべての単元</option>
-            </select>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">科目絞り込み</label>
+              <select id="admin-filter-subject" onchange="onAdminFilterSubjectChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <option value="ALL">すべての科目</option>
+                <option value="数学Ⅰ">数学Ⅰ</option>
+                <option value="数学Ⅱ">数学Ⅱ</option>
+                <option value="数学Ⅲ">数学Ⅲ</option>
+                <option value="数学A">数学A</option>
+                <option value="数学B">数学B</option>
+                <option value="数学C">数学C</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">単元絞り込み</label>
+              <select id="admin-filter-unit" onchange="renderAdminQuestionList()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <option value="ALL">すべての単元</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-cyan-300 mb-1">授業・プリントタグ絞り込み</label>
+              <select id="admin-filter-tag" onchange="renderAdminQuestionList()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <option value="ALL">すべてのタグ</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">問題文キーワード検索</label>
+              <div class="relative">
+                <input type="text" id="admin-filter-keyword" oninput="renderAdminQuestionList()" placeholder="例: 頂点, 確率, sin..." class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 pl-7 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <i class="fa-solid fa-magnifying-glass text-slate-500 text-[11px] absolute left-2.5 top-2.5"></i>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div id="admin-question-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
+        <!-- 一括選択・一括操作バー -->
+        <div class="bg-slate-900/90 border border-indigo-500/30 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-3">
+            <label class="flex items-center space-x-2 cursor-pointer select-none">
+              <input type="checkbox" id="admin-select-all-checkbox" onchange="toggleSelectAllDisplayed(this.checked)" class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-800 cursor-pointer">
+              <span class="text-xs font-semibold text-slate-200">表示中の問題をすべて選択</span>
+            </label>
+            <span id="admin-selected-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
+              選択中: <span id="admin-selected-count">0</span> 件
+            </span>
+            <button id="admin-clear-selection-btn" onclick="clearAdminSelection()" class="hidden text-[11px] text-slate-400 hover:text-slate-200 underline">
+              選択解除
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <!-- 基本仕様: 選択した問題の一括編集ボタン -->
+            <button id="admin-bulk-edit-btn" onclick="openBulkEditModal()" disabled class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 disabled:cursor-not-allowed text-white border border-indigo-500/50 rounded-lg text-xs font-semibold transition-all flex items-center space-x-1.5 shadow">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>選択した問題を一括編集</span>
+            </button>
+            <!-- 追加アイデア3: 選択した問題の一括削除ボタン -->
+            <button id="admin-bulk-delete-btn" onclick="bulkDeleteSelectedQuestions()" disabled class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:border-slate-700 disabled:cursor-not-allowed text-white border border-rose-500/50 rounded-lg text-xs font-semibold transition-all flex items-center space-x-1.5 shadow">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>一括削除</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="admin-question-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-1"></div>
       </div>
     </section>
 
   </main>
+
+  <!-- 共通候補データリスト (単元・タグ入力補助用) -->
+  <datalist id="existing-units-datalist"></datalist>
+  <datalist id="existing-tags-datalist"></datalist>
 
   <!-- Confirm Dialog Modal -->
   <div id="confirm-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -680,7 +745,172 @@
     </div>
   </div>
 
-  <!-- Edit Question Modal -->
+  <!-- BULK EDIT MODAL (基本仕様: 選択した問題の一括編集) -->
+  <div id="bulk-edit-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-indigo-500/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-slate-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+          <i class="fa-solid fa-layer-group text-indigo-400"></i>
+          <span>選択した問題の一括編集 (<span id="bulk-edit-target-count" class="text-indigo-300">0</span>問)</span>
+        </h3>
+        <button onclick="closeBulkEditModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400 leading-relaxed">
+        左側のチェックを入れた項目のみ、選択中のすべての問題に対して一括上書きします。チェックが入っていない項目は元の設定が維持されます。
+      </p>
+
+      <div class="space-y-3.5 text-xs">
+        <!-- 科目（大区分） -->
+        <div class="p-3 bg-slate-800/80 border border-slate-700/80 rounded-xl space-y-2">
+          <label class="flex items-center space-x-2 cursor-pointer font-semibold text-slate-200">
+            <input type="checkbox" id="bulk-check-subject" class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-900">
+            <span>科目（大区分）を変更する</span>
+          </label>
+          <select id="bulk-val-subject" onchange="document.getElementById('bulk-check-subject').checked = true" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <option value="数学Ⅰ">数学Ⅰ</option>
+            <option value="数学Ⅱ">数学Ⅱ</option>
+            <option value="数学Ⅲ">数学Ⅲ</option>
+            <option value="数学A">数学A</option>
+            <option value="数学B">数学B</option>
+            <option value="数学C">数学C</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+
+        <!-- 詳細単元 -->
+        <div class="p-3 bg-slate-800/80 border border-slate-700/80 rounded-xl space-y-2">
+          <label class="flex items-center space-x-2 cursor-pointer font-semibold text-slate-200">
+            <input type="checkbox" id="bulk-check-unit" class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-900">
+            <span>詳細単元を変更する</span>
+          </label>
+          <input type="text" id="bulk-val-unit" list="existing-units-datalist" oninput="document.getElementById('bulk-check-unit').checked = true" placeholder="新しい単元名を入力または候補から選択 (例: 2次関数)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <!-- 授業・プリント連動タグ -->
+        <div class="p-3 bg-slate-800/80 border border-slate-700/80 rounded-xl space-y-2">
+          <label class="flex items-center space-x-2 cursor-pointer font-semibold text-cyan-300">
+            <input type="checkbox" id="bulk-check-tag" class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-900">
+            <span>授業・プリント連動タグを変更する</span>
+          </label>
+          <input type="text" id="bulk-val-tag" list="existing-tags-datalist" oninput="document.getElementById('bulk-check-tag').checked = true" placeholder="新しいタグ名を入力 (空欄のまま適用するとタグを解除)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <!-- 難易度 -->
+        <div class="p-3 bg-slate-800/80 border border-slate-700/80 rounded-xl space-y-2">
+          <label class="flex items-center space-x-2 cursor-pointer font-semibold text-amber-300">
+            <input type="checkbox" id="bulk-check-diff" class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-900">
+            <span>難易度を変更する</span>
+          </label>
+          <select id="bulk-val-diff" onchange="document.getElementById('bulk-check-diff').checked = true" class="w-full bg-slate-900 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <option value="1">★1 初級</option>
+            <option value="2">★2 中級</option>
+            <option value="3">★3 上級</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+        <button onclick="closeBulkEditModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
+          キャンセル
+        </button>
+        <button onclick="applyBulkEdit()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow flex items-center space-x-1.5">
+          <i class="fa-solid fa-check"></i>
+          <span>一括変更を適用する</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK REPLACE MODAL (追加アイデア1: 単元名・タグ・科目の一括置換リネーム) -->
+  <div id="bulk-replace-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-cyan-500/60 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 text-slate-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-cyan-300 flex items-center space-x-2">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i>
+          <span>単元名・タグの一括置換 (リネーム)</span>
+        </h3>
+        <button onclick="closeBulkReplaceModal()" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400 leading-relaxed">
+        既存の単元名やタグ名の表記ゆれ（例：「2次関数」→「二次関数」）を条件指定でまとめて書き換えます。
+      </p>
+
+      <div class="space-y-3.5 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- 置換対象項目 -->
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">置換する項目</label>
+            <select id="replace-target-field" onchange="onReplaceFieldOrSubjectChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              <option value="unit">詳細単元</option>
+              <option value="tag">授業・プリント連動タグ</option>
+              <option value="subject">科目（大区分）</option>
+            </select>
+          </div>
+
+          <!-- 対象科目の限定 -->
+          <div id="replace-subject-scope-box">
+            <label class="block text-slate-300 font-semibold mb-1">対象科目の限定（任意）</label>
+            <select id="replace-filter-subject" onchange="onReplaceFieldOrSubjectChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              <option value="ALL">すべての科目を対象</option>
+              <option value="数学Ⅰ">数学Ⅰ のみ</option>
+              <option value="数学Ⅱ">数学Ⅱ のみ</option>
+              <option value="数学Ⅲ">数学Ⅲ のみ</option>
+              <option value="数学A">数学A のみ</option>
+              <option value="数学B">数学B のみ</option>
+              <option value="数学C">数学C のみ</option>
+              <option value="その他">その他 のみ</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 置換前の名称 -->
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">置換前の名称（現在の登録値から選択）</label>
+          <select id="replace-old-value" onchange="updateReplacePreviewCount()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+          </select>
+        </div>
+
+        <!-- 置換後の名称（テキスト入力 or 科目セレクト） -->
+        <div>
+          <label class="block text-cyan-300 font-semibold mb-1">置換後の新しい名称</label>
+          <input type="text" id="replace-new-value-text" list="existing-units-datalist" placeholder="新しい名称を入力してください" class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+          <select id="replace-new-value-subject" class="hidden w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-lg p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            <option value="数学Ⅰ">数学Ⅰ</option>
+            <option value="数学Ⅱ">数学Ⅱ</option>
+            <option value="数学Ⅲ">数学Ⅲ</option>
+            <option value="数学A">数学A</option>
+            <option value="数学B">数学B</option>
+            <option value="数学C">数学C</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+
+        <!-- 一致件数プレビュー -->
+        <div class="p-3 bg-cyan-950/40 border border-cyan-500/30 rounded-xl flex items-center justify-between">
+          <span class="text-slate-300">置換対象に一致する問題数:</span>
+          <span class="text-sm font-bold text-cyan-300"><span id="replace-match-count">0</span> 問</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+        <button onclick="closeBulkReplaceModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold rounded-xl">
+          キャンセル
+        </button>
+        <button id="execute-bulk-replace-btn" onclick="executeBulkReplace()" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-xl shadow flex items-center space-x-1.5">
+          <i class="fa-solid fa-check"></i>
+          <span>一括置換を実行</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Question Modal (個別編集モーダル) -->
   <div id="edit-question-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-indigo-500/60 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 text-slate-100 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -710,11 +940,11 @@
         </div>
         <div>
           <label class="block text-slate-300 font-semibold mb-1">詳細単元</label>
-          <input type="text" id="edit-q-unit" placeholder="例: 2次関数" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <input type="text" id="edit-q-unit" list="existing-units-datalist" placeholder="例: 2次関数" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
         </div>
         <div>
           <label class="block text-slate-300 font-semibold mb-1">授業・プリント連動タグ</label>
-          <input type="text" id="edit-q-tag" placeholder="例: 教科書 P.45" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <input type="text" id="edit-q-tag" list="existing-tags-datalist" placeholder="例: 教科書 P.45" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
         </div>
       </div>
 
@@ -952,6 +1182,7 @@ function responseJSON(obj) {
     let questions = [];
     let historyData = [];
     let wrongQuestionIds = []; // 端末ごとに管理する間違い問題IDリスト
+    let selectedAdminQuestionIds = new Set(); // 管理画面で一括編集・削除用に選択された問題IDセット
     let misconceptionStats = { CALC: 0, FORMULA: 0, STRATEGY: 0, READING: 0 };
     let currentQuizQuestions = [];
     let currentQuestionIdx = 0;
@@ -975,14 +1206,56 @@ function responseJSON(obj) {
       loadStoredData();
       initScratchpad();
       initDropZone();
-      updateUnitSelectOptions();
-      updateTagSelectOptions();
-      onAdminFilterSubjectChange();
+      refreshAllTaxonomyUI();
       updateAnalyticsView();
 
       // 起動時にスプレッドシートから最新問題を自動同期
       await syncQuestionsFromCloud();
     });
+
+    // HTMLエスケープ用ユーティリティ
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 科目・単元・タグのセレクトボックスおよび入力補助datalistを一括更新
+    function refreshAllTaxonomyUI() {
+      updateUnitSelectOptions();
+      updateTagSelectOptions();
+      updateExistingDatalists();
+      onAdminFilterSubjectChange();
+    }
+
+    function updateExistingDatalists() {
+      const units = [...new Set(questions.map(q => q.unit).filter(Boolean))];
+      const tags = [...new Set(questions.map(q => q.tag || q.lessonTag).filter(Boolean))];
+
+      const unitList = document.getElementById('existing-units-datalist');
+      if (unitList) {
+        unitList.innerHTML = '';
+        units.forEach(u => {
+          const opt = document.createElement('option');
+          opt.value = u;
+          unitList.appendChild(opt);
+        });
+      }
+
+      const tagList = document.getElementById('existing-tags-datalist');
+      if (tagList) {
+        tagList.innerHTML = '';
+        tags.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          tagList.appendChild(opt);
+        });
+      }
+    }
 
     function renderMath(element) {
       if (!element) return;
@@ -1260,9 +1533,7 @@ function responseJSON(obj) {
         if (newCreatedQuestions.length > 0) {
           questions = questions.concat(newCreatedQuestions);
           localStorage.setItem('math_app_questions', JSON.stringify(questions));
-          updateUnitSelectOptions();
-          updateTagSelectOptions();
-          onAdminFilterSubjectChange();
+          refreshAllTaxonomyUI();
 
           showToast(`✨ 全 ${totalPages} ページから【合計 ${newCreatedQuestions.length} 問】を取り込みました！`);
 
@@ -1332,10 +1603,9 @@ function responseJSON(obj) {
           const cloudQuestions = await res.json();
           if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
             questions = cloudQuestions;
+            selectedAdminQuestionIds.clear();
             localStorage.setItem('math_app_questions', JSON.stringify(questions));
-            updateUnitSelectOptions();
-            updateTagSelectOptions();
-            onAdminFilterSubjectChange();
+            refreshAllTaxonomyUI();
             showToast(`スプレッドシートから ${questions.length} 問の問題を同期しました！`);
           }
         }
@@ -1383,10 +1653,9 @@ function responseJSON(obj) {
           if (!Array.isArray(importedData)) throw new Error("JSON形式が不正です");
 
           questions = importedData;
+          selectedAdminQuestionIds.clear();
           localStorage.setItem('math_app_questions', JSON.stringify(questions));
-          updateUnitSelectOptions();
-          updateTagSelectOptions();
-          onAdminFilterSubjectChange();
+          refreshAllTaxonomyUI();
           showToast(`✓ JSONから ${questions.length} 問を取り込みました！`);
 
           const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
@@ -1413,10 +1682,9 @@ function responseJSON(obj) {
     function clearAllQuestions() {
       showConfirm("全問題の削除", "保存されているすべての問題を削除しますか？この操作は取り消せません。", () => {
         questions = [];
+        selectedAdminQuestionIds.clear();
         localStorage.setItem('math_app_questions', JSON.stringify(questions));
-        updateUnitSelectOptions();
-        updateTagSelectOptions();
-        onAdminFilterSubjectChange();
+        refreshAllTaxonomyUI();
         showToast("すべての問題を削除しました");
       });
     }
@@ -1878,7 +2146,7 @@ function responseJSON(obj) {
         bar.className = "space-y-1";
         bar.innerHTML = `
           <div class="flex justify-between text-xs text-slate-300">
-            <span>${u} (${uTotal}問)</span>
+            <span>${escapeHtml(u)} (${uTotal}問)</span>
             <span class="font-bold">${uPct}%</span>
           </div>
           <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
@@ -1913,13 +2181,44 @@ function responseJSON(obj) {
       document.getElementById('top-misconception-cause').textContent = topCauseText;
     }
 
+    // =========================================================================
+    // 管理画面：絞り込みフィルター＆問題一覧・一括選択制御
+    // =========================================================================
+
+    function getAdminFilteredQuestions() {
+      const filterSubject = document.getElementById('admin-filter-subject') ? document.getElementById('admin-filter-subject').value : 'ALL';
+      const filterUnit = document.getElementById('admin-filter-unit') ? document.getElementById('admin-filter-unit').value : 'ALL';
+      const filterTag = document.getElementById('admin-filter-tag') ? document.getElementById('admin-filter-tag').value : 'ALL';
+      const filterKeyword = document.getElementById('admin-filter-keyword') ? document.getElementById('admin-filter-keyword').value.trim().toLowerCase() : '';
+
+      return questions.filter(q => {
+        if (filterSubject !== 'ALL' && q.subject !== filterSubject) return false;
+        if (filterUnit !== 'ALL' && q.unit !== filterUnit) return false;
+        const qTag = q.tag || q.lessonTag || '';
+        if (filterTag !== 'ALL' && qTag !== filterTag) return false;
+        if (filterKeyword) {
+          const textMatch = (q.question || '').toLowerCase().includes(filterKeyword);
+          const unitMatch = (q.unit || '').toLowerCase().includes(filterKeyword);
+          const tagMatch = qTag.toLowerCase().includes(filterKeyword);
+          if (!textMatch && !unitMatch && !tagMatch) return false;
+        }
+        return true;
+      });
+    }
+
     function onAdminFilterSubjectChange() {
       const selectedSubject = document.getElementById('admin-filter-subject').value;
       const selectUnit = document.getElementById('admin-filter-unit');
+      const selectTag = document.getElementById('admin-filter-tag');
+      const prevUnit = selectUnit.value;
+      const prevTag = selectTag.value;
+
       let filtered = questions;
       if (selectedSubject !== 'ALL') {
         filtered = questions.filter(q => q.subject === selectedSubject);
       }
+
+      // 単元選択肢の更新
       const units = [...new Set(filtered.map(q => q.unit).filter(Boolean))];
       selectUnit.innerHTML = '<option value="ALL">すべての単元</option>';
       units.forEach(u => {
@@ -1927,25 +2226,48 @@ function responseJSON(obj) {
         opt.value = u; opt.textContent = u;
         selectUnit.appendChild(opt);
       });
+      if (units.includes(prevUnit)) selectUnit.value = prevUnit;
+
+      // タグ選択肢の更新
+      const tags = [...new Set(filtered.map(q => q.tag || q.lessonTag).filter(Boolean))];
+      selectTag.innerHTML = '<option value="ALL">すべてのタグ</option>';
+      tags.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = t;
+        selectTag.appendChild(opt);
+      });
+      if (tags.includes(prevTag)) selectTag.value = prevTag;
+
+      renderAdminQuestionList();
+    }
+
+    function resetAdminFilters() {
+      document.getElementById('admin-filter-subject').value = 'ALL';
+      document.getElementById('admin-filter-keyword').value = '';
+      onAdminFilterSubjectChange();
+      document.getElementById('admin-filter-unit').value = 'ALL';
+      document.getElementById('admin-filter-tag').value = 'ALL';
       renderAdminQuestionList();
     }
 
     function renderAdminQuestionList() {
       const container = document.getElementById('admin-question-list');
       const countEl = document.getElementById('admin-question-count');
+      const totalCountEl = document.getElementById('admin-total-question-count');
       if (!container) return;
 
-      const filterSubject = document.getElementById('admin-filter-subject') ? document.getElementById('admin-filter-subject').value : 'ALL';
-      const filterUnit = document.getElementById('admin-filter-unit') ? document.getElementById('admin-filter-unit').value : 'ALL';
+      // 存在しないIDを選択セットから除去（整合性維持）
+      const validIds = new Set(questions.map(q => q.id));
+      for (const id of selectedAdminQuestionIds) {
+        if (!validIds.has(id)) selectedAdminQuestionIds.delete(id);
+      }
 
-      let displayQuestions = questions.filter(q => {
-        if (filterSubject !== 'ALL' && q.subject !== filterSubject) return false;
-        if (filterUnit !== 'ALL' && q.unit !== filterUnit) return false;
-        return true;
-      });
-
+      const displayQuestions = getAdminFilteredQuestions();
       countEl.textContent = displayQuestions.length;
+      if (totalCountEl) totalCountEl.textContent = questions.length;
       container.innerHTML = '';
+
+      updateAdminSelectionUI(displayQuestions);
 
       if (displayQuestions.length === 0) {
         container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 bg-slate-900/40 rounded-xl">条件に一致する問題がありません</div>`;
@@ -1953,23 +2275,33 @@ function responseJSON(obj) {
       }
 
       displayQuestions.forEach((q) => {
+        const isChecked = selectedAdminQuestionIds.has(q.id);
+        const qTag = q.tag || q.lessonTag || '';
         const item = document.createElement('div');
-        item.className = "p-4 bg-slate-900/90 border border-slate-700/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3";
+        item.className = isChecked
+          ? "p-4 bg-indigo-950/30 border border-indigo-500/80 rounded-xl flex items-start sm:items-center justify-between gap-3 transition-colors"
+          : "p-4 bg-slate-900/90 border border-slate-700/80 hover:border-slate-600 rounded-xl flex items-start sm:items-center justify-between gap-3 transition-colors";
+
         item.innerHTML = `
-          <div class="space-y-1.5 flex-1 pr-2">
-            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-              <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded text-[10px] font-semibold">${q.subject || '数学Ⅰ'}</span>
-              <span class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-[10px]">${q.unit || '共通'}</span>
-              ${(q.tag || q.lessonTag) ? `<span class="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded text-[10px]">${q.tag || q.lessonTag}</span>` : ''}
-              <span class="text-amber-400 text-[10px] font-bold">★${q.difficulty || 1}</span>
+          <div class="flex items-start space-x-3 flex-1 min-w-0">
+            <div class="pt-0.5 shrink-0">
+              <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleAdminQuestionSelect('${escapeHtml(q.id)}', this.checked)" class="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-800 cursor-pointer">
             </div>
-            <div class="text-xs text-slate-200 line-clamp-2">${q.question}</div>
+            <div class="space-y-1.5 flex-1 pr-2 min-w-0 cursor-pointer" onclick="toggleAdminQuestionSelect('${escapeHtml(q.id)}')">
+              <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded text-[10px] font-semibold">${escapeHtml(q.subject || '数学Ⅰ')}</span>
+                <span class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded text-[10px]">${escapeHtml(q.unit || '共通')}</span>
+                ${qTag ? `<span class="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-700/60 rounded text-[10px]">${escapeHtml(qTag)}</span>` : ''}
+                <span class="text-amber-400 text-[10px] font-bold">★${escapeHtml(q.difficulty || 1)}</span>
+              </div>
+              <div class="text-xs text-slate-200 line-clamp-2">${escapeHtml(q.question)}</div>
+            </div>
           </div>
           <div class="flex items-center space-x-2 shrink-0">
-            <button onclick="openEditQuestionModal('${q.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="openEditQuestionModal('${escapeHtml(q.id)}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 rounded-lg text-xs font-semibold transition-all">
               編集
             </button>
-            <button onclick="deleteQuestion('${q.id}')" class="px-3 py-1.5 bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 border border-rose-700/50 rounded-lg text-xs font-semibold transition-all">
+            <button onclick="deleteQuestion('${escapeHtml(q.id)}')" class="px-3 py-1.5 bg-rose-900/40 hover:bg-rose-800/60 text-rose-300 border border-rose-700/50 rounded-lg text-xs font-semibold transition-all">
               削除
             </button>
           </div>
@@ -1979,6 +2311,322 @@ function responseJSON(obj) {
 
       renderMath(container);
     }
+
+    function toggleAdminQuestionSelect(id, forcedState) {
+      if (typeof forcedState === 'boolean') {
+        if (forcedState) selectedAdminQuestionIds.add(id);
+        else selectedAdminQuestionIds.delete(id);
+      } else {
+        if (selectedAdminQuestionIds.has(id)) selectedAdminQuestionIds.delete(id);
+        else selectedAdminQuestionIds.add(id);
+      }
+      renderAdminQuestionList();
+    }
+
+    function toggleSelectAllDisplayed(checked) {
+      const displayQuestions = getAdminFilteredQuestions();
+      displayQuestions.forEach(q => {
+        if (checked) selectedAdminQuestionIds.add(q.id);
+        else selectedAdminQuestionIds.delete(q.id);
+      });
+      renderAdminQuestionList();
+    }
+
+    function clearAdminSelection() {
+      selectedAdminQuestionIds.clear();
+      renderAdminQuestionList();
+    }
+
+    function updateAdminSelectionUI(displayQuestions) {
+      const count = selectedAdminQuestionIds.size;
+      const countSpan = document.getElementById('admin-selected-count');
+      const badge = document.getElementById('admin-selected-badge');
+      const clearBtn = document.getElementById('admin-clear-selection-btn');
+      const bulkEditBtn = document.getElementById('admin-bulk-edit-btn');
+      const bulkDeleteBtn = document.getElementById('admin-bulk-delete-btn');
+      const selectAllCheckbox = document.getElementById('admin-select-all-checkbox');
+
+      if (countSpan) countSpan.textContent = count;
+
+      if (count > 0) {
+        badge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40";
+        clearBtn.classList.remove('hidden');
+        bulkEditBtn.disabled = false;
+        bulkDeleteBtn.disabled = false;
+      } else {
+        badge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700";
+        clearBtn.classList.add('hidden');
+        bulkEditBtn.disabled = true;
+        bulkDeleteBtn.disabled = true;
+      }
+
+      // 「表示中の問題をすべて選択」チェックボックスの同期
+      if (selectAllCheckbox) {
+        if (displayQuestions.length === 0) {
+          selectAllCheckbox.checked = false;
+          selectAllCheckbox.indeterminate = false;
+        } else {
+          const selectedInView = displayQuestions.filter(q => selectedAdminQuestionIds.has(q.id)).length;
+          selectAllCheckbox.checked = selectedInView === displayQuestions.length;
+          selectAllCheckbox.indeterminate = selectedInView > 0 && selectedInView < displayQuestions.length;
+        }
+      }
+    }
+
+    // =========================================================================
+    // 基本仕様：選択した問題の一括編集モーダル
+    // =========================================================================
+
+    function openBulkEditModal() {
+      if (selectedAdminQuestionIds.size === 0) {
+        showToast("一括編集する問題を選択してください", true);
+        return;
+      }
+
+      document.getElementById('bulk-edit-target-count').textContent = selectedAdminQuestionIds.size;
+
+      // チェック状態と入力欄をリセット
+      document.getElementById('bulk-check-subject').checked = false;
+      document.getElementById('bulk-check-unit').checked = false;
+      document.getElementById('bulk-check-tag').checked = false;
+      document.getElementById('bulk-check-diff').checked = false;
+
+      document.getElementById('bulk-val-unit').value = '';
+      document.getElementById('bulk-val-tag').value = '';
+
+      // 選択中の問題がすべて同じ科目ならデフォルト選択にしておく
+      const selectedList = questions.filter(q => selectedAdminQuestionIds.has(q.id));
+      if (selectedList.length > 0) {
+        document.getElementById('bulk-val-subject').value = selectedList[0].subject || '数学Ⅰ';
+        document.getElementById('bulk-val-diff').value = String(selectedList[0].difficulty || 1);
+      }
+
+      document.getElementById('bulk-edit-modal').classList.remove('hidden');
+    }
+
+    function closeBulkEditModal() {
+      document.getElementById('bulk-edit-modal').classList.add('hidden');
+    }
+
+    function applyBulkEdit() {
+      const changeSubject = document.getElementById('bulk-check-subject').checked;
+      const changeUnit = document.getElementById('bulk-check-unit').checked;
+      const changeTag = document.getElementById('bulk-check-tag').checked;
+      const changeDiff = document.getElementById('bulk-check-diff').checked;
+
+      if (!changeSubject && !changeUnit && !changeTag && !changeDiff) {
+        showToast("変更する項目にチェックを入れてください", true);
+        return;
+      }
+
+      const newSubject = document.getElementById('bulk-val-subject').value;
+      const newUnit = document.getElementById('bulk-val-unit').value.trim();
+      const newTag = document.getElementById('bulk-val-tag').value.trim();
+      const newDiff = parseInt(document.getElementById('bulk-val-diff').value, 10);
+
+      if (changeUnit && !newUnit) {
+        showToast("新しい単元名を入力してください", true);
+        return;
+      }
+
+      let updatedCount = 0;
+      questions.forEach(q => {
+        if (selectedAdminQuestionIds.has(q.id)) {
+          if (changeSubject) q.subject = newSubject;
+          if (changeUnit) q.unit = newUnit;
+          if (changeTag) {
+            q.tag = newTag;
+            if ('lessonTag' in q) delete q.lessonTag;
+          }
+          if (changeDiff) q.difficulty = newDiff;
+          updatedCount++;
+        }
+      });
+
+      // ローカルストレージへ保存（※スプレッドシートへの自動反映は行わない）
+      localStorage.setItem('math_app_questions', JSON.stringify(questions));
+      closeBulkEditModal();
+      refreshAllTaxonomyUI();
+      showToast(`✓ ${updatedCount} 問の設定を一括更新しました`);
+    }
+
+    // =========================================================================
+    // 追加アイデア1：単元名・タグ・科目の一括置換（リネーム）モーダル
+    // =========================================================================
+
+    function openBulkReplaceModal() {
+      if (questions.length === 0) {
+        showToast("登録されている問題がありません", true);
+        return;
+      }
+      document.getElementById('replace-target-field').value = 'unit';
+      document.getElementById('replace-filter-subject').value = 'ALL';
+      document.getElementById('replace-new-value-text').value = '';
+      onReplaceFieldOrSubjectChange();
+      document.getElementById('bulk-replace-modal').classList.remove('hidden');
+    }
+
+    function closeBulkReplaceModal() {
+      document.getElementById('bulk-replace-modal').classList.add('hidden');
+    }
+
+    function onReplaceFieldOrSubjectChange() {
+      const field = document.getElementById('replace-target-field').value;
+      const subjectScope = document.getElementById('replace-filter-subject').value;
+      const subjectScopeBox = document.getElementById('replace-subject-scope-box');
+      const oldSelect = document.getElementById('replace-old-value');
+      const newText = document.getElementById('replace-new-value-text');
+      const newSubjectSelect = document.getElementById('replace-new-value-subject');
+
+      // 置換対象が「科目」自身の場合は科目限定ボックスを隠し、新しい値もセレクトにする
+      if (field === 'subject') {
+        subjectScopeBox.classList.add('hidden');
+        newText.classList.add('hidden');
+        newSubjectSelect.classList.remove('hidden');
+      } else {
+        subjectScopeBox.classList.remove('hidden');
+        newText.classList.remove('hidden');
+        newSubjectSelect.classList.add('hidden');
+        newText.setAttribute('list', field === 'unit' ? 'existing-units-datalist' : 'existing-tags-datalist');
+        newText.placeholder = field === 'tag'
+          ? '新しいタグ名を入力（空欄でタグを削除）'
+          : '新しい単元名を入力してください';
+      }
+
+      // 対象範囲内の問題から既存値のユニーク一覧を抽出
+      const scopedQuestions = questions.filter(q => {
+        if (field !== 'subject' && subjectScope !== 'ALL' && q.subject !== subjectScope) return false;
+        return true;
+      });
+
+      const valueCounts = new Map();
+      scopedQuestions.forEach(q => {
+        let val = '';
+        if (field === 'subject') val = q.subject || '';
+        else if (field === 'unit') val = q.unit || '';
+        else if (field === 'tag') val = q.tag || q.lessonTag || '';
+
+        valueCounts.set(val, (valueCounts.get(val) || 0) + 1);
+      });
+
+      oldSelect.innerHTML = '';
+      if (valueCounts.size === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = '該当するデータがありません';
+        oldSelect.appendChild(opt);
+      } else {
+        valueCounts.forEach((cnt, val) => {
+          const opt = document.createElement('option');
+          opt.value = val;
+          opt.textContent = val === '' ? `(未設定・空欄) [${cnt}問]` : `${val} [${cnt}問]`;
+          oldSelect.appendChild(opt);
+        });
+      }
+
+      // 置換前の値を新しい値欄にも初期セット（一部だけ文字修正したいときに便利）
+      if (field !== 'subject' && oldSelect.options.length > 0) {
+        newText.value = oldSelect.value;
+      }
+
+      updateReplacePreviewCount();
+    }
+
+    function updateReplacePreviewCount() {
+      const field = document.getElementById('replace-target-field').value;
+      const subjectScope = document.getElementById('replace-filter-subject').value;
+      const oldVal = document.getElementById('replace-old-value').value;
+
+      const matched = questions.filter(q => {
+        if (field !== 'subject' && subjectScope !== 'ALL' && q.subject !== subjectScope) return false;
+        let currentVal = '';
+        if (field === 'subject') currentVal = q.subject || '';
+        else if (field === 'unit') currentVal = q.unit || '';
+        else if (field === 'tag') currentVal = q.tag || q.lessonTag || '';
+        return currentVal === oldVal;
+      });
+
+      document.getElementById('replace-match-count').textContent = matched.length;
+      document.getElementById('execute-bulk-replace-btn').disabled = matched.length === 0;
+    }
+
+    function executeBulkReplace() {
+      const field = document.getElementById('replace-target-field').value;
+      const subjectScope = document.getElementById('replace-filter-subject').value;
+      const oldVal = document.getElementById('replace-old-value').value;
+      const newVal = field === 'subject'
+        ? document.getElementById('replace-new-value-subject').value
+        : document.getElementById('replace-new-value-text').value.trim();
+
+      if (field === 'unit' && !newVal) {
+        showToast("置換後の新しい単元名を入力してください", true);
+        return;
+      }
+
+      if (oldVal === newVal) {
+        showToast("置換前と置換後の名称が同じです", true);
+        return;
+      }
+
+      let replacedCount = 0;
+      questions.forEach(q => {
+        if (field !== 'subject' && subjectScope !== 'ALL' && q.subject !== subjectScope) return;
+
+        let currentVal = '';
+        if (field === 'subject') currentVal = q.subject || '';
+        else if (field === 'unit') currentVal = q.unit || '';
+        else if (field === 'tag') currentVal = q.tag || q.lessonTag || '';
+
+        if (currentVal === oldVal) {
+          if (field === 'subject') q.subject = newVal;
+          else if (field === 'unit') q.unit = newVal;
+          else if (field === 'tag') {
+            q.tag = newVal;
+            if ('lessonTag' in q) delete q.lessonTag;
+          }
+          replacedCount++;
+        }
+      });
+
+      if (replacedCount === 0) {
+        showToast("置換対象の問題が見つかりませんでした", true);
+        return;
+      }
+
+      // ローカルストレージへ保存（※スプレッドシートへの自動反映は行わない）
+      localStorage.setItem('math_app_questions', JSON.stringify(questions));
+      closeBulkReplaceModal();
+      refreshAllTaxonomyUI();
+      showToast(`✓ ${replacedCount} 問を「${newVal || '未設定'}」へ一括置換しました`);
+    }
+
+    // =========================================================================
+    // 追加アイデア3：選択した問題の一括削除
+    // =========================================================================
+
+    function bulkDeleteSelectedQuestions() {
+      const count = selectedAdminQuestionIds.size;
+      if (count === 0) return;
+
+      showConfirm(
+        "選択した問題の一括削除",
+        `選択中の ${count} 問を削除してもよろしいですか？この操作は取り消せません。`,
+        () => {
+          questions = questions.filter(q => !selectedAdminQuestionIds.has(q.id));
+          wrongQuestionIds = wrongQuestionIds.filter(id => !selectedAdminQuestionIds.has(id));
+          selectedAdminQuestionIds.clear();
+
+          localStorage.setItem('math_app_questions', JSON.stringify(questions));
+          saveWrongQuestionIds();
+          refreshAllTaxonomyUI();
+          showToast(`${count} 問を一括削除しました`);
+        }
+      );
+    }
+
+    // =========================================================================
+    // 個別問題編集・削除
+    // =========================================================================
 
     function openEditQuestionModal(id) {
       const q = questions.find(item => item.id === id);
@@ -2030,15 +2678,16 @@ function responseJSON(obj) {
 
       localStorage.setItem('math_app_questions', JSON.stringify(questions));
       closeEditQuestionModal();
-      onAdminFilterSubjectChange();
+      refreshAllTaxonomyUI();
       showToast("問題内容を更新・保存しました");
     }
 
     function deleteQuestion(id) {
       showConfirm("問題の削除", "この問題を削除してもよろしいですか？", () => {
         questions = questions.filter(q => q.id !== id);
+        selectedAdminQuestionIds.delete(id);
         localStorage.setItem('math_app_questions', JSON.stringify(questions));
-        onAdminFilterSubjectChange();
+        refreshAllTaxonomyUI();
         showToast("問題を削除しました");
       });
     }
@@ -2089,6 +2738,7 @@ function responseJSON(obj) {
     function updateUnitSelectOptions() {
       const selectedSubject = document.getElementById('quiz-subject-select').value;
       const selectUnit = document.getElementById('quiz-unit-select');
+      const prevVal = selectUnit.value;
       let filteredQuestions = questions;
       if (selectedSubject !== 'ALL') {
         filteredQuestions = questions.filter(q => q.subject === selectedSubject);
@@ -2101,10 +2751,12 @@ function responseJSON(obj) {
         opt.value = u; opt.textContent = u;
         selectUnit.appendChild(opt);
       });
+      if (availableUnits.includes(prevVal)) selectUnit.value = prevVal;
     }
 
     function updateTagSelectOptions() {
       const selectTag = document.getElementById('quiz-tag-select');
+      const prevVal = selectTag.value;
       const tags = [...new Set(questions.map(q => q.tag || q.lessonTag).filter(Boolean))];
       selectTag.innerHTML = '<option value="ALL">指定なし (全問題)</option>';
       tags.forEach(t => {
@@ -2112,6 +2764,7 @@ function responseJSON(obj) {
         opt.value = t; opt.textContent = t;
         selectTag.appendChild(opt);
       });
+      if (tags.includes(prevVal)) selectTag.value = prevVal;
     }
 
     function onSubjectChange() {
