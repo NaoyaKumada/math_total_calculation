@@ -482,7 +482,7 @@
             </div>
             <div>
               <h3 class="text-base font-bold text-white">Google スプレッドシート クラウド同期設定 (GAS)</h3>
-              <p class="text-xs text-slate-400">小テスト成績の自動保存、およびスプレッドシート上の問題データベースとの完全同期（50問分割セル保存対応）</p>
+              <p class="text-xs text-slate-400">小テスト成績の自動保存、およびスプレッドシート上の問題データベースとの完全同期（4万文字自動分割・画像軽量化対応）</p>
             </div>
           </div>
           <button onclick="openGasCodeModal()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-cyan-300 border border-cyan-500/40 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5">
@@ -493,14 +493,16 @@
 
         <div class="grid grid-cols-1 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">GAS Web App URL <span class="text-rose-400">*</span></label>
-            <input type="text" id="gas-url-input" value="https://script.google.com/macros/s/AKfycbwXSOSb7o8il4fP8gQ3cMd2ifKtnsj2ddDbqqjvvDdQSFWeFfdIl1CmTHo_C1PIFTbigQ/exec" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-xs sm:text-sm rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">
+              GAS Web App URL <span class="ml-1.5 px-2 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded"><i class="fa-solid fa-lock mr-1"></i>固定済み</span>
+            </label>
+            <input type="text" id="gas-url-input" value="https://script.google.com/macros/s/AKfycbxG7oCIRzPEysQ6FahTD_fkXusPgJgOdtK-W-q5ufNsFAwP4az-7Ul_rMUTQ-sD-gqGDg/exec" readonly class="w-full bg-slate-900/80 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm rounded-xl p-2.5 focus:outline-none font-mono cursor-not-allowed select-all">
           </div>
         </div>
 
         <div class="flex justify-end pt-1">
           <button onclick="saveGasUrl()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow shrink-0">
-            GAS URLを保存
+            GAS URLを再適用
           </button>
         </div>
       </div>
@@ -738,13 +740,16 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-cyan-300 flex items-center space-x-2">
           <i class="fa-solid fa-code"></i>
-          <span>Google Apps Script (GAS) スプレッドシート連携コード (50問分割保存対応)</span>
+          <span>Google Apps Script (GAS) スプレッドシート連携コード (4万文字自動分割・画像対応)</span>
         </h3>
         <button onclick="closeGasCodeModal()" class="text-slate-400 hover:text-white text-lg">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <p class="text-xs text-slate-300">Google スプレッドシートの「拡張機能」>「Apps Script」に貼り付け、「ウェブアプリとしてデプロイ」してください（アクセスできるユーザー: 全員）。<br><span class="text-amber-300">※ セルの文字数オーバーを防止するため、50問ごとに分割して A1, A2, A3... セルへ保存します。</span></p>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Google スプレッドシートの「拡張機能」&gt;「Apps Script」に貼り付け、「デプロイ」してください（アクセスできるユーザー: 全員）。<br>
+        <span class="text-amber-300 font-semibold">※ セルの50,000文字上限エラーを防ぐため、40,000文字ごとに自動で A1, A2, A3... セルへ分割保存します。すでにGASを設定済みの場合は、コードを貼り替えて「デプロイ ＞ デプロイを管理 ＞ 編集 ＞ バージョン：新バージョン ＞ デプロイ」を実行してください。</span>
+      </p>
       <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex-1 overflow-y-auto font-mono text-xs text-emerald-400">
         <pre id="gas-script-content" class="whitespace-pre-wrap break-all leading-relaxed"></pre>
       </div>
@@ -1175,10 +1180,10 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     }
 
-    // GAS Web App URL のデフォルト初期値設定
-    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbwXSOSb7o8il4fP8gQ3cMd2ifKtnsj2ddDbqqjvvDdQSFWeFfdIl1CmTHo_C1PIFTbigQ/exec";
+    // GAS Web App URL の固定設定
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxG7oCIRzPEysQ6FahTD_fkXusPgJgOdtK-W-q5ufNsFAwP4az-7Ul_rMUTQ-sD-gqGDg/exec";
 
-    // GAS用テンプレートコード (スプレッドシート完全連携：50問分割保存対応)
+    // GAS用テンプレートコード (スプレッドシート完全連携：40,000文字自動分割・画像データ対応)
     const GAS_TEMPLATE_CODE = `function doGet(e) {
   var params = e ? e.parameter : {};
   var action = params.action || "get_questions";
@@ -1197,6 +1202,12 @@ function doPost(e) {
     if (action === "save_questions") {
       var questions = data.questions || [];
       return saveQuestionsToSpreadsheet(questions);
+    }
+
+    if (action === "append_questions") {
+      var questions = data.questions || [];
+      var clearFirst = !!data.clearFirst;
+      return appendQuestionsToSpreadsheet(questions, clearFirst);
     }
 
     if (data.studentName) {
@@ -1240,6 +1251,30 @@ function getQuestionsFromSpreadsheet() {
   }
 }
 
+function buildCharLimitedRows(questions) {
+  // Googleスプレッドシートの1セル上限(50,000文字)を超えないよう38,000文字単位で自動分割
+  var MAX_CELL_CHARS = 38000;
+  var rows = [];
+  var currentChunk = [];
+  var currentLen = 2; // "[]"
+
+  for (var i = 0; i < questions.length; i++) {
+    var qStr = JSON.stringify(questions[i]);
+    if (currentChunk.length > 0 && (currentLen + qStr.length + 1) > MAX_CELL_CHARS) {
+      rows.push([JSON.stringify(currentChunk)]);
+      currentChunk = [questions[i]];
+      currentLen = 2 + qStr.length;
+    } else {
+      currentChunk.push(questions[i]);
+      currentLen += qStr.length + (currentChunk.length > 1 ? 1 : 0);
+    }
+  }
+  if (currentChunk.length > 0) {
+    rows.push([JSON.stringify(currentChunk)]);
+  }
+  return rows;
+}
+
 function saveQuestionsToSpreadsheet(questions) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -1251,13 +1286,28 @@ function saveQuestionsToSpreadsheet(questions) {
       return responseJSON({ status: "success", count: 0, chunks: 0 });
     }
     
-    var chunkSize = 50;
-    var rows = [];
-    for (var i = 0; i < questions.length; i += chunkSize) {
-      var chunk = questions.slice(i, i + chunkSize);
-      rows.push([JSON.stringify(chunk)]);
-    }
+    var rows = buildCharLimitedRows(questions);
     sheet.getRange(1, 1, rows.length, 1).setValues(rows);
+    return responseJSON({ status: "success", count: questions.length, chunks: rows.length });
+  } catch (err) {
+    return responseJSON({ status: "error", message: err.toString() });
+  }
+}
+
+function appendQuestionsToSpreadsheet(questions, clearFirst) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName("問題データベース");
+    if (!sheet) sheet = ss.insertSheet("問題データベース");
+    if (clearFirst) {
+      sheet.clearContents();
+    }
+    if (!questions || questions.length === 0) {
+      return responseJSON({ status: "success", count: 0 });
+    }
+    var rows = buildCharLimitedRows(questions);
+    var startRow = clearFirst ? 1 : (sheet.getLastRow() + 1);
+    sheet.getRange(startRow, 1, rows.length, 1).setValues(rows);
     return responseJSON({ status: "success", count: questions.length, chunks: rows.length });
   } catch (err) {
     return responseJSON({ status: "error", message: err.toString() });
@@ -1306,7 +1356,7 @@ function responseJSON(obj) {
           "判別式 $D$ を計算する"
         ],
         thinkingAnswer: 0,
-        options: ["(2, -1)", "(2, 1)", "(-2, -1)", "(4, 3)"],
+        options: ["$(2, -1)$", "$(2, 1)$", "$(-2, -1)$", "$(4, 3)$"],
         answer: 0,
         explanation: "【着眼点】頂点を求めるには平方完成を行います。\n$y = (x - 2)^2 - 4 + 3 = (x - 2)^2 - 1$ より、頂点座標は $(2, -1)$ です。",
         figureImage: null
@@ -1315,8 +1365,8 @@ function responseJSON(obj) {
 
     let questions = [];
     let historyData = [];
-    let wrongQuestionIds = []; // 端末ごとに管理する間違い問題IDリスト
-    let selectedAdminQuestionIds = new Set(); // 管理画面で一括編集・削除用に選択された問題IDセット
+    let wrongQuestionIds = [];
+    let selectedAdminQuestionIds = new Set();
     let misconceptionStats = { CALC: 0, FORMULA: 0, STRATEGY: 0, READING: 0 };
     let currentQuizQuestions = [];
     let currentQuestionIdx = 0;
@@ -1326,23 +1376,17 @@ function responseJSON(obj) {
     let isAnswerSubmitted = false;
     let pendingConfirmCallback = null;
 
-    // 現在出題中問題のシャッフル後選択肢と正解インデックス
     let currentShuffledOptions = [];
     let currentShuffledCorrectIdx = 0;
 
-    // 解析用画像（Base64DataURLの配列）
     let uploadedImages = [];
-
-    // 編集モーダルで編集中の一時図形DataURL
     let currentEditingFigureImage = null;
 
-    // 切り抜きモーダル用ステート
     let cropSourceImgObj = null;
-    let cropRect = null; // { x, y, w, h } キャンバス表示座標
+    let cropRect = null;
     let isCroppingDrag = false;
     let cropStartPoint = { x: 0, y: 0 };
 
-    // Canvas Scratchpad State
     let scratchCanvas, scratchCtx, isDrawing = false, scratchMode = 'pen';
 
     window.addEventListener('DOMContentLoaded', async () => {
@@ -1354,7 +1398,6 @@ function responseJSON(obj) {
       refreshAllTaxonomyUI();
       updateAnalyticsView();
 
-      // 起動時にスプレッドシートから最新問題を自動同期
       await syncQuestionsFromCloud();
     });
 
@@ -1373,6 +1416,15 @@ function responseJSON(obj) {
       }
     }
 
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     function showConfirm(title, msg, onConfirm) {
       document.getElementById('confirm-modal-title').textContent = title;
       document.getElementById('confirm-modal-msg').textContent = msg;
@@ -1386,6 +1438,94 @@ function responseJSON(obj) {
         pendingConfirmCallback();
       }
       pendingConfirmCallback = null;
+    }
+
+    // 重複ID修復＆正規化関数
+    function ensureUniqueQuestionIds() {
+      const seen = new Set();
+      let repaired = false;
+      questions.forEach((q, idx) => {
+        if (!q.id || seen.has(q.id)) {
+          q.id = `q_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 7)}`;
+          repaired = true;
+        }
+        seen.add(q.id);
+      });
+      if (repaired) {
+        localStorage.setItem('math_app_questions', JSON.stringify(questions));
+      }
+    }
+
+    // =========================================================================
+    // LaTeX分数（\frac）＆数式フォーマット保護・自動変換エンジン
+    // =========================================================================
+
+    function parseAiJsonSafely(rawText) {
+      let cleaned = String(rawText || '').replace(/```json/gi, '').replace(/```/g, '').trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e1) {
+        // AIが \frac, \theta, \sqrt 等を単一バックスラッシュで出力した場合のJSONエスケープ崩壊を復元
+        const protectedStr = cleaned.replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
+        return JSON.parse(protectedStr);
+      }
+    }
+
+    function convertSlashFractionsInMathSegment(mathBody) {
+      let s = mathBody;
+      // 1. (分子)/(分母) パターン -> \frac{分子}{分母}
+      s = s.replace(/\(([^()]+)\)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
+      // 2. (分子)/単項分母 パターン -> \frac{分子}{分母}
+      s = s.replace(/\(([^()]+)\)\s*\/\s*([0-9a-zA-Z\\{}]+)/g, '\\frac{$1}{$2}');
+      // 3. 単項分子/(分母) パターン -> \frac{分子}{分母}
+      s = s.replace(/([0-9a-zA-Z\\{}]+)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
+      // 4. 単項分子/単項分母 (例: 1/2, \pi/3, \sqrt{3}/2, x/y) -> \frac{分子}{分母}
+      s = s.replace(/(?<![a-zA-Z0-9_\\}])(\\[a-zA-Z]+(?:\{[^{}]*\})*|[0-9a-zA-Z]+)\s*\/\s*(\\[a-zA-Z]+(?:\{[^{}]*\})*|[0-9a-zA-Z]+)(?![a-zA-Z0-9_\\{])/g, '\\frac{$1}{$2}');
+      return s;
+    }
+
+    function normalizeMathText(text) {
+      if (typeof text !== 'string' || !text) return text || '';
+      let s = text;
+
+      // JSONパース時に \f -> FormFeed(\x0c) + "rac" に化けた箇所を \frac に復元
+      s = s.replace(/\x0crac/g, '\\frac');
+      // テキスト先頭や空白直後に剥き出しになった frac{ を \frac{ に補正
+      s = s.replace(/(^|[^\\a-zA-Z])frac\{/g, '$1\\frac{');
+
+      // すでに $...$ または $$...$$ で囲まれている数式内のスラッシュ分数を \frac に変換
+      s = s.replace(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g, (match) => {
+        if (match.startsWith('$$')) {
+          const inner = match.slice(2, -2);
+          return '$$' + convertSlashFractionsInMathSegment(inner) + '$$';
+        } else {
+          const inner = match.slice(1, -1);
+          return '$' + convertSlashFractionsInMathSegment(inner) + '$';
+        }
+      });
+
+      // 文字列全体が純粋な分数単体（例: "1/2", "-3/4", "2/3"）で $ が付いていない場合も $\frac{}{}$ 化
+      const trimmed = s.trim();
+      if (/^([+-]?)\s*(\d+)\s*\/\s*(\d+)$/.test(trimmed)) {
+        s = trimmed.replace(/^([+-]?)\s*(\d+)\s*\/\s*(\d+)$/, (m, sign, num, den) => {
+          return `$${sign}\\frac{${num}}{${den}}$`;
+        });
+      }
+
+      return s;
+    }
+
+    function normalizeQuestionMath(q) {
+      if (!q || typeof q !== 'object') return q;
+      q.question = normalizeMathText(q.question);
+      q.explanation = normalizeMathText(q.explanation);
+      if (Array.isArray(q.options)) {
+        q.options = q.options.map(opt => normalizeMathText(opt));
+      }
+      if (Array.isArray(q.thinkingOptions)) {
+        q.thinkingOptions = q.thinkingOptions.map(opt => normalizeMathText(opt));
+      }
+      return q;
     }
 
     function loadStoredData() {
@@ -1407,8 +1547,17 @@ function responseJSON(obj) {
         try { wrongQuestionIds = JSON.parse(wData); } catch(e) { wrongQuestionIds = []; }
       }
 
-      const gasUrl = localStorage.getItem('math_app_gas_url') || DEFAULT_GAS_URL;
-      document.getElementById('gas-url-input').value = gasUrl;
+      const mData = localStorage.getItem('math_app_misconceptions');
+      if (mData) {
+        try {
+          const parsedM = JSON.parse(mData);
+          misconceptionStats = { ...misconceptionStats, ...parsedM };
+        } catch(e) {}
+      }
+
+      // 過去のキャッシュが残っている場合も必ず固定URLで上書きする
+      localStorage.setItem('math_app_gas_url', DEFAULT_GAS_URL);
+      document.getElementById('gas-url-input').value = DEFAULT_GAS_URL;
 
       const geminiKey = localStorage.getItem('math_app_gemini_key') || "";
       document.getElementById('gemini-api-key-input').value = geminiKey;
@@ -1420,23 +1569,6 @@ function responseJSON(obj) {
           modelSel.value = savedModel;
         }
       }
-    }
-
-    // 全問題のIDが重複・欠損していないかを検証し、重複があれば一意なIDへ自動修復する
-    function ensureUniqueQuestionIds() {
-      const seen = new Set();
-      let repaired = false;
-      questions.forEach((q, idx) => {
-        if (!q.id || seen.has(q.id)) {
-          q.id = `q_uid_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 8)}`;
-          repaired = true;
-        }
-        seen.add(q.id);
-      });
-      if (repaired) {
-        localStorage.setItem('math_app_questions', JSON.stringify(questions));
-      }
-      return repaired;
     }
 
     function refreshAllTaxonomyUI() {
@@ -1486,9 +1618,9 @@ function responseJSON(obj) {
     }
 
     function saveGasUrl() {
-      const url = document.getElementById('gas-url-input').value.trim();
-      localStorage.setItem('math_app_gas_url', url);
-      showToast("GAS Web App URLを保存しました");
+      localStorage.setItem('math_app_gas_url', DEFAULT_GAS_URL);
+      document.getElementById('gas-url-input').value = DEFAULT_GAS_URL;
+      showToast("固定された GAS Web App URL を適用しました");
     }
 
     function saveGeminiSettings() {
@@ -1499,7 +1631,6 @@ function responseJSON(obj) {
       showToast("Gemini API設定を保存しました");
     }
 
-    // APIキーで利用可能なGeminiモデル一覧を取得してプルダウンに反映する
     async function fetchAvailableGeminiModels() {
       const apiKey = document.getElementById('gemini-api-key-input').value.trim();
       if (!apiKey) {
@@ -1508,290 +1639,157 @@ function responseJSON(obj) {
       }
 
       try {
-        showToast("Gemini APIから利用可能なモデル一覧を取得中...");
+        showToast("Google APIから利用可能モデルを取得中...");
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
         if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error?.message || `HTTP ${res.status}`);
+          const err = await res.json();
+          throw new Error(err.error?.message || `HTTP ${res.status}`);
         }
-
         const data = await res.json();
         const models = (data.models || []).filter(m =>
           Array.isArray(m.supportedGenerationMethods) &&
-          m.supportedGenerationMethods.includes("generateContent") &&
-          m.name && m.name.includes("gemini")
+          m.supportedGenerationMethods.includes('generateContent')
         );
 
         if (models.length === 0) {
-          showToast("利用可能なGeminiモデルが見つかりませんでした", true);
+          showToast("利用可能なモデルが見つかりませんでした", true);
           return;
         }
 
         const selectEl = document.getElementById('gemini-model-select');
-        const prevSelected = selectEl.value;
+        const currentVal = selectEl.value;
         selectEl.innerHTML = '';
 
-        // 推奨モデルを上位に並べ替え
-        const priority = ["gemini-3.1-flash-lite", "gemini-4-hydrogen", "gemini-2.5-flash", "gemini-3.1-pro-preview"];
-        models.sort((a, b) => {
-          const idA = a.name.replace("models/", "");
-          const idB = b.name.replace("models/", "");
-          const pA = priority.indexOf(idA);
-          const pB = priority.indexOf(idB);
-          if (pA !== -1 && pB !== -1) return pA - pB;
-          if (pA !== -1) return -1;
-          if (pB !== -1) return 1;
-          return idB.localeCompare(idA);
-        });
-
         models.forEach(m => {
-          const modelId = m.name.replace("models/", "");
+          const id = m.name.replace(/^models\//, '');
           const opt = document.createElement('option');
-          opt.value = modelId;
-          const label = m.displayName ? `${modelId} (${m.displayName})` : modelId;
-          opt.textContent = label;
+          opt.value = id;
+          opt.textContent = m.displayName ? `${id} (${m.displayName})` : id;
           selectEl.appendChild(opt);
         });
 
-        if ([...selectEl.options].some(o => o.value === prevSelected)) {
-          selectEl.value = prevSelected;
-        } else if ([...selectEl.options].some(o => o.value === "gemini-3.1-flash-lite")) {
-          selectEl.value = "gemini-3.1-flash-lite";
+        if ([...selectEl.options].some(o => o.value === currentVal)) {
+          selectEl.value = currentVal;
         }
-
-        showToast(`✓ 利用可能な ${models.length} 件のモデルを取得しました`);
+        showToast(`✓ ${models.length} 件の利用可能モデルを取得しました`);
       } catch (err) {
-        showErrorModal("モデル一覧の取得エラー:\n" + err.message);
+        showErrorModal("モデル一覧取得エラー:\n" + err.message);
       }
     }
 
     // =========================================================================
-    // PDF・画像ファイルのドラッグ＆ドロップ読込 / ページ画像変換 / 図形切り抜き
+    // ファイルドロップ・画像変換・図形切り抜きユーティリティ
     // =========================================================================
 
     function initDropZone() {
       const dropZone = document.getElementById('pdf-drop-zone');
       if (!dropZone) return;
 
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('border-indigo-400', 'bg-indigo-950/30');
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
       });
 
-      dropZone.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-indigo-400', 'bg-indigo-950/30');
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('border-indigo-400', 'bg-slate-800'), false);
       });
 
-      dropZone.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-indigo-400', 'bg-indigo-950/30');
-        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          await processUploadedFiles(e.dataTransfer.files);
-        }
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('border-indigo-400', 'bg-slate-800'), false);
       });
+
+      dropZone.addEventListener('drop', handleDrop, false);
     }
 
-    async function handleFileSelect(event) {
-      const files = event.target.files;
-      if (!files || files.length === 0) return;
-      await processUploadedFiles(files);
-      event.target.value = '';
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
 
-    async function processUploadedFiles(fileList) {
-      const files = Array.from(fileList);
-      if (files.length === 0) return;
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) processFiles(files);
+    }
 
-      // JSONファイルが含まれている場合は問題データとして取り込み
-      const jsonFile = files.find(f => f.name.toLowerCase().endsWith('.json') || f.type === 'application/json');
-      if (jsonFile) {
-        importQuestionsJSON({ target: { files: [jsonFile], value: '' } });
-        return;
-      }
+    function handleFileSelect(e) {
+      const files = e.target.files;
+      if (files && files.length > 0) processFiles(files);
+    }
 
-      const previewContainer = document.getElementById('pdf-image-preview-container');
-      const thumbnailsEl = document.getElementById('pdf-image-thumbnails');
+    async function processFiles(files) {
       uploadedImages = [];
-      thumbnailsEl.innerHTML = '';
-      previewContainer.classList.remove('hidden');
-
-      showToast("ファイルを解析用画像に変換中...");
-
-      try {
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const lowerName = file.name.toLowerCase();
-          if (file.type === 'application/pdf' || lowerName.endsWith('.pdf')) {
-            await renderPdfPagesToImages(file, thumbnailsEl);
-          } else if (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(lowerName)) {
-            await renderImageFileToDataUrl(file, thumbnailsEl);
-          } else if (file.type === 'text/plain' || lowerName.endsWith('.txt')) {
-            await renderTextFileToDataUrl(file, thumbnailsEl);
-          }
-        }
-
-        if (uploadedImages.length > 0) {
-          showToast(`✓ 合計 ${uploadedImages.length} ページの解析用画像を準備しました`);
-        } else {
-          previewContainer.classList.add('hidden');
-          showToast("対応するPDFまたは画像ファイルが見つかりませんでした", true);
-        }
-      } catch (err) {
-        showErrorModal("ファイル読み込みエラー:\n" + err.message);
-      }
-    }
-
-    function rebuildUploadedThumbnails() {
       const previewContainer = document.getElementById('pdf-image-preview-container');
       const thumbnailsEl = document.getElementById('pdf-image-thumbnails');
-      if (!thumbnailsEl || !previewContainer) return;
-
       thumbnailsEl.innerHTML = '';
-      if (uploadedImages.length === 0) {
-        previewContainer.classList.add('hidden');
-        return;
+      previewContainer.classList.remove('hidden');
+
+      showToast("ファイルを取り込み・高解像度レンダリング処理中...");
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type === 'application/pdf') {
+          await renderPdfPagesToImages(file, thumbnailsEl);
+        } else if (file.type.startsWith('image/')) {
+          await renderImageFileToDataUrl(file, thumbnailsEl);
+        } else if (file.name.endsWith('.json')) {
+          const eventMock = { target: { files: [file] } };
+          importQuestionsJSON(eventMock);
+          return;
+        }
       }
 
-      previewContainer.classList.remove('hidden');
-      uploadedImages.forEach((dataUrl, idx) => {
-        appendThumbnailCard(thumbnailsEl, dataUrl, idx);
-      });
-    }
-
-    function appendThumbnailCard(thumbnailsEl, dataUrl, pageIndex) {
-      if (!thumbnailsEl) return;
-      const card = document.createElement('div');
-      card.className = "relative shrink-0 bg-slate-950 border border-slate-700 rounded-lg p-1.5 flex flex-col items-center space-y-1";
-
-      const img = document.createElement('img');
-      img.src = dataUrl;
-      img.alt = `Page ${pageIndex + 1}`;
-      img.className = "h-24 w-auto object-contain bg-white rounded";
-
-      const footer = document.createElement('div');
-      footer.className = "w-full flex items-center justify-between text-[10px] text-slate-300 px-0.5";
-      footer.innerHTML = `<span class="font-semibold">P.${pageIndex + 1}</span>`;
-
-      const delBtn = document.createElement('button');
-      delBtn.type = "button";
-      delBtn.className = "text-slate-400 hover:text-rose-400 transition-colors";
-      delBtn.title = "このページを除外";
-      delBtn.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        uploadedImages.splice(pageIndex, 1);
-        rebuildUploadedThumbnails();
-      };
-
-      footer.appendChild(delBtn);
-      card.appendChild(img);
-      card.appendChild(footer);
-      thumbnailsEl.appendChild(card);
+      showToast(`${uploadedImages.length} ページの画像データを読み込みました`);
     }
 
     async function renderPdfPagesToImages(file, thumbnailsEl) {
-      if (!window.pdfjsLib) {
-        throw new Error("PDF.js ライブラリが読み込まれていません");
-      }
+      if (!window.pdfjsLib) return;
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 1.8 });
+        const viewport = page.getViewport({ scale: 2.0 });
 
         const canvas = document.createElement('canvas');
-        canvas.width = Math.floor(viewport.width);
-        canvas.height = Math.floor(viewport.height);
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
 
-        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-        const idx = uploadedImages.length;
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+        const dataUrl = canvas.toDataURL('image/png');
         uploadedImages.push(dataUrl);
-        appendThumbnailCard(thumbnailsEl, dataUrl, idx);
+
+        if (thumbnailsEl) {
+          const img = document.createElement('img');
+          img.src = dataUrl;
+          img.className = 'h-24 w-auto rounded border border-slate-600 object-contain shadow-md shrink-0';
+          thumbnailsEl.appendChild(img);
+        }
       }
     }
 
     function renderImageFileToDataUrl(file, thumbnailsEl) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const reader = new FileReader();
-        reader.onload = async (e) => {
-          try {
-            const normalizedUrl = await compressImageDataUrl(e.target.result, 1800, 0.9);
-            const idx = uploadedImages.length;
-            uploadedImages.push(normalizedUrl);
-            appendThumbnailCard(thumbnailsEl, normalizedUrl, idx);
-            resolve();
-          } catch (err) {
-            reject(err);
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          uploadedImages.push(dataUrl);
+
+          if (thumbnailsEl) {
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.className = 'h-24 w-auto rounded border border-slate-600 object-contain shadow-md shrink-0';
+            thumbnailsEl.appendChild(img);
           }
+          resolve();
         };
-        reader.onerror = () => reject(new Error("画像ファイルの読み込みに失敗しました"));
         reader.readAsDataURL(file);
       });
     }
 
-    function renderTextFileToDataUrl(file, thumbnailsEl) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const text = String(e.target.result || '');
-          const lines = text.split(/\r?\n/);
-          const canvas = document.createElement('canvas');
-          canvas.width = 1000;
-          canvas.height = Math.max(400, Math.min(2400, lines.length * 28 + 80));
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.fillStyle = '#111827';
-          ctx.font = '20px sans-serif';
-          lines.slice(0, 80).forEach((line, i) => {
-            ctx.fillText(line.slice(0, 75), 32, 48 + i * 28);
-          });
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-          const idx = uploadedImages.length;
-          uploadedImages.push(dataUrl);
-          appendThumbnailCard(thumbnailsEl, dataUrl, idx);
-          resolve();
-        };
-        reader.onerror = () => reject(new Error("テキストファイルの読み込みに失敗しました"));
-        reader.readAsText(file, 'UTF-8');
-      });
-    }
-
-    function compressImageDataUrl(dataUrl, maxDim = 600, quality = 0.82) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          let w = img.width;
-          let h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w >= h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, w);
-          canvas.height = Math.max(1, h);
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.onerror = () => resolve(null);
-        img.src = dataUrl;
-      });
-    }
-
+    // 正規化バウンディングボックス [ymin, xmin, ymax, xmax] (0〜1000) から図形を切り抜いて軽量JPEG DataURLを返す
     function cropFigureFromPageDataUrl(pageDataUrl, box) {
       return new Promise((resolve) => {
         if (!Array.isArray(box) || box.length !== 4) {
@@ -1799,25 +1797,34 @@ function responseJSON(obj) {
           return;
         }
         const [ymin, xmin, ymax, xmax] = box.map(Number);
-        if ([ymin, xmin, ymax, xmax].some(v => isNaN(v)) || ymax <= ymin || xmax <= xmin) {
+        if (isNaN(ymin) || isNaN(xmin) || isNaN(ymax) || isNaN(xmax)) {
+          resolve(null);
+          return;
+        }
+        if (ymax <= ymin || xmax <= xmin) {
           resolve(null);
           return;
         }
 
         const img = new Image();
         img.onload = () => {
-          const pad = 15; // 1000スケールで1.5%の余白を追加
-          const ny1 = Math.max(0, ymin - pad) / 1000;
-          const nx1 = Math.max(0, xmin - pad) / 1000;
-          const ny2 = Math.min(1000, ymax + pad) / 1000;
-          const nx2 = Math.min(1000, xmax + pad) / 1000;
+          const iw = img.width;
+          const ih = img.height;
 
-          const sx = Math.floor(nx1 * img.width);
-          const sy = Math.floor(ny1 * img.height);
-          const sw = Math.max(10, Math.floor((nx2 - nx1) * img.width));
-          const sh = Math.max(10, Math.floor((ny2 - ny1) * img.height));
+          const padY = 15;
+          const padX = 15;
+          const ny1 = Math.max(0, ymin - padY) / 1000;
+          const nx1 = Math.max(0, xmin - padX) / 1000;
+          const ny2 = Math.min(1000, ymax + padY) / 1000;
+          const nx2 = Math.min(1000, xmax + padX) / 1000;
 
-          const maxDim = 600;
+          const sx = Math.floor(nx1 * iw);
+          const sy = Math.floor(ny1 * ih);
+          const sw = Math.max(10, Math.floor((nx2 - nx1) * iw));
+          const sh = Math.max(10, Math.floor((ny2 - ny1) * ih));
+
+          // スプレッドシート1セル50,000文字制限対策：最大辺420px・品質0.72に軽量圧縮
+          const maxDim = 420;
           let dw = sw;
           let dh = sh;
           if (dw > maxDim || dh > maxDim) {
@@ -1837,109 +1844,64 @@ function responseJSON(obj) {
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(0, 0, dw, dh);
           ctx.drawImage(img, sx, sy, sw, sh, 0, 0, dw, dh);
-          resolve(canvas.toDataURL('image/jpeg', 0.85));
+
+          resolve(canvas.toDataURL('image/jpeg', 0.72));
         };
         img.onerror = () => resolve(null);
         img.src = pageDataUrl;
       });
     }
 
-    // =========================================================================
-    // Gemini Vision AI 問題＆図形自動取り込み & 数式LaTeX正規化
-    // =========================================================================
+    function compressImageDataUrl(rawDataUrl, maxDim = 420, quality = 0.72) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let dw = img.width;
+          let dh = img.height;
+          if (dw > maxDim || dh > maxDim) {
+            if (dw >= dh) {
+              dh = Math.round((dh * maxDim) / dw);
+              dw = maxDim;
+            } else {
+              dw = Math.round((dw * maxDim) / dh);
+              dh = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = dw;
+          canvas.height = dh;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, dw, dh);
+          ctx.drawImage(img, 0, 0, dw, dh);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => resolve(null);
+        img.src = rawDataUrl;
+      });
+    }
 
-    // AI出力のJSON内バックスラッシュ破損（\fracが\f制御文字になる現象等）を防いで安全にパースする
-    function parseAiJsonSafely(rawText) {
-      const clean = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-      const latexEscapeRe = /\\(["\\/bfnrt]|u[0-9a-fA-F]{4})|\\(.)/g;
-      const repaired = clean.replace(latexEscapeRe, (match, validEsc, invalidEsc, offset, fullStr) => {
-        if (invalidEsc !== undefined) {
-          // \sqrt, \pi, \sin, \cos, \left, \cdot 等の単一バックスラッシュを二重化
-          return '\\\\' + invalidEsc;
-        }
-        // \f, \t, \r, \b の直後に英字が続くLaTeXコマンド（\frac, \theta, \tan, \times, \text, \right, \beta等）を保護
-        if (validEsc === 'f' || validEsc === 't' || validEsc === 'r' || validEsc === 'b') {
-          const rest = fullStr.slice(offset + 2);
-          if (/^(rac|box|orall|heta|an|imes|ext|o\b|riangle|ight|ho|angle|eta|inom|ar\b)/.test(rest)) {
-            return '\\\\' + validEsc;
+    // すでに保存されている大きすぎる図形画像もクラウド保存前に自動再圧縮する
+    async function recompressAllQuestionFigures() {
+      let updated = false;
+      for (let i = 0; i < questions.length; i++) {
+        const fig = questions[i].figureImage;
+        if (typeof fig === 'string' && fig.startsWith('data:image/') && fig.length > 22000) {
+          const compressed = await compressImageDataUrl(fig, 400, 0.70);
+          if (compressed && compressed.length < fig.length) {
+            questions[i].figureImage = compressed;
+            updated = true;
           }
         }
-        return match;
-      });
-      return JSON.parse(repaired);
-    }
-
-    // 数式内のスラッシュ分数（1/2, -3/4, x/2, \pi/3, (x+1)/2 等）を \frac{分子}{分母} へ正規化する
-    function convertSlashFractionsInMathExpr(expr) {
-      let s = expr;
-      // 1. 括弧付き分子・分母: (a+b)/(c+d) -> \frac{a+b}{c+d}
-      s = s.replace(/\(([^()]+)\)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
-      // 2. 括弧付き分子: (a+b)/c -> \frac{a+b}{c}
-      s = s.replace(/\(([^()]+)\)\s*\/\s*([a-zA-Z0-9\\{}^_]+)/g, '\\frac{$1}{$2}');
-      // 3. 括弧付き分母: a/(b+c) -> \frac{a}{b+c}
-      s = s.replace(/([a-zA-Z0-9\\{}^_]+)\s*\/\s*\(([^()]+)\)/g, '\\frac{$1}{$2}');
-      // 4. 単項同士の分数: 1/2, x/3, \pi/6, \sqrt{2}/2, 2x/3, a^2/b^2 -> \frac{...}{...}
-      const termPattern = '(?:\\\\[a-zA-Z]+(?:\\{[^{}]*\\})*|[a-zA-Z0-9^{}_])+';
-      const simpleFracRe = new RegExp(`(${termPattern})\\s*\\/\\s*(${termPattern})`, 'g');
-      s = s.replace(simpleFracRe, '\\frac{$1}{$2}');
-      return s;
-    }
-
-    // テキスト全体の数式LaTeX（\frac等）を整え、取り込み時の数式状態を保持する
-    function normalizeMathLatex(text, isOptionField = false) {
-      if (typeof text !== 'string' || !text) return text || '';
-
-      // 万が一混入した制御文字をLaTeXコマンドへ復元
-      let s = text
-        .replace(/\u000c(rac|box|orall)/g, '\\f$1')
-        .replace(/\u0009(heta|an|imes|ext|o\b|riangle)/g, '\\t$1')
-        .replace(/\u000d(ight|ho|angle)/g, '\\r$1')
-        .replace(/\u0008(eta|inom|ar\b)/g, '\\b$1');
-
-      // 選択肢全体が単純な分数（例: "1/2", "-3/4", "(x+1)/2", "\pi/3"）のみで構成されている場合
-      const trimmed = s.trim();
-      if (isOptionField && !trimmed.includes('$')) {
-        if (/^[+-]?\s*(?:\([^()]+\)|(?:\\[a-zA-Z]+(?:\{[^{}]*\})*|[a-zA-Z0-9^{}_])+)\s*\/\s*(?:\([^()]+\)|(?:\\[a-zA-Z]+(?:\{[^{}]*\})*|[a-zA-Z0-9^{}_])+)$/.test(trimmed)) {
-          return `$${convertSlashFractionsInMathExpr(trimmed)}$`;
-        }
-        // \frac や \sqrt 等のLaTeXコマンドを含みながら $ で囲まれていない選択肢を保護
-        if (/\\(?:frac|dfrac|sqrt|pi|sin|cos|tan|log|vec|pm|mp|times|div)\b/.test(trimmed)) {
-          return `$${convertSlashFractionsInMathExpr(trimmed)}$`;
-        }
       }
-
-      // すでに $...$ または $$...$$ で囲まれている領域と、通常テキスト領域に分割して処理
-      const segments = s.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g);
-      return segments.map((seg, index) => {
-        if (index % 2 === 1) {
-          // 数式ブロック（$...$ / $$...$$）内部のスラッシュ分数を \frac に変換
-          const isDisplay = seg.startsWith('$$');
-          const delimiter = isDisplay ? '$$' : '$';
-          const inner = seg.slice(delimiter.length, seg.length - delimiter.length);
-          const convertedInner = convertSlashFractionsInMathExpr(inner);
-          return `${delimiter}${convertedInner}${delimiter}`;
-        } else {
-          // 通常テキスト内の孤立した数値分数（例: "1/2", "-3/4"）を $\frac{1}{2}$ へ変換（日付 2026/11/17 や URL は除外）
-          return seg.replace(/(?<![0-9A-Za-z_./\\:])([+-]?)\s*(\d{1,3})\s*\/\s*(\d{1,3})(?![0-9A-Za-z_./\\:])/g, (m, sign, num, den) => {
-            return `$${sign}\\frac{${num}}{${den}}$`;
-          });
-        }
-      }).join('');
+      if (updated) {
+        localStorage.setItem('math_app_questions', JSON.stringify(questions));
+      }
     }
 
-    // 問題オブジェクト全体のテキストフィールドにLaTeX数式正規化を適用する
-    function normalizeQuestionMathFields(q) {
-      if (!q || typeof q !== 'object') return q;
-      q.question = normalizeMathLatex(q.question || '', false);
-      q.explanation = normalizeMathLatex(q.explanation || '', false);
-      if (Array.isArray(q.options)) {
-        q.options = q.options.map(opt => normalizeMathLatex(opt || '', true));
-      }
-      if (Array.isArray(q.thinkingOptions)) {
-        q.thinkingOptions = q.thinkingOptions.map(tOpt => normalizeMathLatex(tOpt || '', false));
-      }
-      return q;
-    }
+    // =========================================================================
+    // Gemini Vision AI 問題＆図形自動取り込み
+    // =========================================================================
 
     async function generateQuestionsWithAI() {
       const apiKey = document.getElementById('gemini-api-key-input').value.trim();
@@ -1978,28 +1940,27 @@ function responseJSON(obj) {
               text: `
 画像のページ内容に含まれる数学の問題を【1問も漏らさずに】読み取り、4択のクイズ形式問題データを生成してください。
 
-【重要指示（数式・分数の保持ルール）】
+【重要な指示】
 1. 画像内に含まれる問題（小問を含む）をすべて個別問題として抽出してください。
-2. 問題文・選択肢・解説・思考アプローチ内のすべての数式は必ずKaTeX形式（$...$）で記述してください。
-3. **分数は「1/2」「x/3」「(x+1)/2」のようなスラッシュ表記を絶対に使用せず、必ず「$\\frac{1}{2}$」「$\\frac{x}{3}$」「$\\frac{x+1}{2}$」のように \\frac{分子}{分母} を使用してください。**
-4. 平方根は \\sqrt{...}、三角関数・対数・ベクトル・積分・極限なども正確なLaTeXコマンドで記述し、選択肢が分数や数式のみの場合も必ず $...$ で囲んでください（例: "$\\frac{1}{2}$"）。
-5. JSON文字列内のバックスラッシュは必ず二重にエスケープしてください（例: "\\\\frac{1}{2}", "\\\\sqrt{2}"）。
-6. 問題に対応する図形・グラフ・表・幾何図・イラストが画像内にある場合は、その図形領域のバウンディングボックス座標を "figureBox": [ymin, xmin, ymax, xmax] （0〜1000の整数スケール）として必ず指定してください。図形がない問題の場合は "figureBox": null にしてください。
-7. 返答は以下のJSON配列形式（コードブロック記法なしの純粋JSON）のみで出力してください。
+2. 【数式・分数の厳格ルール】
+   - 数式は必ずKaTeX形式（$...$）で記述してください。
+   - 分数は絶対に "1/2" や "(x+1)/2" のようなスラッシュ表記にせず、必ず "$\\\\frac{1}{2}$" や "$\\\\frac{x+1}{2}$" のように \\\\frac{分子}{分母} を使用してください（問題文・選択肢・解説・思考アプローチすべてに適用）。
+   - JSON文字列内のバックスラッシュは必ず二重（\\\\frac, \\\\sqrt, \\\\theta など）にエスケープしてください。
+3. 問題に対応する図形・グラフ・表・幾何図が画像内にある場合は、その図形領域のバウンディングボックス座標を "figureBox": [ymin, xmin, ymax, xmax] （0〜1000の整数スケール）として必ず指定してください。図形がない問題の場合は "figureBox": null にしてください。
+4. 返答は以下のJSON配列形式（コードブロック記法なしの純粋JSON）のみで出力してください。
 
 [
   {
-    "id": "q_ai_${Date.now()}_${i + 1}_1",
     "subject": "数学Ⅰ",
     "unit": "単元名",
     "difficulty": 1,
-    "question": "2次方程式 $2x^2 - 3x + 1 = 0$ の解のうち小さい方は $\\\\frac{1}{2}$ であることを確かめ、大きい方の解を求めよ。",
+    "question": "2次方程式 $x^2 - x - \\\\frac{3}{4} = 0$ を解け。",
     "figureBox": [120, 500, 380, 900],
-    "thinkingOptions": ["解の公式 $x = \\\\frac{-b \\\\pm \\\\sqrt{b^2-4ac}}{2a}$ を用いる","因数分解 $(2x-1)(x-1)=0$ を利用する","平方完成を行う","グラフの軸を求める"],
-    "thinkingAnswer": 1,
-    "options": ["$1$","$\\\\frac{1}{2}$","$-1$","$-\\\\frac{1}{2}$"],
+    "thinkingOptions": ["方針1","方針2","方針3","方針4"],
+    "thinkingAnswer": 0,
+    "options": ["$x = \\\\frac{3}{2}, -\\\\frac{1}{2}$","$x = \\\\frac{1}{2}, -\\\\frac{3}{2}$","$x = \\\\frac{3}{4}, -1$","$x = 1, -\\\\frac{3}{4}$"],
     "answer": 0,
-    "explanation": "左辺を因数分解すると $(2x - 1)(x - 1) = 0$ となるため、解は $x = \\\\frac{1}{2}, 1$ です。"
+    "explanation": "両辺に4を掛けると $4x^2 - 4x - 3 = 0$ より $(2x-3)(2x+1)=0$、よって $x = \\\\frac{3}{2}, -\\\\frac{1}{2}$。"
   }
 ]
 `
@@ -2027,8 +1988,8 @@ function responseJSON(obj) {
             const parsed = parseAiJsonSafely(responseText);
             if (Array.isArray(parsed)) {
               for (let idx = 0; idx < parsed.length; idx++) {
-                const q = normalizeQuestionMathFields(parsed[idx]);
-                // AIが例示IDを複製して返すことによるID重複を防ぐため、必ず一意IDを強制採番する
+                const q = normalizeQuestionMath(parsed[idx]);
+                // 重複を防ぐため固有IDを強制採番
                 q.id = `q_ai_${Date.now()}_p${i + 1}_${idx}_${Math.random().toString(36).slice(2, 7)}`;
                 q.tag = lessonTag;
                 q.figureImage = null;
@@ -2088,13 +2049,12 @@ function responseJSON(obj) {
 元問題: ${currentQ.question}
 解説: ${currentQ.explanation}
 
-【数式記述ルール】
-- 数式は必ずKaTeX形式（$...$）で記述し、分数は「1/2」のようなスラッシュ表記を使わず必ず「$\\frac{1}{2}$」のように \\frac{分子}{分母} を使用してください。
-- JSON文字列内のバックスラッシュは必ず二重エスケープ（例: "\\\\frac{1}{2}"）にしてください。
+【数式ルール】
+- 数式は必ずKaTeX形式（$...$）で記述してください。
+- 分数は "1/2" などのスラッシュ表記を使わず、必ず "$\\\\frac{1}{2}$" のように \\\\frac{分子}{分母} を用いてください。
 
 返答は以下の単一JSON形式（コードブロックなし）のみで出力してください。
 {
-  "id": "q_sim_${Date.now()}",
   "subject": "${currentQ.subject || '数学Ⅰ'}",
   "unit": "${currentQ.unit || '単元'}",
   "difficulty": ${currentQ.difficulty || 1},
@@ -2116,7 +2076,7 @@ function responseJSON(obj) {
 
         const data = await res.json();
         const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        const newQ = normalizeQuestionMathFields(parseAiJsonSafely(responseText));
+        const newQ = normalizeQuestionMath(parseAiJsonSafely(responseText));
         newQ.id = `q_sim_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
         currentQuizQuestions.splice(currentQuestionIdx + 1, 0, newQ);
@@ -2141,7 +2101,7 @@ function responseJSON(obj) {
         if (res.ok) {
           const cloudQuestions = await res.json();
           if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
-            questions = cloudQuestions;
+            questions = cloudQuestions.map(q => normalizeQuestionMath(q));
             ensureUniqueQuestionIds();
             localStorage.setItem('math_app_questions', JSON.stringify(questions));
             refreshAllTaxonomyUI();
@@ -2161,25 +2121,69 @@ function responseJSON(obj) {
       }
 
       try {
-        showToast(`${questions.length} 問のデータを送信中...`);
-        const payload = { action: "save_questions", questions: questions };
+        showToast(`${questions.length} 問のデータを圧縮・送信準備中...`);
+        await recompressAllQuestionFigures();
 
-        const res = await fetch(gasUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
+        const fullPayloadStr = JSON.stringify({ action: "save_questions", questions: questions });
 
-        if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
-
-        const resData = await res.json();
-        if (resData.status === "success") {
-          showToast(`✓ スプレッドシートへ ${questions.length} 問のデータを保存しました！`);
-        } else {
-          showErrorModal("GASエラー: " + (resData.message || "保存中にエラーが発生しました"));
+        // データ全体が35,000文字以内の場合は1回で一括送信
+        if (fullPayloadStr.length <= 35000) {
+          const res = await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: fullPayloadStr
+          });
+          if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
+          const resData = await res.json();
+          if (resData.status === "success") {
+            showToast(`✓ スプレッドシートへ ${questions.length} 問のデータを保存しました！`);
+          } else {
+            showErrorModal("GASエラー: " + (resData.message || "保存中にエラーが発生しました"));
+          }
+          return;
         }
+
+        // 画像付き問題等でデータが大きい場合は35,000文字単位でパケット分割して順次送信
+        const MAX_PACKET_CHARS = 35000;
+        const packets = [];
+        let currentPacket = [];
+        let currentLen = 0;
+
+        for (let i = 0; i < questions.length; i++) {
+          const qStr = JSON.stringify(questions[i]);
+          if (currentPacket.length > 0 && (currentLen + qStr.length) > MAX_PACKET_CHARS) {
+            packets.push(currentPacket);
+            currentPacket = [questions[i]];
+            currentLen = qStr.length;
+          } else {
+            currentPacket.push(questions[i]);
+            currentLen += qStr.length;
+          }
+        }
+        if (currentPacket.length > 0) packets.push(currentPacket);
+
+        for (let pIdx = 0; pIdx < packets.length; pIdx++) {
+          showToast(`スプレッドシートへ分割送信中... (${pIdx + 1} / ${packets.length})`);
+          const payload = {
+            action: "append_questions",
+            clearFirst: pIdx === 0,
+            questions: packets[pIdx]
+          };
+          const res = await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(`HTTPエラー (${pIdx + 1}/${packets.length}): ${res.status}`);
+          const resData = await res.json();
+          if (resData.status !== "success") {
+            throw new Error(resData.message || "GAS側で保存エラーが発生しました（最新のGASコードがデプロイされているかご確認ください）");
+          }
+        }
+
+        showToast(`✓ スプレッドシートへ全 ${questions.length} 問（${packets.length}分割）の保存が完了しました！`);
       } catch (e) {
-        showErrorModal("【通信エラー】GAS設定やアクセス権限をご確認ください\n" + e.message);
+        showErrorModal("【スプレッドシート保存エラー】\n" + e.message + "\n\n※ 画像付き問題を保存する場合は、管理画面の「GASコードを表示」から最新コードをコピーし、Apps Script側で「新バージョン」として再デプロイしてください。");
       }
     }
 
@@ -2193,7 +2197,7 @@ function responseJSON(obj) {
           const importedData = JSON.parse(e.target.result);
           if (!Array.isArray(importedData)) throw new Error("JSON形式が不正です");
 
-          questions = importedData;
+          questions = importedData.map(q => normalizeQuestionMath(q));
           ensureUniqueQuestionIds();
           selectedAdminQuestionIds.clear();
           localStorage.setItem('math_app_questions', JSON.stringify(questions));
@@ -2364,7 +2368,7 @@ function responseJSON(obj) {
     }
 
     function renderCurrentQuestion() {
-      const q = currentQuizQuestions[currentQuestionIdx];
+      const q = normalizeQuestionMath(currentQuizQuestions[currentQuestionIdx]);
       const mode = document.getElementById('quiz-mode-select').value;
 
       selectedThinkingIdx = null;
@@ -2569,6 +2573,7 @@ function responseJSON(obj) {
 
     function recordMisconception(cause) {
       if (misconceptionStats[cause] !== undefined) misconceptionStats[cause]++;
+      localStorage.setItem('math_app_misconceptions', JSON.stringify(misconceptionStats));
       showToast("つまずき理由を記録しました");
       document.getElementById('misconception-diagnosis-box').classList.add('hidden');
       updateAnalyticsView();
@@ -2653,6 +2658,27 @@ function responseJSON(obj) {
       document.getElementById('total-answers-cnt').innerHTML = `${totalAnswers} <span class="text-xs font-normal text-slate-400">問</span>`;
       document.getElementById('wrong-questions-cnt').innerHTML = `${wrongQuestionIds.length} <span class="text-xs font-normal text-slate-400">問</span>`;
 
+      const causeMap = { CALC: '🧮 計算ミス', FORMULA: '📖 公式欠落', STRATEGY: '🧩 解法方針誤り', READING: '🔍 題意誤認' };
+      let maxCauseVal = -1;
+      let topCauseText = "未記録";
+
+      const misconceptionContainer = document.getElementById('misconception-stats-container');
+      if (misconceptionContainer) {
+        misconceptionContainer.innerHTML = '';
+        Object.keys(misconceptionStats).forEach(key => {
+          const val = misconceptionStats[key];
+          if (val > maxCauseVal && val > 0) {
+            maxCauseVal = val;
+            topCauseText = causeMap[key];
+          }
+          const div = document.createElement('div');
+          div.className = "flex items-center justify-between text-xs bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/60";
+          div.innerHTML = `<span>${causeMap[key]}</span><span class="font-bold text-amber-400">${val} 回</span>`;
+          misconceptionContainer.appendChild(div);
+        });
+      }
+      document.getElementById('top-misconception-cause').textContent = topCauseText;
+
       if (totalAnswers === 0) return;
 
       const correctAnswers = historyData.filter(h => h.isCorrect).length;
@@ -2661,9 +2687,10 @@ function responseJSON(obj) {
 
       const unitMap = {};
       historyData.forEach(h => {
-        if (!unitMap[h.unit]) unitMap[h.unit] = { total: 0, correct: 0 };
-        unitMap[h.unit].total++;
-        if (h.isCorrect) unitMap[h.unit].correct++;
+        const uName = h.unit || '共通';
+        if (!unitMap[uName]) unitMap[uName] = { total: 0, correct: 0 };
+        unitMap[uName].total++;
+        if (h.isCorrect) unitMap[uName].correct++;
       });
 
       const unitListContainer = document.getElementById('unit-performance-list');
@@ -2686,7 +2713,7 @@ function responseJSON(obj) {
         bar.className = "space-y-1";
         bar.innerHTML = `
           <div class="flex justify-between text-xs text-slate-300">
-            <span>${u} (${uTotal}問)</span>
+            <span>${escapeHtml(u)} (${uTotal}問)</span>
             <span class="font-bold">${uPct}%</span>
           </div>
           <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
@@ -2697,28 +2724,6 @@ function responseJSON(obj) {
       });
 
       document.getElementById('weakest-unit-name').textContent = weakestUnit;
-
-      const causeMap = { CALC: '🧮 計算ミス', FORMULA: '📖 公式欠落', STRATEGY: '🧩 解法方針誤り', READING: '🔍 題意誤認' };
-      let maxCauseVal = -1;
-      let topCauseText = "未記録";
-
-      const misconceptionContainer = document.getElementById('misconception-stats-container');
-      misconceptionContainer.innerHTML = '';
-
-      Object.keys(misconceptionStats).forEach(key => {
-        const val = misconceptionStats[key];
-        if (val > maxCauseVal && val > 0) {
-          maxCauseVal = val;
-          topCauseText = causeMap[key];
-        }
-
-        const div = document.createElement('div');
-        div.className = "flex items-center justify-between text-xs bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/60";
-        div.innerHTML = `<span>${causeMap[key]}</span><span class="font-bold text-amber-400">${val} 回</span>`;
-        misconceptionContainer.appendChild(div);
-      });
-
-      document.getElementById('top-misconception-cause').textContent = topCauseText;
     }
 
     // =========================================================================
@@ -2800,7 +2805,6 @@ function responseJSON(obj) {
       countEl.textContent = displayQuestions.length;
       if (totalCountEl) totalCountEl.textContent = questions.length;
 
-      // 存在しないIDを選択セットからクリーンアップ
       const existingIds = new Set(questions.map(q => q.id));
       selectedAdminQuestionIds.forEach(id => {
         if (!existingIds.has(id)) selectedAdminQuestionIds.delete(id);
@@ -2882,15 +2886,6 @@ function responseJSON(obj) {
       });
 
       renderMath(container);
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
     }
 
     function toggleAdminQuestionSelect(id, checked) {
@@ -3153,6 +3148,45 @@ function responseJSON(obj) {
     // 個別問題編集・図形編集（アップロード / Ctrl+V貼り付け / ドラッグ切り抜き）
     // =========================================================================
 
+    function insertLatexSnippet(elementId, snippet, cursorOffset) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const start = el.selectionStart || 0;
+      const end = el.selectionEnd || 0;
+      const val = el.value;
+      el.value = val.slice(0, start) + snippet + val.slice(end);
+      el.focus();
+      const pos = start + (cursorOffset !== undefined ? cursorOffset : snippet.length);
+      el.setSelectionRange(pos, pos);
+      updateEditMathPreview();
+    }
+
+    function updateEditMathPreview() {
+      const qPrev = document.getElementById('edit-q-text-preview');
+      const expPrev = document.getElementById('edit-q-exp-preview');
+      const optsPrev = document.getElementById('edit-q-opts-preview');
+
+      if (qPrev) {
+        qPrev.textContent = normalizeMathText(document.getElementById('edit-q-text').value || '');
+        renderMath(qPrev);
+      }
+      if (expPrev) {
+        expPrev.textContent = normalizeMathText(document.getElementById('edit-q-explanation').value || '');
+        renderMath(expPrev);
+      }
+      if (optsPrev) {
+        optsPrev.innerHTML = '';
+        for (let i = 0; i < 4; i++) {
+          const val = normalizeMathText(document.getElementById(`edit-q-opt-${i}`)?.value || '');
+          const cell = document.createElement('div');
+          cell.className = "bg-slate-900/90 px-2 py-1 rounded border border-slate-800 truncate";
+          cell.textContent = `${i + 1}. ${val}`;
+          optsPrev.appendChild(cell);
+        }
+        renderMath(optsPrev);
+      }
+    }
+
     function openEditQuestionModal(id) {
       const q = questions.find(item => item.id === id);
       if (!q) return;
@@ -3174,46 +3208,9 @@ function responseJSON(obj) {
       if (radio) radio.checked = true;
 
       setEditedFigurePreview(q.figureImage || null);
+      updateEditMathPreview();
 
       document.getElementById('edit-question-modal').classList.remove('hidden');
-      updateEditMathPreview();
-    }
-
-    function insertLatexSnippet(targetId, snippet, cursorOffset) {
-      const el = document.getElementById(targetId);
-      if (!el) return;
-      const start = el.selectionStart ?? el.value.length;
-      const end = el.selectionEnd ?? el.value.length;
-      el.value = el.value.slice(0, start) + snippet + el.value.slice(end);
-      el.focus();
-      const pos = start + cursorOffset;
-      el.setSelectionRange(pos, pos);
-      updateEditMathPreview();
-    }
-
-    function updateEditMathPreview() {
-      const qPrev = document.getElementById('edit-q-text-preview');
-      const expPrev = document.getElementById('edit-q-exp-preview');
-      const optsPrev = document.getElementById('edit-q-opts-preview');
-      if (qPrev) {
-        qPrev.textContent = document.getElementById('edit-q-text').value;
-        renderMath(qPrev);
-      }
-      if (expPrev) {
-        expPrev.textContent = document.getElementById('edit-q-explanation').value;
-        renderMath(expPrev);
-      }
-      if (optsPrev) {
-        optsPrev.innerHTML = '';
-        for (let i = 0; i < 4; i++) {
-          const val = document.getElementById(`edit-q-opt-${i}`)?.value || '';
-          const div = document.createElement('div');
-          div.className = "bg-slate-900 px-2 py-1 rounded border border-slate-800 truncate";
-          div.textContent = `${i + 1}. ${val}`;
-          optsPrev.appendChild(div);
-        }
-        renderMath(optsPrev);
-      }
     }
 
     function closeEditQuestionModal() {
@@ -3250,7 +3247,7 @@ function responseJSON(obj) {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const compressed = await compressImageDataUrl(e.target.result, 600, 0.82);
+        const compressed = await compressImageDataUrl(e.target.result, 420, 0.72);
         if (compressed) {
           setEditedFigurePreview(compressed);
           showToast("図形画像を読み込みました");
@@ -3274,7 +3271,7 @@ function responseJSON(obj) {
             if (!blob) continue;
             const reader = new FileReader();
             reader.onload = async (ev) => {
-              const compressed = await compressImageDataUrl(ev.target.result, 600, 0.82);
+              const compressed = await compressImageDataUrl(ev.target.result, 420, 0.72);
               if (compressed) {
                 setEditedFigurePreview(compressed);
                 showToast("✓ クリップボードの画像を貼り付けました");
@@ -3300,13 +3297,13 @@ function responseJSON(obj) {
       if (questions[qIdx].lessonTag !== undefined) questions[qIdx].lessonTag = tagVal;
 
       questions[qIdx].difficulty = parseInt(document.getElementById('edit-q-diff').value, 10);
-      questions[qIdx].question = document.getElementById('edit-q-text').value.trim();
-      questions[qIdx].explanation = document.getElementById('edit-q-explanation').value.trim();
+      questions[qIdx].question = normalizeMathText(document.getElementById('edit-q-text').value.trim());
+      questions[qIdx].explanation = normalizeMathText(document.getElementById('edit-q-explanation').value.trim());
       questions[qIdx].figureImage = currentEditingFigureImage || null;
 
       const options = [];
       for (let i = 0; i < 4; i++) {
-        options.push(document.getElementById(`edit-q-opt-${i}`).value.trim());
+        options.push(normalizeMathText(document.getElementById(`edit-q-opt-${i}`).value.trim()));
       }
       questions[qIdx].options = options;
 
@@ -3414,7 +3411,6 @@ function responseJSON(obj) {
       const canvas = document.getElementById('crop-canvas');
       if (!canvas || !cropSourceImgObj) return;
 
-      // 表示用に最大幅760pxにスケーリングして描画
       const maxDisplayWidth = 760;
       const scale = cropSourceImgObj.width > maxDisplayWidth ? (maxDisplayWidth / cropSourceImgObj.width) : 1;
       canvas.width = Math.round(cropSourceImgObj.width * scale);
@@ -3430,14 +3426,12 @@ function responseJSON(obj) {
         const rw = Math.abs(cropRect.w);
         const rh = Math.abs(cropRect.h);
 
-        // 選択領域外を半透明ダークマスク
         ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
         ctx.fillRect(0, 0, canvas.width, ry);
         ctx.fillRect(0, ry + rh, canvas.width, canvas.height - (ry + rh));
         ctx.fillRect(0, ry, rx, rh);
         ctx.fillRect(rx + rw, ry, canvas.width - (rx + rw), rh);
 
-        // 選択枠線
         ctx.strokeStyle = '#22d3ee';
         ctx.lineWidth = 2.5;
         ctx.strokeRect(rx, ry, rw, rh);
@@ -3523,7 +3517,6 @@ function responseJSON(obj) {
       const rw = Math.abs(cropRect.w);
       const rh = Math.abs(cropRect.h);
 
-      // 元画像の実ピクセル座標に変換して高画質で切り抜き
       const ratioX = cropSourceImgObj.width / canvas.width;
       const ratioY = cropSourceImgObj.height / canvas.height;
 
@@ -3532,7 +3525,7 @@ function responseJSON(obj) {
       const sw = Math.max(10, Math.floor(rw * ratioX));
       const sh = Math.max(10, Math.floor(rh * ratioY));
 
-      const maxDim = 600;
+      const maxDim = 420;
       let dw = sw;
       let dh = sh;
       if (dw > maxDim || dh > maxDim) {
@@ -3553,7 +3546,7 @@ function responseJSON(obj) {
       outCtx.fillRect(0, 0, dw, dh);
       outCtx.drawImage(cropSourceImgObj, sx, sy, sw, sh, 0, 0, dw, dh);
 
-      const croppedDataUrl = outCanvas.toDataURL('image/jpeg', 0.85);
+      const croppedDataUrl = outCanvas.toDataURL('image/jpeg', 0.72);
       setEditedFigurePreview(croppedDataUrl);
       closeFigureCropModal();
       showToast("✓ 選択範囲を図形として切り抜きました（「保存する」で確定します）");
