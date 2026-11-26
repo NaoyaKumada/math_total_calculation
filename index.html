@@ -219,18 +219,28 @@
 
         <!-- 手書き計算メモエリア -->
         <div id="scratchpad-wrapper" class="hidden bg-slate-950 border border-indigo-500/40 rounded-xl p-3 space-y-2">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-2 text-xs">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2 text-xs">
             <span class="text-indigo-300 font-semibold flex items-center space-x-1">
               <i class="fa-solid fa-paintbrush"></i>
               <span>画面上計算メモ (指・ペンで描画可能)</span>
             </span>
-            <div class="flex items-center space-x-2">
-              <button onclick="setScratchMode('pen')" id="scratch-pen-btn" class="px-2 py-1 bg-indigo-600 text-white rounded text-[11px]">ペン</button>
-              <button onclick="setScratchMode('eraser')" id="scratch-eraser-btn" class="px-2 py-1 bg-slate-700 text-slate-300 rounded text-[11px]">消しゴム</button>
-              <button onclick="clearScratchpad()" class="px-2 py-1 bg-rose-900/60 text-rose-300 border border-rose-700/60 rounded text-[11px]">全消去</button>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="setScratchMode('pen')" id="scratch-pen-btn" class="px-2.5 py-1 bg-indigo-600 text-white rounded text-[11px] font-medium transition-colors">ペン</button>
+              <button onclick="setScratchMode('eraser')" id="scratch-eraser-btn" class="px-2.5 py-1 bg-slate-700 text-slate-300 rounded text-[11px] font-medium transition-colors">消しゴム</button>
+              <!-- 消しゴムサイズ調整スライダー -->
+              <div id="eraser-size-control" class="hidden items-center space-x-1.5 bg-slate-900 px-2.5 py-1 rounded border border-slate-700/80">
+                <span class="text-[10px] text-slate-400">範囲:</span>
+                <input type="range" id="scratch-eraser-size" min="8" max="72" value="24" oninput="updateEraserSize(this.value)" class="w-20 accent-rose-400 cursor-pointer h-1.5 bg-slate-700 rounded-lg">
+                <span id="scratch-eraser-size-label" class="text-[10px] font-mono text-rose-300 w-7 text-right">24px</span>
+              </div>
+              <button onclick="clearScratchpad()" class="px-2.5 py-1 bg-rose-900/60 hover:bg-rose-800/70 text-rose-300 border border-rose-700/60 rounded text-[11px] transition-colors">全消去</button>
             </div>
           </div>
-          <canvas id="scratch-canvas" class="scratch-pad w-full h-48 bg-slate-900 rounded-lg border border-slate-800"></canvas>
+          <div id="scratch-canvas-container" class="relative w-full h-48 rounded-lg border border-slate-800 overflow-hidden bg-slate-900">
+            <canvas id="scratch-canvas" class="scratch-pad w-full h-full block"></canvas>
+            <!-- 消しゴム範囲の可視化ガイドリング -->
+            <div id="eraser-cursor-ring" class="hidden pointer-events-none fixed rounded-full border-2 border-rose-400 bg-rose-400/20 shadow-[0_0_8px_rgba(251,113,133,0.4)] -translate-x-1/2 -translate-y-1/2 z-50"></div>
+          </div>
         </div>
 
         <!-- Question Area -->
@@ -496,7 +506,7 @@
             <label class="block text-xs font-semibold text-slate-300 mb-1">
               GAS Web App URL <span class="ml-1.5 px-2 py-0.5 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded"><i class="fa-solid fa-lock mr-1"></i>固定済み</span>
             </label>
-            <input type="text" id="gas-url-input" value="https://script.google.com/macros/s/AKfycbxG7oCIRzPEysQ6FahTD_fkXusPgJgOdtK-W-q5ufNsFAwP4az-7Ul_rMUTQ-sD-gqGDg/exec" readonly class="w-full bg-slate-900/80 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm rounded-xl p-2.5 focus:outline-none font-mono cursor-not-allowed select-all">
+            <input type="text" id="gas-url-input" value="https://script.google.com/macros/s/AKfycbz16RPGJ-Zz0_9sI5rn3hBW5T9e2w_RTEpj9M6xDJsQYfcI50TEDyyNz-dfLmW0cNoliw/exec" readonly class="w-full bg-slate-900/80 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm rounded-xl p-2.5 focus:outline-none font-mono cursor-not-allowed select-all">
           </div>
         </div>
 
@@ -509,14 +519,31 @@
 
       <!-- 問題データの全端末共有・入出力パネル -->
       <div class="bg-slate-800 border border-indigo-500/40 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
-        <div class="flex items-center space-x-2 border-b border-slate-700 pb-3">
-          <div class="p-2 bg-indigo-500/20 text-indigo-300 rounded-lg">
-            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3 flex-wrap gap-2">
+          <div class="flex items-center space-x-2">
+            <div class="p-2 bg-indigo-500/20 text-indigo-300 rounded-lg">
+              <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">スプレッドシート連携問題共有・全端末自動同期</h3>
+              <p class="text-xs text-slate-400">Google スプレッドシートに問題データを一括バックアップ（図形画像も圧縮して自動保存）</p>
+            </div>
           </div>
-          <div>
-            <h3 class="text-base font-bold text-white">スプレッドシート連携問題共有・全端末自動同期</h3>
-            <p class="text-xs text-slate-400">Google スプレッドシートに問題データを一括バックアップ（図形画像も圧縮して自動保存）</p>
+          <!-- 端末内とクラウド上の問題数比較ステータス -->
+          <div class="flex items-center space-x-2 text-xs bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-700">
+            <span class="text-slate-400">この端末: <strong id="sync-local-count" class="text-indigo-300">0</strong>問</span>
+            <span class="text-slate-600">/</span>
+            <span class="text-slate-400">シート側: <strong id="sync-cloud-count" class="text-emerald-300">未確認</strong></span>
           </div>
+        </div>
+
+        <!-- 同期不一致時の安全保護警告バナー -->
+        <div id="sync-mismatch-banner" class="hidden p-3.5 bg-amber-950/60 border border-amber-500/60 rounded-xl text-xs text-amber-200 space-y-1.5">
+          <div class="font-bold text-amber-300 flex items-center space-x-1.5">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>端末内の問題データ保護のため自動上書きを停止しました</span>
+          </div>
+          <p id="sync-mismatch-msg" class="text-[11px] text-slate-200 leading-relaxed"></p>
         </div>
         
         <div class="flex flex-wrap gap-3">
@@ -525,7 +552,7 @@
             <span>現在の問題をスプレッドシートへ保存</span>
           </button>
           
-          <button onclick="syncQuestionsFromCloud()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
+          <button onclick="syncQuestionsFromCloud(true)" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center space-x-2">
             <i class="fa-solid fa-cloud-arrow-down"></i>
             <span>スプレッドシートから最新問題を取得・同期</span>
           </button>
@@ -1181,7 +1208,7 @@
     }
 
     // GAS Web App URL の固定設定
-    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbxG7oCIRzPEysQ6FahTD_fkXusPgJgOdtK-W-q5ufNsFAwP4az-7Ul_rMUTQ-sD-gqGDg/exec";
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbz16RPGJ-Zz0_9sI5rn3hBW5T9e2w_RTEpj9M6xDJsQYfcI50TEDyyNz-dfLmW0cNoliw/exec";
 
     // GAS用テンプレートコード (スプレッドシート完全連携：40,000文字自動分割・画像データ対応)
     const GAS_TEMPLATE_CODE = `function doGet(e) {
@@ -1388,6 +1415,7 @@ function responseJSON(obj) {
     let cropStartPoint = { x: 0, y: 0 };
 
     let scratchCanvas, scratchCtx, isDrawing = false, scratchMode = 'pen';
+    let scratchEraserSize = 24;
 
     window.addEventListener('DOMContentLoaded', async () => {
       loadStoredData();
@@ -1398,7 +1426,7 @@ function responseJSON(obj) {
       refreshAllTaxonomyUI();
       updateAnalyticsView();
 
-      await syncQuestionsFromCloud();
+      await syncQuestionsFromCloud(false);
     });
 
     function renderMath(element) {
@@ -1465,7 +1493,6 @@ function responseJSON(obj) {
       try {
         return JSON.parse(cleaned);
       } catch (e1) {
-        // AIが \frac, \theta, \sqrt 等を単一バックスラッシュで出力した場合のJSONエスケープ崩壊を復元
         const protectedStr = cleaned.replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
         return JSON.parse(protectedStr);
       }
@@ -1572,6 +1599,9 @@ function responseJSON(obj) {
     }
 
     function refreshAllTaxonomyUI() {
+      const localCountEl = document.getElementById('sync-local-count');
+      if (localCountEl) localCountEl.textContent = questions.length;
+
       updateUnitSelectOptions();
       updateTagSelectOptions();
       updateTaxonomyDatalists();
@@ -1989,7 +2019,6 @@ function responseJSON(obj) {
             if (Array.isArray(parsed)) {
               for (let idx = 0; idx < parsed.length; idx++) {
                 const q = normalizeQuestionMath(parsed[idx]);
-                // 重複を防ぐため固有IDを強制採番
                 q.id = `q_ai_${Date.now()}_p${i + 1}_${idx}_${Math.random().toString(36).slice(2, 7)}`;
                 q.tag = lessonTag;
                 q.figureImage = null;
@@ -2091,26 +2120,108 @@ function responseJSON(obj) {
     // クラウド同期・ローカルJSON入出力
     // =========================================================================
 
-    async function syncQuestionsFromCloud() {
+    function updateCloudSyncStatusDisplay(cloudCount, mismatchMessage = "") {
+      const cloudCountEl = document.getElementById('sync-cloud-count');
+      if (cloudCountEl && typeof cloudCount === 'number') {
+        cloudCountEl.textContent = `${cloudCount}問`;
+      }
+      const banner = document.getElementById('sync-mismatch-banner');
+      const msgEl = document.getElementById('sync-mismatch-msg');
+      if (banner && msgEl) {
+        if (mismatchMessage) {
+          msgEl.textContent = mismatchMessage;
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
+    }
+
+    async function syncQuestionsFromCloud(manualTrigger = false) {
       const gasUrl = document.getElementById('gas-url-input').value.trim() || DEFAULT_GAS_URL;
       if (!gasUrl) return;
 
       try {
-        showToast("スプレッドシートから問題を自動同期中...", false);
-        const res = await fetch(`${gasUrl}?action=get_questions`);
-        if (res.ok) {
-          const cloudQuestions = await res.json();
-          if (Array.isArray(cloudQuestions) && cloudQuestions.length > 0) {
-            questions = cloudQuestions.map(q => normalizeQuestionMath(q));
-            ensureUniqueQuestionIds();
-            localStorage.setItem('math_app_questions', JSON.stringify(questions));
-            refreshAllTaxonomyUI();
-            showToast(`スプレッドシートから ${questions.length} 問の問題を同期しました！`);
-          }
+        if (manualTrigger) {
+          showToast("スプレッドシートから問題を読み込み中...", false);
         }
+        const res = await fetch(`${gasUrl}?action=get_questions`);
+        if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
+
+        const cloudQuestions = await res.json();
+        if (!Array.isArray(cloudQuestions)) return;
+
+        updateCloudSyncStatusDisplay(cloudQuestions.length);
+
+        if (cloudQuestions.length === 0) {
+          if (manualTrigger) {
+            showToast("スプレッドシート側に保存されている問題はまだ0問です", true);
+          }
+          return;
+        }
+
+        const isLocalDefaultOnly =
+          questions.length === 0 ||
+          (questions.length === 1 && questions[0].id === "q_preset_1");
+
+        const applyCloudData = () => {
+          questions = cloudQuestions.map(q => normalizeQuestionMath(q));
+          ensureUniqueQuestionIds();
+          selectedAdminQuestionIds.clear();
+          localStorage.setItem('math_app_questions', JSON.stringify(questions));
+          updateCloudSyncStatusDisplay(cloudQuestions.length, "");
+          refreshAllTaxonomyUI();
+          showToast(`✓ スプレッドシートから ${questions.length} 問の問題を同期しました！`);
+        };
+
+        // 起動時の自動同期で、手元に未保存のローカル問題がある場合は勝手に上書きしない
+        if (!manualTrigger && !isLocalDefaultOnly && questions.length !== cloudQuestions.length) {
+          const warnMsg = `この端末には ${questions.length} 問保存されていますが、スプレッドシート上は ${cloudQuestions.length} 問です。未送信データを保護するため自動上書きをスキップしました。手元の ${questions.length} 問を反映したい場合は「現在の問題をスプレッドシートへ保存」を押してください。`;
+          updateCloudSyncStatusDisplay(cloudQuestions.length, warnMsg);
+          showToast(`⚠️ 端末内(${questions.length}問)とシート(${cloudQuestions.length}問)の件数が異なるため自動上書きを保留しました`, true);
+          return;
+        }
+
+        // 手動同期ボタンを押した際も、ローカルの件数の方がクラウドより多い場合は確認ダイアログを出す
+        if (manualTrigger && !isLocalDefaultOnly && questions.length > cloudQuestions.length) {
+          showConfirm(
+            "クラウドデータで上書き同期しますか？",
+            `現在この端末には ${questions.length} 問ありますが、スプレッドシート上は ${cloudQuestions.length} 問しかありません。同期するとこの端末の差分データが失われます。実行しますか？`,
+            applyCloudData
+          );
+          return;
+        }
+
+        applyCloudData();
       } catch (e) {
         console.warn("Cloud sync skipped or offline:", e);
+        if (manualTrigger) {
+          showErrorModal("スプレッドシート同期エラー:\n" + e.message);
+        }
       }
+    }
+
+    async function verifySpreadsheetSavedCount(gasUrl, expectedCount) {
+      const checkRes = await fetch(`${gasUrl}?action=get_questions`);
+      if (!checkRes.ok) {
+        throw new Error(`保存後の件数確認に失敗しました (HTTP ${checkRes.status})`);
+      }
+      const savedList = await checkRes.json();
+      const actualCount = Array.isArray(savedList) ? savedList.length : -1;
+      updateCloudSyncStatusDisplay(actualCount >= 0 ? actualCount : 0);
+
+      if (actualCount !== expectedCount) {
+        throw new Error(
+          `送信した問題数（${expectedCount} 問）と、実際にスプレッドシートへ保存された問題数（${actualCount} 問）が一致しません。\n\n` +
+          `【原因と対処法】\n` +
+          `Googleスプレッドシート側の Apps Script（GAS）が古いバージョンのままデプロイされているため、分割保存データが受け取れていません。\n` +
+          `1. 管理画面の「GASコードを表示」から最新コードをコピー\n` +
+          `2. スプレッドシートの「拡張機能 ＞ Apps Script」に貼り付けて保存\n` +
+          `3. 右上の「デプロイ ＞ デプロイを管理 ＞ 鉛筆アイコン ＞ バージョン：新バージョン ＞ デプロイ」を実行\n` +
+          `その後、もう一度「現在の問題をスプレッドシートへ保存」を押してください。`
+        );
+      }
+      updateCloudSyncStatusDisplay(actualCount, "");
     }
 
     async function uploadQuestionsToCloud() {
@@ -2135,11 +2246,11 @@ function responseJSON(obj) {
           });
           if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
           const resData = await res.json();
-          if (resData.status === "success") {
-            showToast(`✓ スプレッドシートへ ${questions.length} 問のデータを保存しました！`);
-          } else {
-            showErrorModal("GASエラー: " + (resData.message || "保存中にエラーが発生しました"));
+          if (resData.status !== "success") {
+            throw new Error(resData.message || "保存中にエラーが発生しました");
           }
+          await verifySpreadsheetSavedCount(gasUrl, questions.length);
+          showToast(`✓ スプレッドシートへ ${questions.length} 問の保存・反映を確認しました！`);
           return;
         }
 
@@ -2177,13 +2288,15 @@ function responseJSON(obj) {
           if (!res.ok) throw new Error(`HTTPエラー (${pIdx + 1}/${packets.length}): ${res.status}`);
           const resData = await res.json();
           if (resData.status !== "success") {
-            throw new Error(resData.message || "GAS側で保存エラーが発生しました（最新のGASコードがデプロイされているかご確認ください）");
+            throw new Error(resData.message || "GAS側で保存エラーが発生しました");
           }
         }
 
-        showToast(`✓ スプレッドシートへ全 ${questions.length} 問（${packets.length}分割）の保存が完了しました！`);
+        showToast("スプレッドシート側の保存件数を検証中...");
+        await verifySpreadsheetSavedCount(gasUrl, questions.length);
+        showToast(`✓ スプレッドシートへ全 ${questions.length} 問（${packets.length}分割）の保存・反映を確認しました！`);
       } catch (e) {
-        showErrorModal("【スプレッドシート保存エラー】\n" + e.message + "\n\n※ 画像付き問題を保存する場合は、管理画面の「GASコードを表示」から最新コードをコピーし、Apps Script側で「新バージョン」として再デプロイしてください。");
+        showErrorModal("【スプレッドシート保存エラー】\n" + e.message);
       }
     }
 
@@ -2236,8 +2349,33 @@ function responseJSON(obj) {
     }
 
     // =========================================================================
-    // 手書き計算メモパッド
+    // 手書き計算メモパッド（消しゴムサイズ調整＆ガイドリング可視化対応）
     // =========================================================================
+
+    function updateEraserSize(val) {
+      scratchEraserSize = parseInt(val, 10) || 24;
+      const label = document.getElementById('scratch-eraser-size-label');
+      if (label) label.textContent = `${scratchEraserSize}px`;
+      const ring = document.getElementById('eraser-cursor-ring');
+      if (ring) {
+        ring.style.width = `${scratchEraserSize}px`;
+        ring.style.height = `${scratchEraserSize}px`;
+      }
+    }
+
+    function updateEraserCursorPosition(clientX, clientY, visible = true) {
+      const ring = document.getElementById('eraser-cursor-ring');
+      if (!ring) return;
+      if (scratchMode !== 'eraser' || !visible) {
+        ring.classList.add('hidden');
+        return;
+      }
+      ring.style.width = `${scratchEraserSize}px`;
+      ring.style.height = `${scratchEraserSize}px`;
+      ring.style.left = `${clientX}px`;
+      ring.style.top = `${clientY}px`;
+      ring.classList.remove('hidden');
+    }
 
     function initScratchpad() {
       scratchCanvas = document.getElementById('scratch-canvas');
@@ -2245,13 +2383,26 @@ function responseJSON(obj) {
       scratchCtx = scratchCanvas.getContext('2d');
       resizeScratchCanvas();
 
-      scratchCanvas.addEventListener('mousedown', startDraw);
-      scratchCanvas.addEventListener('mousemove', draw);
+      scratchCanvas.addEventListener('mousedown', (e) => {
+        updateEraserCursorPosition(e.clientX, e.clientY, true);
+        startDraw(e);
+      });
+      scratchCanvas.addEventListener('mousemove', (e) => {
+        updateEraserCursorPosition(e.clientX, e.clientY, true);
+        draw(e);
+      });
+      scratchCanvas.addEventListener('mouseenter', (e) => {
+        updateEraserCursorPosition(e.clientX, e.clientY, true);
+      });
       scratchCanvas.addEventListener('mouseup', stopDraw);
-      scratchCanvas.addEventListener('mouseleave', stopDraw);
+      scratchCanvas.addEventListener('mouseleave', () => {
+        updateEraserCursorPosition(0, 0, false);
+        stopDraw();
+      });
 
       scratchCanvas.addEventListener('touchstart', (e) => {
         const touch = e.touches[0];
+        updateEraserCursorPosition(touch.clientX, touch.clientY, true);
         const mouseEvent = new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY });
         scratchCanvas.dispatchEvent(mouseEvent);
         e.preventDefault();
@@ -2259,25 +2410,50 @@ function responseJSON(obj) {
 
       scratchCanvas.addEventListener('touchmove', (e) => {
         const touch = e.touches[0];
+        updateEraserCursorPosition(touch.clientX, touch.clientY, true);
         const mouseEvent = new MouseEvent("mousemove", { clientX: touch.clientX, clientY: touch.clientY });
         scratchCanvas.dispatchEvent(mouseEvent);
         e.preventDefault();
       }, { passive: false });
 
-      scratchCanvas.addEventListener('touchend', stopDraw);
+      scratchCanvas.addEventListener('touchend', () => {
+        updateEraserCursorPosition(0, 0, false);
+        stopDraw();
+      });
+      scratchCanvas.addEventListener('touchcancel', () => {
+        updateEraserCursorPosition(0, 0, false);
+        stopDraw();
+      });
     }
 
     function resizeScratchCanvas() {
       if (!scratchCanvas) return;
+      const tempImg = scratchCanvas.width > 0 && scratchCanvas.height > 0 ? scratchCanvas.toDataURL() : null;
       scratchCanvas.width = scratchCanvas.clientWidth || 600;
       scratchCanvas.height = scratchCanvas.clientHeight || 200;
+      if (tempImg) {
+        const img = new Image();
+        img.onload = () => scratchCtx.drawImage(img, 0, 0);
+        img.src = tempImg;
+      }
     }
 
     function startDraw(e) {
       isDrawing = true;
       const rect = scratchCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
       scratchCtx.beginPath();
-      scratchCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+      scratchCtx.moveTo(x, y);
+
+      // クリック/タップした瞬間にもその範囲を消去・描画できるようにする
+      scratchCtx.lineWidth = scratchMode === 'eraser' ? scratchEraserSize : 2;
+      scratchCtx.strokeStyle = scratchMode === 'eraser' ? '#0f172a' : '#818cf8';
+      scratchCtx.lineCap = 'round';
+      scratchCtx.lineJoin = 'round';
+      scratchCtx.lineTo(x + 0.01, y + 0.01);
+      scratchCtx.stroke();
     }
 
     function draw(e) {
@@ -2286,9 +2462,10 @@ function responseJSON(obj) {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      scratchCtx.lineWidth = scratchMode === 'eraser' ? 16 : 2;
+      scratchCtx.lineWidth = scratchMode === 'eraser' ? scratchEraserSize : 2;
       scratchCtx.strokeStyle = scratchMode === 'eraser' ? '#0f172a' : '#818cf8';
       scratchCtx.lineCap = 'round';
+      scratchCtx.lineJoin = 'round';
       scratchCtx.lineTo(x, y);
       scratchCtx.stroke();
     }
@@ -2298,13 +2475,31 @@ function responseJSON(obj) {
     function toggleScratchpad() {
       const wrapper = document.getElementById('scratchpad-wrapper');
       wrapper.classList.toggle('hidden');
-      if (!wrapper.classList.contains('hidden')) resizeScratchCanvas();
+      if (!wrapper.classList.contains('hidden')) {
+        resizeScratchCanvas();
+      } else {
+        updateEraserCursorPosition(0, 0, false);
+      }
     }
 
     function setScratchMode(mode) {
       scratchMode = mode;
-      document.getElementById('scratch-pen-btn').className = mode === 'pen' ? 'px-2 py-1 bg-indigo-600 text-white rounded text-[11px]' : 'px-2 py-1 bg-slate-700 text-slate-300 rounded text-[11px]';
-      document.getElementById('scratch-eraser-btn').className = mode === 'eraser' ? 'px-2 py-1 bg-indigo-600 text-white rounded text-[11px]' : 'px-2 py-1 bg-slate-700 text-slate-300 rounded text-[11px]';
+      document.getElementById('scratch-pen-btn').className = mode === 'pen' ? 'px-2.5 py-1 bg-indigo-600 text-white rounded text-[11px] font-medium transition-colors' : 'px-2.5 py-1 bg-slate-700 text-slate-300 rounded text-[11px] font-medium transition-colors';
+      document.getElementById('scratch-eraser-btn').className = mode === 'eraser' ? 'px-2.5 py-1 bg-rose-600 text-white rounded text-[11px] font-medium transition-colors' : 'px-2.5 py-1 bg-slate-700 text-slate-300 rounded text-[11px] font-medium transition-colors';
+
+      const sizeControl = document.getElementById('eraser-size-control');
+      if (sizeControl) {
+        if (mode === 'eraser') {
+          sizeControl.classList.remove('hidden');
+          sizeControl.classList.add('flex');
+          scratchCanvas.style.cursor = 'none';
+        } else {
+          sizeControl.classList.add('hidden');
+          sizeControl.classList.remove('flex');
+          scratchCanvas.style.cursor = 'crosshair';
+          updateEraserCursorPosition(0, 0, false);
+        }
+      }
     }
 
     function clearScratchpad() {
